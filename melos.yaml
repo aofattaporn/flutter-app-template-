@@ -1,0 +1,76 @@
+name: ingre_note_workspace
+repository: https://github.com/your-org/ingre_note
+
+packages:
+  - apps/*
+  - packages/*
+
+command:
+  version:
+    linkToCommits: true
+    workspaceChangelog: true
+
+  bootstrap:
+    usePubspecOverrides: true
+    runPubGetInParallel: true
+
+scripts:
+  # ─────────────────────────────────────────────────────────────
+  # Analysis & Formatting
+  # ─────────────────────────────────────────────────────────────
+  analyze:
+    description: Run dart analyze in all packages
+    run: melos exec -- dart analyze .
+
+  format:
+    description: Format all packages
+    run: melos exec -- dart format .
+
+  format:check:
+    description: Check formatting in all packages
+    run: melos exec -- dart format --set-exit-if-changed .
+
+  # ─────────────────────────────────────────────────────────────
+  # Code Generation
+  # ─────────────────────────────────────────────────────────────
+  generate:
+    description: Run build_runner in all packages
+    run: melos exec -- dart run build_runner build --delete-conflicting-outputs
+    packageFilters:
+      dependsOn: build_runner
+
+  generate:watch:
+    description: Run build_runner watch in all packages
+    run: melos exec -- dart run build_runner watch --delete-conflicting-outputs
+    packageFilters:
+      dependsOn: build_runner
+
+  # ─────────────────────────────────────────────────────────────
+  # Testing
+  # ─────────────────────────────────────────────────────────────
+  test:
+    description: Run tests in all packages
+    run: melos exec -- flutter test
+    packageFilters:
+      dirExists: test
+
+  test:coverage:
+    description: Run tests with coverage
+    run: melos exec -- flutter test --coverage
+    packageFilters:
+      dirExists: test
+
+  # ─────────────────────────────────────────────────────────────
+  # Cleaning
+  # ─────────────────────────────────────────────────────────────
+  clean:
+    description: Clean all packages
+    run: melos exec -- flutter clean
+
+  clean:deep:
+    description: Deep clean including generated files
+    run: |
+      melos exec -- flutter clean
+      melos exec -- rm -rf pubspec.lock
+      melos exec -- rm -rf .dart_tool
+      melos exec -- rm -rf build

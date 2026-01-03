@@ -1,0 +1,65 @@
+name: app_template
+description: "App Template - Clean Architecture Flutter Starter Template."
+
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ─────────────────────────────────────────────────────────────
+  # Local Packages (Design System only - core/domain/data are in lib/)
+  # ─────────────────────────────────────────────────────────────
+  budgetwise_design_system:
+    path: ../../packages/design_system_template
+
+  cupertino_icons: ^1.0.8
+
+  # ─────────────────────────────────────────────────────────────
+  # Core dependencies (used by lib/core, lib/data, lib/domain)
+  # ─────────────────────────────────────────────────────────────
+  dio: ^5.4.0
+  dartz: ^0.10.1
+  equatable: ^2.0.5
+  logger: ^2.0.2+1
+  connectivity_plus: ^6.0.3
+  shared_preferences: ^2.2.2
+  supabase_flutter: ^2.3.4
+
+  # ─────────────────────────────────────────────────────────────
+  # State Management
+  # ─────────────────────────────────────────────────────────────
+  flutter_riverpod: ^2.4.1
+
+  # ─────────────────────────────────────────────────────────────
+  # Dependency Injection
+  # ─────────────────────────────────────────────────────────────
+  get_it: ^8.2.0
+  injectable: ^2.3.0
+
+  # ─────────────────────────────────────────────────────────────
+  # Navigation
+  # ─────────────────────────────────────────────────────────────
+  go_router: ^14.0.0
+
+  # ─────────────────────────────────────────────────────────────
+  # Env / Config
+  # ─────────────────────────────────────────────────────────────
+  flutter_dotenv: ^5.0.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.8
+  injectable_generator: ^2.4.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - .env

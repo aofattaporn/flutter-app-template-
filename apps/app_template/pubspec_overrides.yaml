@@ -1,0 +1,4 @@
+# melos_managed_dependency_overrides: budgetwise_design_system
+dependency_overrides:
+  budgetwise_design_system:
+    path: ../../packages/design_system_template

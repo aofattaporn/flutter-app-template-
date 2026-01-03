@@ -1,0 +1,35 @@
+# ---- Flutter / Dart ----
+.dart_tool/
+.packages
+.pub-cache/
+build/
+coverage/
+
+# ---- Flutter iOS ----
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/.symlinks/
+ios/Pods/
+ios/Podfile.lock
+
+# ---- Flutter Android ----
+android/.gradle/
+android/app/build/
+*.keystore
+*.jks
+
+# ---- IDE / Editor ----
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+
+# ---- Melos / Workspace ----
+melos_ingre_note_app_workspace.iml
+pubspec.lock   # (root ของ workspace ควร ignore, แต่ **แต่ละ package/app เก็บได้**)
+
+# ---- System ----
+.DS_Store
+Thumbs.db
