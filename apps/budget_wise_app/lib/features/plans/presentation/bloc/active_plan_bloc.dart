@@ -1,0 +1,189 @@
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../domain/entities/plan.dart';
+import '../../../../domain/entities/plan_item.dart';
+import '../../../../domain/repositories/plan_repository.dart';
+
+part 'active_plan_event.dart';
+part 'active_plan_state.dart';
+
+/// BLoC for managing active plan state
+class ActivePlanBloc extends Bloc<ActivePlanEvent, ActivePlanState> {
+  final PlanRepository _planRepository;
+
+  ActivePlanBloc({
+    required PlanRepository planRepository,
+  })  : _planRepository = planRepository,
+        super(const ActivePlanState()) {
+    on<LoadActivePlan>(_onLoadActivePlan);
+    on<RefreshActivePlan>(_onRefreshActivePlan);
+    on<CloseActivePlanRequested>(_onCloseActivePlan);
+    on<AddPlanItemRequested>(_onAddPlanItem);
+    on<DeletePlanItemRequested>(_onDeletePlanItem);
+    on<UpdatePlanItemRequested>(_onUpdatePlanItem);
+  }
+
+  Future<void> _onLoadActivePlan(
+    LoadActivePlan event,
+    Emitter<ActivePlanState> emit,
+  ) async {
+    emit(state.copyWith(status: ActivePlanStatus.loading));
+
+    try {
+      final plan = await _planRepository.getActivePlan();
+      
+      if (plan == null) {
+        emit(state.copyWith(
+          status: ActivePlanStatus.loaded,
+          plan: null,
+          planItems: [],
+        ));
+        return;
+      }
+
+      final planItems = await _planRepository.getPlanItems(plan.id);
+      final actualIncome = await _planRepository.getActualIncome(plan.id);
+
+      emit(state.copyWith(
+        status: ActivePlanStatus.loaded,
+        plan: plan,
+        planItems: planItems,
+        actualIncome: actualIncome,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        status: ActivePlanStatus.error,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  Future<void> _onRefreshActivePlan(
+    RefreshActivePlan event,
+    Emitter<ActivePlanState> emit,
+  ) async {
+    // Don't show loading state for refresh
+    try {
+      final plan = await _planRepository.getActivePlan();
+      
+      if (plan == null) {
+        emit(state.copyWith(
+          status: ActivePlanStatus.loaded,
+          plan: null,
+          planItems: [],
+        ));
+        return;
+      }
+
+      final planItems = await _planRepository.getPlanItems(plan.id);
+      final actualIncome = await _planRepository.getActualIncome(plan.id);
+
+      emit(state.copyWith(
+        status: ActivePlanStatus.loaded,
+        plan: plan,
+        planItems: planItems,
+        actualIncome: actualIncome,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        status: ActivePlanStatus.error,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  Future<void> _onCloseActivePlan(
+    CloseActivePlanRequested event,
+    Emitter<ActivePlanState> emit,
+  ) async {
+    if (state.plan == null) return;
+
+    try {
+      await _planRepository.closePlan(state.plan!.id);
+      
+      emit(state.copyWith(
+        status: ActivePlanStatus.loaded,
+        plan: null,
+        planItems: [],
+        actualIncome: 0,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        status: ActivePlanStatus.error,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  Future<void> _onAddPlanItem(
+    AddPlanItemRequested event,
+    Emitter<ActivePlanState> emit,
+  ) async {
+    if (state.plan == null) return;
+
+    try {
+      final newItem = await _planRepository.addPlanItem(
+        planId: state.plan!.id,
+        name: event.name,
+        expectedAmount: event.expectedAmount,
+      );
+
+      emit(state.copyWith(
+        planItems: [...state.planItems, newItem],
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        status: ActivePlanStatus.error,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  Future<void> _onDeletePlanItem(
+    DeletePlanItemRequested event,
+    Emitter<ActivePlanState> emit,
+  ) async {
+    try {
+      await _planRepository.deletePlanItem(event.itemId);
+
+      emit(state.copyWith(
+        planItems: state.planItems.where((item) => item.id != event.itemId).toList(),
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        status: ActivePlanStatus.error,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  Future<void> _onUpdatePlanItem(
+    UpdatePlanItemRequested event,
+    Emitter<ActivePlanState> emit,
+  ) async {
+    try {
+      final existingItem = state.planItems.firstWhere(
+        (item) => item.id == event.itemId,
+      );
+
+      final updatedItem = existingItem.copyWith(
+        name: event.name,
+        expectedAmount: event.expectedAmount,
+      );
+
+      final result = await _planRepository.updatePlanItem(updatedItem);
+
+      emit(state.copyWith(
+        planItems: state.planItems.map((item) {
+          return item.id == event.itemId ? result : item;
+        }).toList(),
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        status: ActivePlanStatus.error,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+}

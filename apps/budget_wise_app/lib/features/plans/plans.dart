@@ -1,4 +1,4 @@
 /// Plans feature barrel file
 library;
 
-export 'presentation/pages/plans_placeholder_page.dart';
+export 'presentation/plans_presentation.dart';
