@@ -1,0 +1,182 @@
+                <html>
+                <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <script>
+                        window.FontAwesomeConfig = {
+                            autoReplaceSvg: 'nest', // Options: 'nest', 'remove', 'replace'
+                        };
+                    </script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                    <style>
+                    </style>
+                    <script>
+                    tailwind.config = {
+                    theme: {
+                        extend: {
+                        colors: {
+                            primary: {"50":"#fafafa","100":"#f5f5f5","200":"#e5e5e5","300":"#d4d4d4","400":"#a3a3a3","500":"#737373","600":"#525252","700":"#404040","800":"#262626","900":"#171717","950":"#0a0a0a"}
+                        }
+                        }
+                    }
+                    }
+                </script>
+                </head>
+
+                <body>
+                        <div id="mobile-accounts-list" class="w-full max-w-[375px] mx-auto bg-white min-h-[840px]">
+  <!-- Header -->
+  <header id="header" class="flex items-center justify-between p-5 border-b border-neutral-200 bg-[#4D648D]">
+    <h1 class="text-lg text-white">Accounts</h1>
+    <button class="p-2 -mr-2">
+      <i class="fa-solid fa-plus text-xl text-white"></i>
+    </button>
+  </header>
+
+  <!-- Total Balance Summary -->
+  <section id="total-balance" class="p-5 bg-neutral-50 border-b border-neutral-200">
+    <div class="bg-white border border-neutral-200 rounded-lg p-5">
+      <p class="text-xs text-neutral-600 mb-2">Total Balance</p>
+      <p class="text-3xl text-neutral-900">฿42,350.00</p>
+      <p class="text-xs text-neutral-500 mt-2">Across 4 accounts</p>
+    </div>
+  </section>
+
+  <!-- Accounts List -->
+  <main id="main-content" class="pb-32">
+    <div class="px-5 py-3 border-b border-neutral-100">
+      <h3 class="text-sm text-neutral-600">Your Accounts</h3>
+    </div>
+
+    <div class="px-5 py-2 space-y-3">
+      <!-- Bank Account 1 -->
+      <div class="bg-white border border-neutral-200 rounded-lg p-4">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex items-center flex-1">
+            <div class="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center mr-3">
+              <i class="fa-solid fa-university text-neutral-600 text-lg"></i>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-base text-neutral-900 mb-1">SCB Main Account</h3>
+              <p class="text-xs text-neutral-500">Bank Account</p>
+            </div>
+          </div>
+          <button class="p-2 -mr-2">
+            <i class="fa-solid fa-ellipsis-vertical text-neutral-400"></i>
+          </button>
+        </div>
+        <div class="border-t border-neutral-200 pt-3 flex items-center justify-between">
+          <p class="text-xs text-neutral-600">Balance</p>
+          <p class="text-xl text-neutral-900">฿15,850.00</p>
+        </div>
+      </div>
+
+      <!-- Cash Account -->
+      <div class="bg-white border border-neutral-200 rounded-lg p-4">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex items-center flex-1">
+            <div class="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center mr-3">
+              <i class="fa-solid fa-money-bill-wave text-neutral-600 text-lg"></i>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-base text-neutral-900 mb-1">Cash on Hand</h3>
+              <p class="text-xs text-neutral-500">Cash</p>
+            </div>
+          </div>
+          <button class="p-2 -mr-2">
+            <i class="fa-solid fa-ellipsis-vertical text-neutral-400"></i>
+          </button>
+        </div>
+        <div class="border-t border-neutral-200 pt-3 flex items-center justify-between">
+          <p class="text-xs text-neutral-600">Balance</p>
+          <p class="text-xl text-neutral-900">฿3,200.00</p>
+        </div>
+      </div>
+
+      <!-- E-Wallet Account -->
+      <div class="bg-white border border-neutral-200 rounded-lg p-4">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex items-center flex-1">
+            <div class="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center mr-3">
+              <i class="fa-solid fa-wallet text-neutral-600 text-lg"></i>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-base text-neutral-900 mb-1">TrueMoney Wallet</h3>
+              <p class="text-xs text-neutral-500">E-Wallet</p>
+            </div>
+          </div>
+          <button class="p-2 -mr-2">
+            <i class="fa-solid fa-ellipsis-vertical text-neutral-400"></i>
+          </button>
+        </div>
+        <div class="border-t border-neutral-200 pt-3 flex items-center justify-between">
+          <p class="text-xs text-neutral-600">Balance</p>
+          <p class="text-xl text-neutral-900">฿1,450.00</p>
+        </div>
+      </div>
+
+      <!-- Bank Account 2 -->
+      <div class="bg-white border border-neutral-200 rounded-lg p-4">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex items-center flex-1">
+            <div class="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center mr-3">
+              <i class="fa-solid fa-university text-neutral-600 text-lg"></i>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-base text-neutral-900 mb-1">Kbank Savings</h3>
+              <p class="text-xs text-neutral-500">Bank Account</p>
+            </div>
+          </div>
+          <button class="p-2 -mr-2">
+            <i class="fa-solid fa-ellipsis-vertical text-neutral-400"></i>
+          </button>
+        </div>
+        <div class="border-t border-neutral-200 pt-3 flex items-center justify-between">
+          <p class="text-xs text-neutral-600">Balance</p>
+          <p class="text-xl text-neutral-900">฿21,850.00</p>
+        </div>
+      </div>
+
+      <!-- Add Account Button -->
+      <div class="pt-4">
+        <button class="w-full bg-white border-2 border-dashed border-neutral-300 rounded-lg py-6 text-sm text-neutral-600 flex flex-col items-center justify-center">
+          <i class="fa-solid fa-plus text-2xl mb-2 text-neutral-400"></i>
+          <span>Add New Account</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation Bar -->
+  <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 max-w-[375px] mx-auto bg-white border-t border-neutral-200">
+    <div class="flex items-center justify-around py-2">
+      <button class="flex flex-col items-center p-2 text-neutral-400">
+        <i class="fa-solid fa-home text-lg mb-1"></i>
+        <span class="text-xs">Home</span>
+      </button>
+      <button class="flex flex-col items-center p-2 text-neutral-400">
+        <i class="fa-solid fa-list-check text-lg mb-1"></i>
+        <span class="text-xs">Plans</span>
+      </button>
+      <button class="flex flex-col items-center p-2 text-neutral-400">
+        <i class="fa-solid fa-receipt text-lg mb-1"></i>
+        <span class="text-xs">Transactions</span>
+      </button>
+      <button class="flex flex-col items-center p-2 text-[#4D648D]">
+        <i class="fa-solid fa-wallet text-lg mb-1"></i>
+        <span class="text-xs">Accounts</span>
+      </button>
+      <button class="flex flex-col items-center p-2 text-neutral-400">
+        <i class="fa-solid fa-gear text-lg mb-1"></i>
+        <span class="text-xs">More</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Floating Add Button -->
+  <button id="fab-add" class="fixed bottom-20 right-5 w-14 h-14 bg-[#4D648D] text-white rounded-full shadow-lg flex items-center justify-center">
+    <i class="fa-solid fa-plus text-xl"></i>
+  </button>
+</div>
+                        </body>
+                        </html>

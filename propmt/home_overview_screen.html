@@ -1,0 +1,145 @@
+
+                <html>
+                <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <script>
+                        window.FontAwesomeConfig = {
+                            autoReplaceSvg: 'nest', // Options: 'nest', 'remove', 'replace'
+                        };
+                    </script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                    <style>
+                    </style>
+                    <script>
+                    tailwind.config = {
+                    theme: {
+                        extend: {
+                        colors: {
+                            primary: {"50":"#fafafa","100":"#f5f5f5","200":"#e5e5e5","300":"#d4d4d4","400":"#a3a3a3","500":"#737373","600":"#525252","700":"#404040","800":"#262626","900":"#171717","950":"#0a0a0a"}
+                        }
+                        }
+                    }
+                    }
+                </script>
+                </head>
+
+                <body>
+                        <div id="mobile-create-transaction" class="w-full max-w-[375px] mx-auto bg-white">
+  <!-- Header -->
+  <header id="header" class="flex items-center justify-between p-5 border-b border-neutral-200 bg-[#4D648D]">
+    <button class="p-2 -ml-2">
+      <i class="fa-solid fa-arrow-left text-xl text-white"></i>
+    </button>
+    <h1 class="text-lg text-white">Create Transaction</h1>
+    <div class="w-10"></div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content" class="p-5 pb-32">
+    <!-- Transaction Type Selector -->
+    <section id="transaction-type" class="mb-6">
+      <h2 class="text-sm text-neutral-600 mb-3">Transaction Type</h2>
+      <div class="grid grid-cols-3 gap-2">
+        <button class="flex flex-col items-center p-4 bg-[#4D648D] text-white rounded-lg border-2 border-[#4D648D]">
+          <i class="fa-solid fa-minus text-xl mb-2"></i>
+          <span class="text-sm">Expense</span>
+        </button>
+        <button class="flex flex-col items-center p-4 bg-white text-neutral-600 rounded-lg border-2 border-neutral-200">
+          <i class="fa-solid fa-plus text-xl mb-2"></i>
+          <span class="text-sm">Income</span>
+        </button>
+        <button class="flex flex-col items-center p-4 bg-white text-neutral-600 rounded-lg border-2 border-neutral-200">
+          <i class="fa-solid fa-arrow-right-arrow-left text-xl mb-2"></i>
+          <span class="text-sm">Transfer</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Amount Input -->
+    <section id="amount-input" class="mb-6">
+      <h2 class="text-sm text-neutral-600 mb-3">Amount</h2>
+      <div class="bg-white border border-neutral-200 rounded-lg p-4">
+        <div class="flex items-center justify-center">
+          <span class="text-2xl text-neutral-400 mr-2">฿</span>
+          <input type="text" class="text-3xl text-neutral-900 text-center bg-transparent outline-none w-full" placeholder="0.00" value="120.00">
+        </div>
+      </div>
+    </section>
+
+    <!-- Account Selection -->
+    <section id="account-selection" class="mb-6">
+      <h2 class="text-sm text-neutral-600 mb-3">From Account</h2>
+      <button class="w-full flex items-center justify-between p-4 bg-white border border-neutral-200 rounded-lg">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-[#E8EDF5] rounded-lg flex items-center justify-center">
+            <i class="fa-solid fa-money-bill-wave text-[#4D648D] text-sm"></i>
+          </div>
+          <div class="text-left">
+            <p class="text-sm text-neutral-900">Cash Wallet</p>
+            <p class="text-xs text-neutral-500">Balance: ฿1,770.00</p>
+          </div>
+        </div>
+        <i class="fa-solid fa-chevron-down text-neutral-400"></i>
+      </button>
+    </section>
+
+    <!-- Plan Item (Optional) -->
+    <section id="plan-item" class="mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm text-neutral-600">Plan Item (Optional)</h2>
+        <i class="fa-solid fa-info-circle text-neutral-400 text-sm"></i>
+      </div>
+      <button class="w-full flex items-center justify-between p-4 bg-white border border-neutral-200 rounded-lg">
+        <div class="text-left">
+          <p class="text-sm text-neutral-900">Food & Dining</p>
+          <p class="text-xs text-neutral-500">Remaining: ฿2,180.00</p>
+        </div>
+        <i class="fa-solid fa-chevron-down text-neutral-400"></i>
+      </button>
+      <p class="text-xs text-neutral-500 mt-2">Plan items help you track spending against your plan.</p>
+    </section>
+
+    <!-- Date & Time -->
+    <section id="date-time" class="mb-6">
+      <h2 class="text-sm text-neutral-600 mb-3">Date & Time</h2>
+      <div class="grid grid-cols-2 gap-3">
+        <button class="flex items-center justify-between p-4 bg-white border border-neutral-200 rounded-lg">
+          <div class="text-left">
+            <p class="text-xs text-neutral-500">Date</p>
+            <p class="text-sm text-neutral-900">Jan 15, 2025</p>
+          </div>
+          <i class="fa-solid fa-calendar text-neutral-400"></i>
+        </button>
+        <button class="flex items-center justify-between p-4 bg-white border border-neutral-200 rounded-lg">
+          <div class="text-left">
+            <p class="text-xs text-neutral-500">Time</p>
+            <p class="text-sm text-neutral-900">2:30 PM</p>
+          </div>
+          <i class="fa-solid fa-clock text-neutral-400"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- Description -->
+    <section id="description" class="mb-6">
+      <h2 class="text-sm text-neutral-600 mb-3">Description (Optional)</h2>
+      <input type="text" class="w-full p-4 bg-white border border-neutral-200 rounded-lg text-sm text-neutral-900 placeholder-neutral-400 outline-none focus:border-[#4D648D]" placeholder="Coffee & Breakfast">
+    </section>
+  </main>
+
+  <!-- Bottom Actions -->
+  <div id="bottom-actions" class="fixed bottom-0 left-0 right-0 max-w-[375px] mx-auto bg-white border-t border-neutral-200 p-5">
+    <div class="flex space-x-3">
+      <button class="flex-1 py-3 px-4 bg-neutral-100 text-neutral-600 rounded-lg text-sm">
+        Cancel
+      </button>
+      <button class="flex-1 py-3 px-4 bg-[#4D648D] text-white rounded-lg text-sm">
+        Save Transaction
+      </button>
+    </div>
+  </div>
+</div>
+                        </body>
+                        </html>
+                        

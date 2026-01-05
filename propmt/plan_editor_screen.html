@@ -1,0 +1,288 @@
+                <html>
+                <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <script>
+                        window.FontAwesomeConfig = {
+                            autoReplaceSvg: 'nest', // Options: 'nest', 'remove', 'replace'
+                        };
+                    </script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                    <style>
+                    </style>
+                    <script>
+                    tailwind.config = {
+                    theme: {
+                        extend: {
+                        colors: {
+                            primary: {"50":"#fafafa","100":"#f5f5f5","200":"#e5e5e5","300":"#d4d4d4","400":"#a3a3a3","500":"#737373","600":"#525252","700":"#404040","800":"#262626","900":"#171717","950":"#0a0a0a"}
+                        }
+                        }
+                    }
+                    }
+                </script>
+                </head>
+
+                <body>
+                        <div id="mobile-plan-item-form" class="w-full max-w-[375px] mx-auto bg-white min-h-[840px]">
+  <!-- Header -->
+  <header id="header" class="flex items-center justify-between p-5 border-b border-neutral-200 bg-[#4D648D]">
+    <button class="p-2 -ml-2">
+      <i class="fa-solid fa-xmark text-xl text-white"></i>
+    </button>
+    <h1 class="text-lg text-white">Create Plan Item</h1>
+    <button class="p-2 -mr-2 opacity-0 pointer-events-none">
+      <i class="fa-solid fa-check text-xl text-white"></i>
+    </button>
+  </header>
+
+  <!-- Form Content -->
+  <main id="main-content" class="p-5 pb-32">
+    <!-- Plan Context -->
+    <div class="mb-6 p-4 bg-neutral-50 border border-neutral-200 rounded-lg">
+      <p class="text-xs text-neutral-600 mb-1">Adding to Plan</p>
+      <p class="text-sm text-neutral-900">Jan 1 - Jan 31, 2025</p>
+    </div>
+
+    <!-- Item Name -->
+    <div class="mb-6">
+      <label class="block text-sm text-neutral-900 mb-2">
+        Item Name <span class="text-neutral-400">*</span>
+      </label>
+      <input 
+        type="text" 
+        placeholder="e.g. Food & Dining, Rent, Salary"
+        class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-base text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-[#4D648D]"
+      />
+    </div>
+
+    <!-- Type Selector -->
+    <div class="mb-6">
+      <label class="block text-sm text-neutral-900 mb-2">
+        Type <span class="text-neutral-400">*</span>
+      </label>
+      <div class="flex gap-3">
+        <button class="flex-1 py-3 px-4 bg-white border-2 border-[#4D648D] rounded-lg text-sm text-[#4D648D] flex items-center justify-center">
+          <i class="fa-solid fa-arrow-trend-down mr-2"></i>
+          Expense
+        </button>
+        <button class="flex-1 py-3 px-4 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-600 flex items-center justify-center">
+          <i class="fa-solid fa-arrow-trend-up mr-2"></i>
+          Income
+        </button>
+      </div>
+    </div>
+
+    <!-- Icon Selector Modal/Section -->
+    <div class="mb-6">
+      <label class="block text-sm text-neutral-900 mb-2">
+        Icon <span class="text-neutral-400">(Optional)</span>
+      </label>
+      <p class="text-xs text-neutral-500 mb-3">Choose an icon to represent this plan item</p>
+      
+      <!-- Selected Icon Display -->
+      <button class="w-full p-4 bg-white border border-neutral-300 rounded-lg flex items-center justify-between mb-3">
+        <div class="flex items-center">
+          <div class="w-12 h-12 bg-[#4D648D] rounded-lg flex items-center justify-center mr-3">
+            <i class="fa-solid fa-utensils text-white text-lg"></i>
+          </div>
+          <span class="text-sm text-neutral-900">Tap to change icon</span>
+        </div>
+        <i class="fa-solid fa-chevron-right text-neutral-400 text-sm"></i>
+      </button>
+
+      <!-- Icon Grid -->
+      <div class="grid grid-cols-6 gap-2 p-4 bg-neutral-50 border border-neutral-200 rounded-lg">
+        <!-- Selected Icon -->
+        <button class="w-12 h-12 bg-[#4D648D] rounded-lg flex items-center justify-center">
+          <i class="fa-solid fa-utensils text-white"></i>
+        </button>
+        
+        <!-- Available Icons -->
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-shopping-cart text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-car text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-home text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-bus text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-coffee text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-heart text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-medkit text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-graduation-cap text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-film text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-plane text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-gift text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-shirt text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-dumbbell text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-book text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-mobile text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-laptop text-neutral-600"></i>
+        </button>
+        <button class="w-12 h-12 bg-white border border-neutral-300 rounded-lg flex items-center justify-center hover:border-[#4D648D]">
+          <i class="fa-solid fa-paw text-neutral-600"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Planned Amount -->
+    <div class="mb-6">
+      <label class="block text-sm text-neutral-900 mb-2">
+        Planned Amount <span class="text-neutral-400">*</span>
+      </label>
+      <div class="relative">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-base text-neutral-600">฿</span>
+        <input 
+          type="number" 
+          placeholder="0.00"
+          class="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg text-base text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-[#4D648D]"
+        />
+      </div>
+      <p class="text-xs text-neutral-500 mt-2">This is your intended budget for this category</p>
+    </div>
+
+    <!-- Description -->
+    <div class="mb-6">
+      <label class="block text-sm text-neutral-900 mb-2">
+        Description <span class="text-neutral-400">(Optional)</span>
+      </label>
+      <textarea 
+        rows="3"
+        placeholder="Add notes about this plan item..."
+        class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-base text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-[#4D648D] resize-none"
+      ></textarea>
+    </div>
+
+    <!-- Account Allocation -->
+    <div class="mb-6">
+      <label class="block text-sm text-neutral-900 mb-2">
+        Link Accounts <span class="text-neutral-400">(Optional)</span>
+      </label>
+      <p class="text-xs text-neutral-500 mb-3">Select which accounts this plan item relates to. This helps track where money comes from or goes.</p>
+      
+      <div class="space-y-2">
+        <!-- Account Option 1 -->
+        <button class="w-full p-3 bg-white border border-neutral-300 rounded-lg flex items-center justify-between">
+          <div class="flex items-center">
+            <div class="w-10 h-10 bg-neutral-200 rounded-lg flex items-center justify-center mr-3">
+              <i class="fa-solid fa-building-columns text-neutral-600"></i>
+            </div>
+            <div class="text-left">
+              <p class="text-sm text-neutral-900">SCB Savings</p>
+              <p class="text-xs text-neutral-500">฿12,450.00</p>
+            </div>
+          </div>
+          <div class="w-5 h-5 border-2 border-neutral-300 rounded"></div>
+        </button>
+
+        <!-- Account Option 2 -->
+        <button class="w-full p-3 bg-white border-2 border-[#4D648D] rounded-lg flex items-center justify-between">
+          <div class="flex items-center">
+            <div class="w-10 h-10 bg-neutral-200 rounded-lg flex items-center justify-center mr-3">
+              <i class="fa-solid fa-wallet text-neutral-600"></i>
+            </div>
+            <div class="text-left">
+              <p class="text-sm text-neutral-900">Cash Wallet</p>
+              <p class="text-xs text-neutral-500">฿3,200.00</p>
+            </div>
+          </div>
+          <div class="w-5 h-5 bg-[#4D648D] border-2 border-[#4D648D] rounded flex items-center justify-center">
+            <i class="fa-solid fa-check text-white text-xs"></i>
+          </div>
+        </button>
+
+        <!-- Account Option 3 -->
+        <button class="w-full p-3 bg-white border border-neutral-300 rounded-lg flex items-center justify-between">
+          <div class="flex items-center">
+            <div class="w-10 h-10 bg-neutral-200 rounded-lg flex items-center justify-center mr-3">
+              <i class="fa-solid fa-credit-card text-neutral-600"></i>
+            </div>
+            <div class="text-left">
+              <p class="text-sm text-neutral-900">Visa Credit</p>
+              <p class="text-xs text-neutral-500">฿8,900.00</p>
+            </div>
+          </div>
+          <div class="w-5 h-5 border-2 border-neutral-300 rounded"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Preview Section -->
+    <div class="mb-6 p-4 bg-neutral-50 border border-neutral-200 rounded-lg">
+      <p class="text-xs text-neutral-600 mb-3">Preview</p>
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-neutral-600">Planned</span>
+          <span class="text-neutral-900">฿0.00</span>
+        </div>
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-neutral-600">Actual</span>
+          <span class="text-neutral-900">฿0.00</span>
+        </div>
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-neutral-600">Remaining</span>
+          <span class="text-neutral-900">฿0.00</span>
+        </div>
+      </div>
+      <div class="w-full bg-neutral-100 rounded-full h-2 mt-3">
+        <div class="bg-neutral-600 h-2 rounded-full" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Helper Note -->
+    <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-lg">
+      <div class="flex items-start">
+        <i class="fa-solid fa-lightbulb text-neutral-500 text-sm mr-2 mt-0.5"></i>
+        <div>
+          <p class="text-xs text-neutral-700 mb-1">About Plan Items</p>
+          <p class="text-xs text-neutral-500">Plan items represent your intentions. They don't lock money or restrict spending—they help you stay aware of your goals.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Action Bar -->
+  <div id="bottom-actions" class="fixed bottom-0 left-0 right-0 max-w-[375px] mx-auto bg-white border-t border-neutral-200 p-5">
+    <div class="flex gap-3">
+      <button class="flex-1 py-3 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-700">
+        Cancel
+      </button>
+      <button class="flex-1 py-3 bg-neutral-300 text-white rounded-lg text-sm">
+        Save Plan Item
+      </button>
+    </div>
+  </div>
+</div>
+
+                        </body>
+                        </html>
+                        
+</initial_code>

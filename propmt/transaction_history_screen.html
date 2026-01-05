@@ -1,0 +1,145 @@
+
+                <html>
+                <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <script>
+                        window.FontAwesomeConfig = {
+                            autoReplaceSvg: 'nest', // Options: 'nest', 'remove', 'replace'
+                        };
+                    </script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                    <style>
+                    </style>
+                    <script>
+                    tailwind.config = {
+                    theme: {
+                        extend: {
+                        colors: {
+                            primary: {"50":"#fafafa","100":"#f5f5f5","200":"#e5e5e5","300":"#d4d4d4","400":"#a3a3a3","500":"#737373","600":"#525252","700":"#404040","800":"#262626","900":"#171717","950":"#0a0a0a"}
+                        }
+                        }
+                    }
+                    }
+                </script>
+                </head>
+
+                <body>
+                        <div id="mobile-create-account" class="w-full max-w-[375px] mx-auto bg-white min-h-[840px]">
+  <!-- Header -->
+  <header id="header" class="flex items-center justify-between p-5 border-b border-neutral-200 bg-[#4D648D]">
+    <button class="p-2 -ml-2">
+      <i class="fa-solid fa-arrow-left text-xl text-white"></i>
+    </button>
+    <h1 class="text-lg text-white">Create Account</h1>
+    <div class="w-8"></div>
+  </header>
+
+  <!-- Main Form Content -->
+  <main id="main-content" class="pb-32 px-5">
+    <!-- Form Container -->
+    <div class="pt-6 space-y-6">
+      
+      <!-- Account Name Section -->
+      <div class="space-y-2">
+        <label class="block text-sm text-neutral-700">Account Name</label>
+        <input 
+          type="text" 
+          placeholder="e.g. Main Bank, Cash, Wallet" 
+          class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-base bg-white focus:border-[#4D648D] focus:outline-none"
+        >
+      </div>
+
+      <!-- Account Type Section -->
+      <div class="space-y-3">
+        <label class="block text-sm text-neutral-700">Account Type</label>
+        <div class="grid grid-cols-2 gap-3">
+          <button class="flex items-center justify-center p-4 border-2 border-[#4D648D] bg-[#4D648D] bg-opacity-5 rounded-lg">
+            <div class="text-center">
+              <i class="fa-solid fa-university text-2xl text-[#4D648D] mb-2"></i>
+              <p class="text-sm text-[#4D648D]">Bank</p>
+            </div>
+          </button>
+          <button class="flex items-center justify-center p-4 border border-neutral-300 bg-white rounded-lg">
+            <div class="text-center">
+              <i class="fa-solid fa-money-bill-wave text-2xl text-neutral-400 mb-2"></i>
+              <p class="text-sm text-neutral-600">Cash</p>
+            </div>
+          </button>
+          <button class="flex items-center justify-center p-4 border border-neutral-300 bg-white rounded-lg">
+            <div class="text-center">
+              <i class="fa-solid fa-wallet text-2xl text-neutral-400 mb-2"></i>
+              <p class="text-sm text-neutral-600">Wallet</p>
+            </div>
+          </button>
+          <button class="flex items-center justify-center p-4 border border-neutral-300 bg-white rounded-lg">
+            <div class="text-center">
+              <i class="fa-solid fa-circle-question text-2xl text-neutral-400 mb-2"></i>
+              <p class="text-sm text-neutral-600">Other</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Initial Balance Section -->
+      <div class="space-y-3">
+        <label class="block text-sm text-neutral-700">Current Balance</label>
+        <div class="relative">
+          <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-600">฿</span>
+          <input 
+            type="number" 
+            placeholder="0.00" 
+            class="w-full pl-8 pr-4 py-3 border border-neutral-300 rounded-lg text-base bg-white focus:border-[#4D648D] focus:outline-none"
+          >
+        </div>
+        <p class="text-xs text-neutral-500">This reflects how much money is currently in this account.</p>
+      </div>
+
+      <!-- Optional Settings Section -->
+      <div class="space-y-4 pt-2">
+        <h3 class="text-sm text-neutral-700">Optional Settings</h3>
+        
+        <!-- Allow Negative Balance Toggle -->
+        <div class="flex items-center justify-between p-4 bg-neutral-50 rounded-lg border border-neutral-200">
+          <div class="flex-1">
+            <p class="text-sm text-neutral-700">Allow negative balance</p>
+            <p class="text-xs text-neutral-500 mt-1">Account can go below zero</p>
+          </div>
+          <div class="relative">
+            <input type="checkbox" class="sr-only">
+            <div class="w-11 h-6 bg-neutral-300 rounded-full"></div>
+            <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform"></div>
+          </div>
+        </div>
+
+        <!-- Notes Field -->
+        <div class="space-y-2">
+          <label class="block text-sm text-neutral-700">Notes (Optional)</label>
+          <textarea 
+            placeholder="Add any additional details..." 
+            rows="3"
+            class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-base bg-white focus:border-[#4D648D] focus:outline-none resize-none"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Action Buttons -->
+  <div id="bottom-actions" class="fixed bottom-0 left-0 right-0 max-w-[375px] mx-auto bg-white border-t border-neutral-200 p-5">
+    <div class="space-y-3">
+      <!-- Primary Action Button -->
+      <button class="w-full bg-[#4D648D] text-white py-4 rounded-lg text-base">
+        Create Account
+      </button>
+      
+      <!-- Secondary Action Button -->
+      <button class="w-full bg-white text-neutral-600 py-4 rounded-lg text-base border border-neutral-300">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+                        </body>
+                        </html>
+                        
