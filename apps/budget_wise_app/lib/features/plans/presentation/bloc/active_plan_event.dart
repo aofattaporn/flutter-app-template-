@@ -62,3 +62,47 @@ class UpdatePlanItemRequested extends ActivePlanEvent {
   @override
   List<Object?> get props => [itemId, name, expectedAmount];
 }
+
+/// Create a new plan
+class CreatePlanRequested extends ActivePlanEvent {
+  final String name;
+  final DateTime startDate;
+  final DateTime endDate;
+  final double? expectedIncome;
+  final bool isActive;
+
+  const CreatePlanRequested({
+    required this.name,
+    required this.startDate,
+    required this.endDate,
+    this.expectedIncome,
+    this.isActive = true,
+  });
+
+  @override
+  List<Object?> get props =>
+      [name, startDate, endDate, expectedIncome, isActive];
+}
+
+/// Update existing plan
+class UpdatePlanRequested extends ActivePlanEvent {
+  final String planId;
+  final String? name;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final double? expectedIncome;
+  final bool? isActive;
+
+  const UpdatePlanRequested({
+    required this.planId,
+    this.name,
+    this.startDate,
+    this.endDate,
+    this.expectedIncome,
+    this.isActive,
+  });
+
+  @override
+  List<Object?> get props =>
+      [planId, name, startDate, endDate, expectedIncome, isActive];
+}

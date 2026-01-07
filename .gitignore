@@ -33,3 +33,5 @@ pubspec.lock   # (root ของ workspace ควร ignore, แต่ **แต�
 # ---- System ----
 .DS_Store
 Thumbs.db
+
+app/budget_wise_app/.env

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../di/injection.dart';
+import '../../../../domain/repositories/plan_repository.dart';
 import '../widgets/widgets.dart';
 import '../../../home/presentation/pages/home_placeholder_page.dart';
-import '../../../plans/plans.dart';
+import '../../../plans/presentation/bloc/active_plan_bloc.dart';
+import '../../../plans/presentation/pages/active_plan_page.dart';
 import '../../../transactions/transactions.dart';
 import '../../../accounts/accounts.dart';
 import '../../../settings/settings.dart';
@@ -25,16 +29,21 @@ class MainAppShell extends StatefulWidget {
 
 class _MainAppShellState extends State<MainAppShell> {
   int _currentIndex = 1; // Default to Plans tab (index 1)
+  late final ActivePlanBloc _activePlanBloc;
 
-  /// Pages for each tab
-  /// Replace placeholder pages with actual feature pages when implementing
-  final List<Widget> _pages = const [
-    HomePlaceholderPage(),
-    PlansPlaceholderPage(),
-    TransactionsPlaceholderPage(),
-    AccountsPlaceholderPage(),
-    SettingsPlaceholderPage(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _activePlanBloc = ActivePlanBloc(
+      planRepository: getIt<PlanRepository>(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _activePlanBloc.close();
+    super.dispose();
+  }
 
   void _onTabTapped(int index) {
     setState(() {
@@ -52,7 +61,16 @@ class _MainAppShellState extends State<MainAppShell> {
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: _pages,
+        children: [
+          const HomePlaceholderPage(),
+          BlocProvider.value(
+            value: _activePlanBloc,
+            child: const ActivePlanPage(),
+          ),
+          const TransactionsPlaceholderPage(),
+          const AccountsPlaceholderPage(),
+          const SettingsPlaceholderPage(),
+        ],
       ),
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _currentIndex,

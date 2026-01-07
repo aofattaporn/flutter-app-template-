@@ -39,6 +39,9 @@ Future<void> configureDependencies() async {
         supabaseClient: getIt<SupabaseClient>(),
       ),
     );
+    getIt.registerLazySingleton<PlanDataSource>(
+      () => PlanSupabaseDataSource(getIt<SupabaseClient>()),
+    );
   } else {
     getIt.registerLazySingleton<AuthDataSource>(
       () => AuthRestDataSource(
@@ -46,6 +49,7 @@ Future<void> configureDependencies() async {
         localStorage: getIt<LocalStorage>(),
       ),
     );
+    // TODO: Add REST implementation for PlanDataSource if needed
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -58,11 +62,18 @@ Future<void> configureDependencies() async {
     ),
   );
 
+  if (BackendConfig.isSupabase) {
+    getIt.registerLazySingleton<PlanRepository>(
+      () => PlanRepositoryImpl(getIt<PlanDataSource>()),
+    );
+  }
+
   // ─────────────────────────────────────────────────────────────
   // Use Cases
   // ─────────────────────────────────────────────────────────────
   getIt.registerLazySingleton(() => LoginUseCase(getIt<AuthRepository>()));
   getIt.registerLazySingleton(() => RegisterUseCase(getIt<AuthRepository>()));
   getIt.registerLazySingleton(() => LogoutUseCase(getIt<AuthRepository>()));
-  getIt.registerLazySingleton(() => GetCurrentUserUseCase(getIt<AuthRepository>()));
+  getIt.registerLazySingleton(
+      () => GetCurrentUserUseCase(getIt<AuthRepository>()));
 }
