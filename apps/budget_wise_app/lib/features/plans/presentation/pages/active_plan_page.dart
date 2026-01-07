@@ -27,9 +27,12 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   }
 
   void _navigateToCreatePlan() async {
+    final state = context.read<ActivePlanBloc>().state;
     final result = await Navigator.of(context).push<Map<String, dynamic>>(
       MaterialPageRoute(
-        builder: (context) => const PlanEditorPage(),
+        builder: (context) => PlanEditorPage(
+          currentTotalPlanned: state.totalPlannedExpenses,
+        ),
         fullscreenDialog: true,
       ),
     );
@@ -48,9 +51,13 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   }
 
   void _navigateToEditPlan(Plan plan) async {
+    final state = context.read<ActivePlanBloc>().state;
     final result = await Navigator.of(context).push<Map<String, dynamic>>(
       MaterialPageRoute(
-        builder: (context) => PlanEditorPage(existingPlan: plan),
+        builder: (context) => PlanEditorPage(
+          existingPlan: plan,
+          currentTotalPlanned: state.totalPlannedExpenses,
+        ),
         fullscreenDialog: true,
       ),
     );
@@ -70,9 +77,13 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   }
 
   void _navigateToAddItem(Plan plan) async {
+    final state = context.read<ActivePlanBloc>().state;
     final result = await Navigator.of(context).push<Map<String, dynamic>>(
       MaterialPageRoute(
-        builder: (context) => PlanItemEditorPage(plan: plan),
+        builder: (context) => PlanItemEditorPage(
+          plan: plan,
+          currentTotalPlanned: state.totalPlannedExpenses,
+        ),
         fullscreenDialog: true,
       ),
     );
@@ -88,11 +99,13 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   }
 
   void _navigateToEditItem(Plan plan, PlanItem item) async {
+    final state = context.read<ActivePlanBloc>().state;
     final result = await Navigator.of(context).push<Map<String, dynamic>>(
       MaterialPageRoute(
         builder: (context) => PlanItemEditorPage(
           plan: plan,
           existingItem: item,
+          currentTotalPlanned: state.totalPlannedExpenses,
         ),
         fullscreenDialog: true,
       ),
@@ -227,6 +240,9 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
       body: SafeArea(
         child: BlocConsumer<ActivePlanBloc, ActivePlanState>(
           listener: (context, state) {
+            // ***
+            /// Handle error states globally
+            /// ***
             if (state.status == ActivePlanStatus.error &&
                 state.errorMessage != null) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -238,6 +254,9 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
             }
           },
           builder: (context, state) {
+            // ***
+            /// Hanler loading state globally
+            /// ***
             if (state.status == ActivePlanStatus.loading) {
               return const Center(
                 child: CircularProgressIndicator(
@@ -246,6 +265,9 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
               );
             }
 
+            // ***
+            /// Hanler no active plan state globally
+            /// ***
             if (!state.hasActivePlan) {
               return NoPlanWidget(
                 onCreatePlan: _navigateToCreatePlan,
@@ -264,7 +286,9 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // ****
                     // Plan Overview Section
+                    // ***
                     PlanOverviewSection(
                       plan: state.plan!,
                       actualIncome: state.actualIncome,
@@ -277,7 +301,9 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
                       },
                     ),
 
+                    // ***
                     // Plan Items Section
+                    // ***
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: Column(

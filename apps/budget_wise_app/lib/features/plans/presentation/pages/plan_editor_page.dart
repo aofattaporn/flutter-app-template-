@@ -11,9 +11,13 @@ class PlanEditorPage extends StatefulWidget {
   /// Existing plan to edit (null for create mode)
   final Plan? existingPlan;
 
+  /// Current total of all plan items (for validation)
+  final double currentTotalPlanned;
+
   const PlanEditorPage({
     super.key,
     this.existingPlan,
+    this.currentTotalPlanned = 0,
   });
 
   /// Check if in edit mode
@@ -128,6 +132,19 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
           ? double.tryParse(_expectedIncomeController.text)
           : null;
 
+      // Validate: expected income should cover total planned items
+      if (expectedIncome != null &&
+          widget.currentTotalPlanned > 0 &&
+          expectedIncome < widget.currentTotalPlanned) {
+        _showValidationError(
+          'Insufficient Budget',
+          'Your expected income (${CurrencyUtils.formatCurrency(expectedIncome)}) '
+              'is less than your total planned items (${CurrencyUtils.formatCurrency(widget.currentTotalPlanned)}). '
+              'Please increase your expected income or reduce your plan items.',
+        );
+        return;
+      }
+
       final result = {
         'name': _nameController.text.trim(),
         'startDate': _startDate,
@@ -142,6 +159,32 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
 
       Navigator.of(context).pop(result);
     }
+  }
+
+  void _showValidationError(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.orange.shade700),
+            const SizedBox(width: 8),
+            Expanded(child: Text(title)),
+          ],
+        ),
+        content: Text(message),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF4D648D),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   String _formatDate(DateTime date) {
@@ -526,22 +569,49 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
         ? double.tryParse(_expectedIncomeController.text) ?? 0
         : 0.0;
 
+    final hasBudgetIssue = expectedIncome > 0 &&
+        widget.currentTotalPlanned > 0 &&
+        expectedIncome < widget.currentTotalPlanned;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
+        color: hasBudgetIssue ? Colors.orange.shade50 : Colors.grey.shade50,
+        border: Border.all(
+          color: hasBudgetIssue ? Colors.orange.shade300 : Colors.grey.shade200,
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Preview',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade600,
-            ),
+          Row(
+            children: [
+              Text(
+                'Preview',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              if (hasBudgetIssue) ...[
+                const Spacer(),
+                Icon(
+                  Icons.warning_amber_rounded,
+                  size: 16,
+                  color: Colors.orange.shade700,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Budget Issue',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.orange.shade700,
+                  ),
+                ),
+              ],
+            ],
           ),
           const SizedBox(height: 12),
           _buildPreviewRow('Plan Name',
@@ -556,14 +626,61 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
             _buildPreviewRow('Expected Income',
                 CurrencyUtils.formatCurrency(expectedIncome)),
           ],
+          if (widget.currentTotalPlanned > 0) ...[
+            const SizedBox(height: 8),
+            _buildPreviewRow(
+              'Total Planned Items',
+              CurrencyUtils.formatCurrency(widget.currentTotalPlanned),
+              valueColor: hasBudgetIssue ? Colors.orange.shade700 : null,
+            ),
+          ],
+          if (expectedIncome > 0 && widget.currentTotalPlanned > 0) ...[
+            const SizedBox(height: 8),
+            _buildPreviewRow(
+              'Remaining Budget',
+              CurrencyUtils.formatCurrency(
+                  expectedIncome - widget.currentTotalPlanned),
+              valueColor:
+                  hasBudgetIssue ? Colors.red.shade600 : Colors.green.shade600,
+            ),
+          ],
           const SizedBox(height: 8),
           _buildPreviewRow('Status', _setAsActive ? 'Active' : 'Inactive'),
+          if (hasBudgetIssue) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: Colors.orange.shade800,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Expected income is less than total planned. Increase income or reduce plan items.',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.orange.shade800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildPreviewRow(String label, String value) {
+  Widget _buildPreviewRow(String label, String value, {Color? valueColor}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -576,9 +693,9 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
         ),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: Colors.black87,
+            color: valueColor ?? Colors.black87,
           ),
         ),
       ],

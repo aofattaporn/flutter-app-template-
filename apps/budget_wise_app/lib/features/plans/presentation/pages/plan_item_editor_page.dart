@@ -22,10 +22,14 @@ class PlanItemEditorPage extends StatefulWidget {
   /// Existing item to edit (null for create mode)
   final PlanItem? existingItem;
 
+  /// Current total of all plan items (for validation)
+  final double currentTotalPlanned;
+
   const PlanItemEditorPage({
     super.key,
     required this.plan,
     this.existingItem,
+    this.currentTotalPlanned = 0,
   });
 
   /// Check if in edit mode
@@ -108,9 +112,32 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
+      final amount = double.parse(_amountController.text);
+      final expectedIncome = widget.plan.expectedIncome ?? 0;
+
+      // Calculate new total (subtract existing item amount if editing)
+      final existingItemAmount = widget.existingItem?.expectedAmount ?? 0;
+      final newTotalPlanned =
+          widget.currentTotalPlanned - existingItemAmount + amount;
+
+      // Validate: new total should not exceed expected income
+      if (expectedIncome > 0 && newTotalPlanned > expectedIncome) {
+        final availableBudget =
+            expectedIncome - widget.currentTotalPlanned + existingItemAmount;
+        _showValidationError(
+          'Budget Exceeded',
+          'Adding this item (${CurrencyUtils.formatCurrency(amount)}) would exceed your plan budget.\n\n'
+              'Available budget: ${CurrencyUtils.formatCurrency(availableBudget.clamp(0, double.infinity))}\n'
+              'Expected income: ${CurrencyUtils.formatCurrency(expectedIncome)}\n'
+              'Current planned: ${CurrencyUtils.formatCurrency(widget.currentTotalPlanned - existingItemAmount)}\n\n'
+              'Please reduce the amount or increase your plan\'s expected income.',
+        );
+        return;
+      }
+
       final result = {
         'name': _nameController.text.trim(),
-        'amount': double.parse(_amountController.text),
+        'amount': amount,
         'isExpense': _isExpenseType,
         'iconIndex': _selectedIconIndex,
         'description': _descriptionController.text.trim(),
@@ -122,6 +149,32 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
 
       Navigator.of(context).pop(result);
     }
+  }
+
+  void _showValidationError(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.orange.shade700),
+            const SizedBox(width: 8),
+            Expanded(child: Text(title, style: const TextStyle(fontSize: 18))),
+          ],
+        ),
+        content: Text(message),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF4D648D),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   double get _previewAmount {
@@ -650,23 +703,54 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
 
   Widget _buildPreviewSection() {
     final amount = _previewAmount;
+    final expectedIncome = widget.plan.expectedIncome ?? 0;
+    final existingItemAmount = widget.existingItem?.expectedAmount ?? 0;
+    final newTotalPlanned =
+        widget.currentTotalPlanned - existingItemAmount + amount;
+    final availableBudget =
+        expectedIncome - widget.currentTotalPlanned + existingItemAmount;
+    final hasBudgetIssue =
+        expectedIncome > 0 && amount > 0 && newTotalPlanned > expectedIncome;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
+        color: hasBudgetIssue ? Colors.orange.shade50 : Colors.grey.shade50,
+        border: Border.all(
+          color: hasBudgetIssue ? Colors.orange.shade300 : Colors.grey.shade200,
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Preview',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade600,
-            ),
+          Row(
+            children: [
+              Text(
+                'Preview',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              if (hasBudgetIssue) ...[
+                const Spacer(),
+                Icon(
+                  Icons.warning_amber_rounded,
+                  size: 16,
+                  color: Colors.orange.shade700,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Exceeds Budget',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.orange.shade700,
+                  ),
+                ),
+              ],
+            ],
           ),
           const SizedBox(height: 12),
           _buildPreviewRow('Planned', amount),
@@ -674,6 +758,24 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
           _buildPreviewRow('Actual', 0),
           const SizedBox(height: 8),
           _buildPreviewRow('Remaining', amount),
+          if (expectedIncome > 0) ...[
+            const SizedBox(height: 12),
+            Divider(height: 1, color: Colors.grey.shade200),
+            const SizedBox(height: 12),
+            _buildPreviewRowWithColor(
+              'Available Budget',
+              CurrencyUtils.formatCurrency(
+                  availableBudget.clamp(0, double.infinity)),
+              Colors.grey.shade600,
+            ),
+            const SizedBox(height: 8),
+            _buildPreviewRowWithColor(
+              'After Adding',
+              CurrencyUtils.formatCurrency((availableBudget - amount)
+                  .clamp(double.negativeInfinity, double.infinity)),
+              hasBudgetIssue ? Colors.red.shade600 : Colors.green.shade600,
+            ),
+          ],
           const SizedBox(height: 12),
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
@@ -684,6 +786,35 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
               valueColor: AlwaysStoppedAnimation<Color>(Colors.grey.shade600),
             ),
           ),
+          if (hasBudgetIssue) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: Colors.orange.shade800,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'This amount exceeds your available budget. Reduce the amount or increase plan income.',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.orange.shade800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -705,6 +836,30 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
           style: const TextStyle(
             fontSize: 12,
             color: Colors.black87,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPreviewRowWithColor(
+      String label, String value, Color valueColor) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey.shade600,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: valueColor,
           ),
         ),
       ],
