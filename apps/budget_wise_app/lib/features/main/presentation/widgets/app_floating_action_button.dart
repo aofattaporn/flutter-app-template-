@@ -28,6 +28,7 @@ class AppFloatingActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
+      heroTag: 'mainAppFab',
       onPressed: onPressed,
       tooltip: tooltip,
       backgroundColor: backgroundColor ?? _defaultBackgroundColor,

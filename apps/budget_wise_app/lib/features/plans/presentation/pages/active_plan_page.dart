@@ -163,22 +163,21 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   }
 
   void _confirmDeleteItem(PlanItem item) {
+    final bloc = context.read<ActivePlanBloc>();
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Item'),
         content: Text('Are you sure you want to delete "${item.name}"?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
-              context
-                  .read<ActivePlanBloc>()
-                  .add(DeletePlanItemRequested(item.id));
+              Navigator.pop(dialogContext);
+              bloc.add(DeletePlanItemRequested(item.id));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red.shade700,
@@ -192,24 +191,23 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   }
 
   void _confirmClosePlan() {
+    final bloc = context.read<ActivePlanBloc>();
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Close Plan'),
         content: const Text(
           'Are you sure you want to close this plan? You can create or activate another plan afterward.',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
-              context
-                  .read<ActivePlanBloc>()
-                  .add(const CloseActivePlanRequested());
+              Navigator.pop(dialogContext);
+              bloc.add(const CloseActivePlanRequested());
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF4D648D),
@@ -399,6 +397,7 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
           if (!state.hasActivePlan) return const SizedBox.shrink();
 
           return FloatingActionButton(
+            heroTag: 'activePlanFab',
             onPressed: () => _navigateToAddItem(state.plan!),
             backgroundColor: const Color(0xFF4D648D),
             child: const Icon(Icons.add, color: Colors.white),
