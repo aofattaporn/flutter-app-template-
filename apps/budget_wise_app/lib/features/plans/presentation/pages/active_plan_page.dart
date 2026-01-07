@@ -10,6 +10,7 @@ import '../widgets/plan_overview_section.dart';
 import '../widgets/unassigned_notice.dart';
 import 'plan_editor_page.dart';
 import 'plan_item_editor_page.dart';
+import 'plan_list_page.dart';
 
 /// Active Plan page displaying the current active plan and its items
 class ActivePlanPage extends StatefulWidget {
@@ -74,6 +75,21 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
             ),
           );
     }
+  }
+
+  void _navigateToAllPlans() {
+    Navigator.of(context)
+        .push(
+      MaterialPageRoute(
+        builder: (context) => const PlanListPage(),
+      ),
+    )
+        .then((_) {
+      // Refresh active plan when returning from plan list
+      if (mounted) {
+        context.read<ActivePlanBloc>().add(const RefreshActivePlan());
+      }
+    });
   }
 
   void _navigateToAddItem(Plan plan) async {
@@ -271,9 +287,7 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
             if (!state.hasActivePlan) {
               return NoPlanWidget(
                 onCreatePlan: _navigateToCreatePlan,
-                onViewAllPlans: () {
-                  // TODO: Navigate to plans list
-                },
+                onViewAllPlans: _navigateToAllPlans,
               );
             }
 
@@ -296,9 +310,7 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
                       totalSpent: state.totalActualExpenses,
                       onEditPlan: () => _navigateToEditPlan(state.plan!),
                       onClosePlan: _confirmClosePlan,
-                      onViewAllPlans: () {
-                        // TODO: Navigate to plans list
-                      },
+                      onViewAllPlans: _navigateToAllPlans,
                     ),
 
                     // ***

@@ -4,4 +4,7 @@ export 'widgets/plan_overview_section.dart';
 export 'widgets/unassigned_notice.dart';
 export 'pages/active_plan_page.dart';
 export 'pages/plan_item_editor_page.dart';
+export 'pages/plan_editor_page.dart';
+export 'pages/plan_list_page.dart';
 export 'bloc/active_plan_bloc.dart';
+export 'bloc/plan_list_bloc.dart';
