@@ -7,12 +7,16 @@ import '../bloc/active_plan_bloc.dart';
 import '../widgets/no_plan_widget.dart';
 import '../widgets/plan_item_card.dart';
 import '../widgets/plan_overview_section.dart';
-import '../widgets/unassigned_notice.dart';
 import 'plan_editor_page.dart';
 import 'plan_item_editor_page.dart';
 import 'plan_list_page.dart';
 
-/// Active Plan page displaying the current active plan and its items
+/// Active Plan Page - Main screen for viewing and managing the active budget plan
+///
+/// This page displays:
+/// - Plan overview with income/expense summary
+/// - List of plan items with their budgets
+/// - Options to add/edit/delete items
 class ActivePlanPage extends StatefulWidget {
   const ActivePlanPage({super.key});
 
@@ -21,13 +25,29 @@ class ActivePlanPage extends StatefulWidget {
 }
 
 class _ActivePlanPageState extends State<ActivePlanPage> {
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LIFECYCLE
+  // ═══════════════════════════════════════════════════════════════════════════
+
   @override
   void initState() {
     super.initState();
+    _loadActivePlan();
+  }
+
+  void _loadActivePlan() {
     context.read<ActivePlanBloc>().add(const LoadActivePlan());
   }
 
-  void _navigateToCreatePlan() async {
+  void _refreshActivePlan() {
+    context.read<ActivePlanBloc>().add(const RefreshActivePlan());
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NAVIGATION METHODS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Future<void> _navigateToCreatePlan() async {
     final state = context.read<ActivePlanBloc>().state;
     final result = await Navigator.of(context).push<dynamic>(
       MaterialPageRoute(
@@ -38,13 +58,12 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
       ),
     );
 
-    // Result is true when plan was created successfully via repository
     if (result == true && mounted) {
-      context.read<ActivePlanBloc>().add(const RefreshActivePlan());
+      _refreshActivePlan();
     }
   }
 
-  void _navigateToEditPlan(Plan plan) async {
+  Future<void> _navigateToEditPlan(Plan plan) async {
     final state = context.read<ActivePlanBloc>().state;
     final result = await Navigator.of(context).push<dynamic>(
       MaterialPageRoute(
@@ -56,28 +75,22 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
       ),
     );
 
-    // Result is true when plan was updated successfully via repository
     if (result == true && mounted) {
-      context.read<ActivePlanBloc>().add(const RefreshActivePlan());
+      _refreshActivePlan();
     }
   }
 
   void _navigateToAllPlans() {
     Navigator.of(context)
-        .push(
-      MaterialPageRoute(
-        builder: (context) => const PlanListPage(),
-      ),
-    )
+        .push(MaterialPageRoute(builder: (context) => const PlanListPage()))
         .then((_) {
-      // Refresh active plan when returning from plan list
       if (mounted) {
-        context.read<ActivePlanBloc>().add(const RefreshActivePlan());
+        _refreshActivePlan();
       }
     });
   }
 
-  void _navigateToAddItem(Plan plan) async {
+  Future<void> _navigateToAddItem(Plan plan) async {
     final state = context.read<ActivePlanBloc>().state;
     final result = await Navigator.of(context).push<Map<String, dynamic>>(
       MaterialPageRoute(
@@ -99,7 +112,7 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
     }
   }
 
-  void _navigateToEditItem(Plan plan, PlanItem item) async {
+  Future<void> _navigateToEditItem(Plan plan, PlanItem item) async {
     final state = context.read<ActivePlanBloc>().state;
     final result = await Navigator.of(context).push<Map<String, dynamic>>(
       MaterialPageRoute(
@@ -123,61 +136,64 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
     }
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // DIALOG METHODS
+  // ═══════════════════════════════════════════════════════════════════════════
+
   void _showItemMenu(Plan plan, PlanItem item) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 8),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Edit Item'),
-              onTap: () {
-                Navigator.pop(context);
-                _navigateToEditItem(plan, item);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.receipt_long),
-              title: const Text('View Transactions'),
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: Navigate to transactions
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.delete, color: Colors.red.shade700),
-              title: Text(
-                'Delete Item',
-                style: TextStyle(color: Colors.red.shade700),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                _confirmDeleteItem(item);
-              },
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
+      builder: (sheetContext) =>
+          _buildItemMenuContent(sheetContext, plan, item),
+    );
+  }
+
+  Widget _buildItemMenuContent(
+      BuildContext sheetContext, Plan plan, PlanItem item) {
+    return SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildDragHandle(),
+          ListTile(
+            leading: const Icon(Icons.edit),
+            title: const Text('Edit Item'),
+            onTap: () {
+              Navigator.pop(sheetContext);
+              _navigateToEditItem(plan, item);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.delete, color: Colors.red.shade700),
+            title: Text('Delete Item',
+                style: TextStyle(color: Colors.red.shade700)),
+            onTap: () {
+              Navigator.pop(sheetContext);
+              _confirmDeleteItem(item);
+            },
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDragHandle() {
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      width: 40,
+      height: 4,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(2),
       ),
     );
   }
 
   void _confirmDeleteItem(PlanItem item) {
-    final bloc = context.read<ActivePlanBloc>();
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -188,15 +204,14 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
             onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
+          TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              bloc.add(DeletePlanItemRequested(item.id));
+              context
+                  .read<ActivePlanBloc>()
+                  .add(DeletePlanItemRequested(item.id));
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.shade700,
-              foregroundColor: Colors.white,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Delete'),
           ),
         ],
@@ -205,28 +220,27 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   }
 
   void _confirmClosePlan() {
-    final bloc = context.read<ActivePlanBloc>();
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Close Plan'),
         content: const Text(
-          'Are you sure you want to close this plan? You can create or activate another plan afterward.',
+          'Are you sure you want to close this plan? '
+          'This will make it inactive and you can create a new plan.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
+          TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              bloc.add(const CloseActivePlanRequested());
+              context
+                  .read<ActivePlanBloc>()
+                  .add(const CloseActivePlanRequested());
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4D648D),
-              foregroundColor: Colors.white,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Close Plan'),
           ),
         ],
@@ -234,199 +248,218 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
     );
   }
 
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red.shade700,
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // BUILD - MAIN
+  // ═══════════════════════════════════════════════════════════════════════════
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: BlocConsumer<ActivePlanBloc, ActivePlanState>(
-          listener: (context, state) {
-            // ***
-            /// Handle error states globally
-            /// ***
-            if (state.status == ActivePlanStatus.error &&
-                state.errorMessage != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage!),
-                  backgroundColor: Colors.red.shade700,
-                ),
-              );
-            }
-          },
-          builder: (context, state) {
-            // ***
-            /// Hanler loading state globally
-            /// ***
-            if (state.status == ActivePlanStatus.loading) {
-              return const Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xFF4D648D),
-                ),
-              );
-            }
-
-            // ***
-            /// Hanler no active plan state globally
-            /// ***
-            if (!state.hasActivePlan) {
-              return NoPlanWidget(
-                onCreatePlan: _navigateToCreatePlan,
-                onViewAllPlans: _navigateToAllPlans,
-              );
-            }
-
-            return RefreshIndicator(
-              onRefresh: () async {
-                context.read<ActivePlanBloc>().add(const RefreshActivePlan());
-              },
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ****
-                    // Plan Overview Section
-                    // ***
-                    PlanOverviewSection(
-                      plan: state.plan!,
-                      actualIncome: state.actualIncome,
-                      totalPlanned: state.totalPlannedExpenses,
-                      totalSpent: state.totalActualExpenses,
-                      onEditPlan: () => _navigateToEditPlan(state.plan!),
-                      onClosePlan: _confirmClosePlan,
-                      onViewAllPlans: _navigateToAllPlans,
-                    ),
-
-                    // ***
-                    // Plan Items Section
-                    // ***
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Header
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Plan Items',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () => _navigateToAddItem(state.plan!),
-                                child: const Row(
-                                  children: [
-                                    Icon(
-                                      Icons.add,
-                                      size: 18,
-                                      color: Color(0xFF4D648D),
-                                    ),
-                                    SizedBox(width: 4),
-                                    Text(
-                                      'Add Item',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color(0xFF4D648D),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          // Plan Items List
-                          if (state.planItems.isEmpty)
-                            Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade50,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Center(
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.inbox_outlined,
-                                      size: 48,
-                                      color: Colors.grey.shade400,
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      'No plan items yet',
-                                      style: TextStyle(
-                                        color: Colors.grey.shade600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Add items to track your budget',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey.shade500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          else
-                            ListView.separated(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: state.planItems.length,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(height: 12),
-                              itemBuilder: (context, index) {
-                                final item = state.planItems[index];
-                                return PlanItemCard(
-                                  item: item,
-                                  onTap: () {
-                                    // TODO: Navigate to item detail
-                                  },
-                                  onMenuTap: () =>
-                                      _showItemMenu(state.plan!, item),
-                                );
-                              },
-                            ),
-
-                          // Unassigned Notice
-                          const UnassignedNotice(
-                            unassignedCount: 3, // TODO: Get from state
-                          ),
-
-                          // Bottom padding for FAB
-                          const SizedBox(height: 80),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
+          listener: _handleStateChanges,
+          builder: _buildBody,
         ),
-      ),
-      floatingActionButton: BlocBuilder<ActivePlanBloc, ActivePlanState>(
-        builder: (context, state) {
-          if (!state.hasActivePlan) return const SizedBox.shrink();
-
-          return FloatingActionButton(
-            heroTag: 'activePlanFab',
-            onPressed: () => _navigateToAddItem(state.plan!),
-            backgroundColor: const Color(0xFF4D648D),
-            child: const Icon(Icons.add, color: Colors.white),
-          );
-        },
       ),
     );
   }
+
+  void _handleStateChanges(BuildContext context, ActivePlanState state) {
+    if (state.status == ActivePlanStatus.error && state.errorMessage != null) {
+      _showErrorSnackBar(state.errorMessage!);
+    }
+  }
+
+  Widget _buildBody(BuildContext context, ActivePlanState state) {
+    if (state.status == ActivePlanStatus.loading) {
+      return _buildLoadingState();
+    }
+
+    if (!state.hasActivePlan) {
+      return _buildNoPlanState();
+    }
+
+    return _buildActivePlanContent(state);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // BUILD - STATES
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildLoadingState() {
+    return const Center(
+      child: CircularProgressIndicator(color: Color(0xFF4D648D)),
+    );
+  }
+
+  Widget _buildNoPlanState() {
+    return NoPlanWidget(
+      onCreatePlan: _navigateToCreatePlan,
+      onViewAllPlans: _navigateToAllPlans,
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // BUILD - ACTIVE PLAN CONTENT
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildActivePlanContent(ActivePlanState state) {
+    return RefreshIndicator(
+      onRefresh: () async => _refreshActivePlan(),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildPlanOverview(state),
+            _buildPlanItemsSection(state),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlanOverview(ActivePlanState state) {
+    return PlanOverviewSection(
+      plan: state.plan!,
+      actualIncome: state.actualIncome,
+      totalPlanned: state.totalPlannedExpenses,
+      totalSpent: state.totalActualExpenses,
+      onEditPlan: () => _navigateToEditPlan(state.plan!),
+      onClosePlan: _confirmClosePlan,
+      onViewAllPlans: _navigateToAllPlans,
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // BUILD - PLAN ITEMS SECTION
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildPlanItemsSection(ActivePlanState state) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader(),
+          const SizedBox(height: 16),
+          _buildPlanItemsList(state),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text(
+          'Budget Items',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2C3E50),
+          ),
+        ),
+        TextButton.icon(
+          onPressed: () {
+            final state = context.read<ActivePlanBloc>().state;
+            if (state.plan != null) {
+              _navigateToAddItem(state.plan!);
+            }
+          },
+          icon: const Icon(Icons.add, size: 18),
+          label: const Text('Add Item'),
+          style: TextButton.styleFrom(foregroundColor: const Color(0xFF4D648D)),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPlanItemsList(ActivePlanState state) {
+    final items = state.planItems;
+
+    if (items.isEmpty) {
+      return _buildEmptyItemsState();
+    }
+
+    return Column(
+      children: items.map((item) => _buildPlanItemCard(state, item)).toList(),
+    );
+  }
+
+  Widget _buildEmptyItemsState() {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.category_outlined,
+                size: 48, color: Colors.grey.shade400),
+            const SizedBox(height: 16),
+            Text(
+              'No budget items yet',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey.shade600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Add items to organize your budget',
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlanItemCard(ActivePlanState state, PlanItem item) {
+    final plan = state.plan!;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: PlanItemCard(
+        item: item,
+        onTap: () => _showItemMenu(plan, item),
+        onMenuTap: () => _showItemMenu(plan, item),
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // BUILD - FLOATING ACTION BUTTON
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Widget? _buildFloatingActionButton() {
+  //   return BlocBuilder<ActivePlanBloc, ActivePlanState>(
+  //     builder: (context, state) {
+  //       if (!state.hasActivePlan) return const SizedBox.shrink();
+
+  //       return FloatingActionButton(
+  //         onPressed: () => _navigateToAddItem(state.plan!),
+  //         backgroundColor: const Color(0xFF4D648D),
+  //         child: const Icon(Icons.add, color: Colors.white),
+  //       );
+  //     },
+  //   );
+  // }
 }
