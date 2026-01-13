@@ -35,3 +35,4 @@ pubspec.lock   # (root ของ workspace ควร ignore, แต่ **แต�
 Thumbs.db
 
 app/budget_wise_app/.env
+apps/budget_wise_app/.env
