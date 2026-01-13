@@ -8,14 +8,14 @@ import '../models/plan_item_model.dart';
 /// Implementation of PlanRepository using PlanDataSource with caching
 class PlanRepositoryImpl implements PlanRepository {
   final PlanDataSource _dataSource;
-  
+
   // Cache variables
   Plan? _cachedActivePlan;
   List<Plan>? _cachedAllPlans;
   Map<String, List<PlanItem>> _cachedPlanItems = {};
   Map<String, double> _cachedActualIncome = {};
   DateTime? _lastFetch;
-  
+
   // Cache duration (adjust as needed)
   static const _cacheDuration = Duration(minutes: 5);
 
@@ -34,15 +34,18 @@ class PlanRepositoryImpl implements PlanRepository {
     _lastFetch = null;
   }
 
+  /// Invalidate only active plan cache - called when active status might change
+  void _invalidateActivePlanCache() {
+    _cachedActivePlan = null;
+    _cachedAllPlans = null;
+  }
+
   @override
   Future<Plan?> getActivePlan() async {
-    if (_isCacheValid() && _cachedActivePlan != null) {
-      return _cachedActivePlan;
-    }
-    
+    // Always fetch fresh data for active plan to ensure accuracy
+    // This is critical because active status can change from other screens
     final model = await _dataSource.getActivePlan();
     _cachedActivePlan = model?.toEntity();
-    _lastFetch = DateTime.now();
     return _cachedActivePlan;
   }
 
@@ -51,7 +54,7 @@ class PlanRepositoryImpl implements PlanRepository {
     if (_isCacheValid() && _cachedAllPlans != null) {
       return _cachedAllPlans!;
     }
-    
+
     final models = await _dataSource.getAllPlans();
     _cachedAllPlans = models.map((m) => m.toEntity()).toList();
     _lastFetch = DateTime.now();
@@ -116,15 +119,15 @@ class PlanRepositoryImpl implements PlanRepository {
     if (_isCacheValid() && _cachedPlanItems.containsKey(planId)) {
       return _cachedPlanItems[planId]!;
     }
-    
+
     final models = await _dataSource.getPlanItems(planId);
     final actuals = await _dataSource.getPlanItemActuals(planId);
-    
+
     final items = models.map((m) {
       final actual = actuals[m.id] ?? 0;
       return m.copyWithActual(actual).toEntity();
     }).toList();
-    
+
     _cachedPlanItems[planId] = items;
     _lastFetch = DateTime.now();
     return items;
@@ -175,7 +178,7 @@ class PlanRepositoryImpl implements PlanRepository {
     if (_isCacheValid() && _cachedActualIncome.containsKey(planId)) {
       return _cachedActualIncome[planId]!;
     }
-    
+
     final income = await _dataSource.getActualIncome(planId);
     _cachedActualIncome[planId] = income;
     _lastFetch = DateTime.now();

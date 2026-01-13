@@ -36,8 +36,7 @@ class ActivePlanState extends Equatable {
       planItems.fold(0, (sum, item) => sum + item.actualAmount);
 
   /// Get income difference (expected - actual)
-  double get incomeDifference =>
-      (plan?.expectedIncome ?? 0) - actualIncome;
+  double get incomeDifference => (plan?.expectedIncome ?? 0) - actualIncome;
 
   /// Get count of items near limit
   int get itemsNearLimitCount =>
@@ -47,16 +46,19 @@ class ActivePlanState extends Equatable {
   int get itemsOverBudgetCount =>
       planItems.where((item) => item.isOverBudget).length;
 
+  /// copyWith that properly handles nullable plan
+  /// Use clearPlan: true to explicitly set plan to null
   ActivePlanState copyWith({
     ActivePlanStatus? status,
     Plan? plan,
+    bool clearPlan = false,
     List<PlanItem>? planItems,
     double? actualIncome,
     String? errorMessage,
   }) {
     return ActivePlanState(
       status: status ?? this.status,
-      plan: plan ?? this.plan,
+      plan: clearPlan ? null : (plan ?? this.plan),
       planItems: planItems ?? this.planItems,
       actualIncome: actualIncome ?? this.actualIncome,
       errorMessage: errorMessage ?? this.errorMessage,

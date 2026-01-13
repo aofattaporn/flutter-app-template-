@@ -37,3 +37,24 @@ class SetActivePlanRequested extends PlanListEvent {
   @override
   List<Object?> get props => [planId];
 }
+
+/// Create a new plan
+class CreatePlanFromListRequested extends PlanListEvent {
+  final String name;
+  final DateTime startDate;
+  final DateTime endDate;
+  final double? expectedIncome;
+  final bool isActive;
+
+  const CreatePlanFromListRequested({
+    required this.name,
+    required this.startDate,
+    required this.endDate,
+    this.expectedIncome,
+    this.isActive = true,
+  });
+
+  @override
+  List<Object?> get props =>
+      [name, startDate, endDate, expectedIncome, isActive];
+}

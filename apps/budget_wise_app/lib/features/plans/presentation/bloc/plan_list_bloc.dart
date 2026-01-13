@@ -19,6 +19,7 @@ class PlanListBloc extends Bloc<PlanListEvent, PlanListState> {
     on<RefreshPlans>(_onRefreshPlans);
     on<DeletePlanRequested>(_onDeletePlan);
     on<SetActivePlanRequested>(_onSetActivePlan);
+    on<CreatePlanFromListRequested>(_onCreatePlan);
   }
 
   Future<void> _onLoadAllPlans(
@@ -115,6 +116,50 @@ class PlanListBloc extends Bloc<PlanListEvent, PlanListState> {
       });
 
       emit(state.copyWith(plans: updatedPlans));
+    } catch (e) {
+      emit(state.copyWith(
+        status: PlanListStatus.error,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  Future<void> _onCreatePlan(
+    CreatePlanFromListRequested event,
+    Emitter<PlanListState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(status: PlanListStatus.loading));
+
+      final newPlan = await _planRepository.createPlan(
+        name: event.name,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        expectedIncome: event.expectedIncome,
+        isActive: event.isActive,
+      );
+
+      // If the new plan is active, deactivate others in the list
+      List<Plan> updatedPlans;
+      if (event.isActive) {
+        updatedPlans =
+            state.plans.map((p) => p.copyWith(isActive: false)).toList();
+      } else {
+        updatedPlans = List.from(state.plans);
+      }
+
+      // Add new plan and sort
+      updatedPlans.insert(0, newPlan);
+      updatedPlans.sort((a, b) {
+        if (a.isActive && !b.isActive) return -1;
+        if (!a.isActive && b.isActive) return 1;
+        return b.startDate.compareTo(a.startDate);
+      });
+
+      emit(state.copyWith(
+        status: PlanListStatus.loaded,
+        plans: updatedPlans,
+      ));
     } catch (e) {
       emit(state.copyWith(
         status: PlanListStatus.error,

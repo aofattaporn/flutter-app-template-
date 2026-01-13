@@ -38,8 +38,9 @@ class ActivePlanBloc extends Bloc<ActivePlanEvent, ActivePlanState> {
       if (plan == null) {
         emit(state.copyWith(
           status: ActivePlanStatus.loaded,
-          plan: null,
+          clearPlan: true,
           planItems: [],
+          actualIncome: 0,
         ));
         return;
       }
@@ -72,8 +73,9 @@ class ActivePlanBloc extends Bloc<ActivePlanEvent, ActivePlanState> {
       if (plan == null) {
         emit(state.copyWith(
           status: ActivePlanStatus.loaded,
-          plan: null,
+          clearPlan: true,
           planItems: [],
+          actualIncome: 0,
         ));
         return;
       }
@@ -106,7 +108,7 @@ class ActivePlanBloc extends Bloc<ActivePlanEvent, ActivePlanState> {
 
       emit(state.copyWith(
         status: ActivePlanStatus.loaded,
-        plan: null,
+        clearPlan: true,
         planItems: [],
         actualIncome: 0,
       ));

@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/utils/currency_utils.dart';
+import '../../../../di/injection.dart';
 import '../../../../domain/entities/plan.dart';
+import '../../../../domain/repositories/plan_repository.dart';
 
 /// Plan Editor page for creating and editing plans
 /// Supports both create and edit modes based on whether an existing plan is passed
@@ -31,10 +33,12 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _expectedIncomeController = TextEditingController();
+  final PlanRepository _planRepository = getIt<PlanRepository>();
 
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now().add(const Duration(days: 30));
   bool _setAsActive = true;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -126,7 +130,7 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
     }
   }
 
-  void _submit() {
+  void _submit() async {
     if (_formKey.currentState!.validate()) {
       final expectedIncome = _expectedIncomeController.text.isNotEmpty
           ? double.tryParse(_expectedIncomeController.text)
@@ -145,19 +149,60 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
         return;
       }
 
-      final result = {
-        'name': _nameController.text.trim(),
-        'startDate': _startDate,
-        'endDate': _endDate,
-        'expectedIncome': expectedIncome,
-        'isActive': _setAsActive,
-      };
+      setState(() => _isLoading = true);
 
-      if (widget.existingPlan != null) {
-        result['id'] = widget.existingPlan!.id;
+      try {
+        if (widget.existingPlan != null) {
+          // Update existing plan
+          final wasActive = widget.existingPlan!.isActive;
+          final wantsToBeActive = _setAsActive;
+
+          // First update the plan data (without changing isActive yet if switching to active)
+          final updatedPlan = widget.existingPlan!.copyWith(
+            name: _nameController.text.trim(),
+            startDate: _startDate,
+            endDate: _endDate,
+            expectedIncome: expectedIncome,
+            // If switching from inactive to active, we'll handle it separately
+            isActive: wasActive ? _setAsActive : false,
+          );
+          await _planRepository.updatePlan(updatedPlan);
+
+          // If user wants to set this plan as active (and it wasn't before),
+          // use setActivePlan to properly deactivate other plans
+          if (wantsToBeActive && !wasActive) {
+            await _planRepository.setActivePlan(widget.existingPlan!.id);
+          }
+        } else {
+          // Create new plan - if setting as active, first create then set active
+          final createdPlan = await _planRepository.createPlan(
+            name: _nameController.text.trim(),
+            startDate: _startDate,
+            endDate: _endDate,
+            expectedIncome: expectedIncome,
+            isActive: false, // Create as inactive first
+          );
+
+          // If user wants this plan to be active, use setActivePlan
+          if (_setAsActive) {
+            await _planRepository.setActivePlan(createdPlan.id);
+          }
+        }
+
+        if (mounted) {
+          Navigator.of(context).pop(true); // Return true to indicate success
+        }
+      } catch (e) {
+        setState(() => _isLoading = false);
+        if (mounted) {
+          _showValidationError(
+            'Error',
+            widget.existingPlan != null
+                ? 'Failed to update plan: ${e.toString()}'
+                : 'Failed to create plan: ${e.toString()}',
+          );
+        }
       }
-
-      Navigator.of(context).pop(result);
     }
   }
 
@@ -748,7 +793,7 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
   }
 
   Widget _buildBottomActionBar(bool isEditMode) {
-    final isValid = _nameController.text.trim().isNotEmpty;
+    final isValid = _nameController.text.trim().isNotEmpty && !_isLoading;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -763,7 +808,8 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed:
+                    _isLoading ? null : () => Navigator.of(context).pop(),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.grey.shade700,
                   side: BorderSide(color: Colors.grey.shade300),
@@ -788,7 +834,16 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: Text(isEditMode ? 'Save Changes' : 'Create Plan'),
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(isEditMode ? 'Save Changes' : 'Create Plan'),
               ),
             ),
           ],

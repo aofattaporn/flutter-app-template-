@@ -29,7 +29,7 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
 
   void _navigateToCreatePlan() async {
     final state = context.read<ActivePlanBloc>().state;
-    final result = await Navigator.of(context).push<Map<String, dynamic>>(
+    final result = await Navigator.of(context).push<dynamic>(
       MaterialPageRoute(
         builder: (context) => PlanEditorPage(
           currentTotalPlanned: state.totalPlannedExpenses,
@@ -38,22 +38,15 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
       ),
     );
 
-    if (result != null && mounted) {
-      context.read<ActivePlanBloc>().add(
-            CreatePlanRequested(
-              name: result['name'] as String,
-              startDate: result['startDate'] as DateTime,
-              endDate: result['endDate'] as DateTime,
-              expectedIncome: result['expectedIncome'] as double?,
-              isActive: result['isActive'] as bool? ?? true,
-            ),
-          );
+    // Result is true when plan was created successfully via repository
+    if (result == true && mounted) {
+      context.read<ActivePlanBloc>().add(const RefreshActivePlan());
     }
   }
 
   void _navigateToEditPlan(Plan plan) async {
     final state = context.read<ActivePlanBloc>().state;
-    final result = await Navigator.of(context).push<Map<String, dynamic>>(
+    final result = await Navigator.of(context).push<dynamic>(
       MaterialPageRoute(
         builder: (context) => PlanEditorPage(
           existingPlan: plan,
@@ -63,17 +56,9 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
       ),
     );
 
-    if (result != null && mounted) {
-      context.read<ActivePlanBloc>().add(
-            UpdatePlanRequested(
-              planId: plan.id,
-              name: result['name'] as String,
-              startDate: result['startDate'] as DateTime,
-              endDate: result['endDate'] as DateTime,
-              expectedIncome: result['expectedIncome'] as double?,
-              isActive: result['isActive'] as bool?,
-            ),
-          );
+    // Result is true when plan was updated successfully via repository
+    if (result == true && mounted) {
+      context.read<ActivePlanBloc>().add(const RefreshActivePlan());
     }
   }
 

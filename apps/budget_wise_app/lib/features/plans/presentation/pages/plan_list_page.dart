@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../../di/injection.dart';
 import '../../../../domain/entities/plan.dart';
 import '../bloc/plan_list_bloc.dart';
+import 'plan_detail_page.dart';
 import 'plan_editor_page.dart';
 
 /// Page to display list of all plans
@@ -174,14 +175,16 @@ class _PlanListView extends StatelessWidget {
   void _navigateToCreatePlan(BuildContext context) {
     final bloc = context.read<PlanListBloc>();
     Navigator.of(context)
-        .push(
+        .push<dynamic>(
       MaterialPageRoute(
         builder: (_) => const PlanEditorPage(
           currentTotalPlanned: 0,
         ),
+        fullscreenDialog: true,
       ),
     )
         .then((result) {
+      // Result is true when plan was created successfully via repository
       if (result == true) {
         bloc.add(const RefreshPlans());
       }
@@ -499,202 +502,6 @@ class _InfoChip extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// Detail page for a single plan (summary view)
-class PlanDetailPage extends StatelessWidget {
-  final Plan plan;
-
-  const PlanDetailPage({
-    super.key,
-    required this.plan,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final dateFormat = DateFormat('MMM d, yyyy');
-    final currencyFormat = NumberFormat.currency(symbol: '\$');
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F6F8),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF4D648D),
-        foregroundColor: Colors.white,
-        title: Text(
-          plan.name,
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => PlanEditorPage(
-                    existingPlan: plan,
-                    currentTotalPlanned: 0,
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Summary Card
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  // Status Badge
-                  if (plan.isActive)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.green[50],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.check_circle,
-                              size: 18, color: Colors.green[700]),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Active Plan',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.green[700],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                  // Date Range
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.calendar_today,
-                        size: 20,
-                        color: Color(0xFF4D648D),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${dateFormat.format(plan.startDate)} - ${dateFormat.format(plan.endDate)}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  const Divider(),
-                  const SizedBox(height: 16),
-
-                  // Budget Summary
-                  if (plan.expectedIncome != null) ...[
-                    _SummaryRow(
-                      label: 'Expected Income',
-                      value: currencyFormat.format(plan.expectedIncome),
-                      valueColor: const Color(0xFF4D648D),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-
-                  // Info message
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          size: 20,
-                          color: Colors.blue[700],
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Set this plan as active to view and manage budget items.',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.blue[700],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SummaryRow extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color valueColor;
-  final bool isBold;
-
-  const _SummaryRow({
-    required this.label,
-    required this.value,
-    required this.valueColor,
-    this.isBold = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 15,
-            color: Colors.grey[700],
-            fontWeight: isBold ? FontWeight.w600 : FontWeight.normal,
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: isBold ? FontWeight.w700 : FontWeight.w600,
-            color: valueColor,
-          ),
-        ),
-      ],
     );
   }
 }
