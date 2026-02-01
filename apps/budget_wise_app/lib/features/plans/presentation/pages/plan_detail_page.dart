@@ -27,6 +27,9 @@ class PlanDetailPage extends StatefulWidget {
 class _PlanDetailPageState extends State<PlanDetailPage> {
   final PlanRepository _planRepository = getIt<PlanRepository>();
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // state usage
+  // ═══════════════════════════════════════════════════════════════════════════
   late Plan _currentPlan;
   List<PlanItem> _planItems = [];
   bool _isLoading = false;
@@ -41,6 +44,10 @@ class _PlanDetailPageState extends State<PlanDetailPage> {
   double get _totalActualExpenses {
     return _planItems.fold(0.0, (sum, item) => sum + item.actualAmount);
   }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LIFECYCLE
+  // ═══════════════════════════════════════════════════════════════════════════
 
   @override
   void initState() {
@@ -67,6 +74,41 @@ class _PlanDetailPageState extends State<PlanDetailPage> {
       debugPrint('Failed to load plan items: $e');
     }
   }
+
+  /// Refresh plan data from repository
+  Future<void> _refreshPlanData() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final updatedPlan = await _planRepository.getPlanById(_currentPlan.id);
+      if (updatedPlan != null && mounted) {
+        setState(() {
+          _currentPlan = updatedPlan;
+          _isLoading = false;
+        });
+        await _loadPlanItems();
+      } else {
+        // Plan was deleted, go back
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to refresh: $e'),
+            backgroundColor: Colors.red.shade700,
+          ),
+        );
+      }
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NAVIGATION METHODS
+  // ═══════════════════════════════════════════════════════════════════════════
 
   /// Navigate to edit plan and refresh data when returning
   void _navigateToEditPlan() async {
@@ -155,7 +197,11 @@ class _PlanDetailPageState extends State<PlanDetailPage> {
     }
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // DIALOG METHODS
+  // ═══════════════════════════════════════════════════════════════════════════
   /// Show item menu with edit and delete options
+
   void _showItemMenu(PlanItem item) {
     showModalBottomSheet(
       context: context,
@@ -241,37 +287,9 @@ class _PlanDetailPageState extends State<PlanDetailPage> {
     );
   }
 
-  /// Refresh plan data from repository
-  Future<void> _refreshPlanData() async {
-    setState(() => _isLoading = true);
-
-    try {
-      final updatedPlan = await _planRepository.getPlanById(_currentPlan.id);
-      if (updatedPlan != null && mounted) {
-        setState(() {
-          _currentPlan = updatedPlan;
-          _isLoading = false;
-        });
-        await _loadPlanItems();
-      } else {
-        // Plan was deleted, go back
-        if (mounted) {
-          Navigator.of(context).pop();
-        }
-      }
-    } catch (e) {
-      setState(() => _isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to refresh: $e'),
-            backgroundColor: Colors.red.shade700,
-          ),
-        );
-      }
-    }
-  }
-
+  // ═══════════════════════════════════════════════════════════════════════════
+  // BUILD - MAIN
+  // ═══════════════════════════════════════════════════════════════════════════
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('MMM d, yyyy');

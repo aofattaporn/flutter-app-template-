@@ -35,11 +35,25 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
   final _expectedIncomeController = TextEditingController();
   final PlanRepository _planRepository = getIt<PlanRepository>();
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // state usage
+  // ═══════════════════════════════════════════════════════════════════════════
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now().add(const Duration(days: 30));
   bool _setAsActive = true;
   bool _isLoading = false;
 
+  String _formatDate(DateTime date) {
+    return DateFormat('MMM d, yyyy').format(date);
+  }
+
+  int get _planDuration {
+    return _endDate.difference(_startDate).inDays + 1;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LIFECYCLE
+  // ═══════════════════════════════════════════════════════════════════════════
   @override
   void initState() {
     super.initState();
@@ -76,6 +90,9 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
     super.dispose();
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // DIALOG METHODS
+  // ═══════════════════════════════════════════════════════════════════════════
   Future<void> _selectStartDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -232,14 +249,9 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
     );
   }
 
-  String _formatDate(DateTime date) {
-    return DateFormat('MMM d, yyyy').format(date);
-  }
-
-  int get _planDuration {
-    return _endDate.difference(_startDate).inDays + 1;
-  }
-
+  // ═══════════════════════════════════════════════════════════════════════════
+  // BUILD - MAIN
+  // ═══════════════════════════════════════════════════════════════════════════
   @override
   Widget build(BuildContext context) {
     final isEditMode = widget.existingPlan != null;

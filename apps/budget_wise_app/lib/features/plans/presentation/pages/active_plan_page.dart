@@ -444,22 +444,4 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
       ),
     );
   }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // BUILD - FLOATING ACTION BUTTON
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  // Widget? _buildFloatingActionButton() {
-  //   return BlocBuilder<ActivePlanBloc, ActivePlanState>(
-  //     builder: (context, state) {
-  //       if (!state.hasActivePlan) return const SizedBox.shrink();
-
-  //       return FloatingActionButton(
-  //         onPressed: () => _navigateToAddItem(state.plan!),
-  //         backgroundColor: const Color(0xFF4D648D),
-  //         child: const Icon(Icons.add, color: Colors.white),
-  //       );
-  //     },
-  //   );
-  // }
 }
