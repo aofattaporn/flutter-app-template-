@@ -29,6 +29,8 @@ class PlanListBloc extends Bloc<PlanListEvent, PlanListState> {
     emit(state.copyWith(status: PlanListStatus.loading));
 
     try {
+
+      print('Fetching all plans from repository...');
       final plans = await _planRepository.getAllPlans();
 
       // Sort: active first, then by start date descending
@@ -43,6 +45,8 @@ class PlanListBloc extends Bloc<PlanListEvent, PlanListState> {
         plans: plans,
       ));
     } catch (e) {
+
+      print(e);
       emit(state.copyWith(
         status: PlanListStatus.error,
         errorMessage: e.toString(),
@@ -68,6 +72,8 @@ class PlanListBloc extends Bloc<PlanListEvent, PlanListState> {
         plans: plans,
       ));
     } catch (e) {
+
+       print(e);
       emit(state.copyWith(
         status: PlanListStatus.error,
         errorMessage: e.toString(),

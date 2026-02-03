@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:app_template/features/accounts/data/datasources/account_remote_datasource.dart';
 import 'package:app_template/features/accounts/data/repositories/account_repository_impl.dart';
 import 'package:app_template/features/accounts/domain/repositories/account_repository.dart';
@@ -26,11 +27,24 @@ Future<void> configureDependencies() async {
   // Supabase (if using Supabase backend)
   // ─────────────────────────────────────────────────────────────
   if (BackendConfig.isSupabase) {
-    await Supabase.initialize(
-      url: AppConfig.supabaseUrl,
-      anonKey: AppConfig.supabaseAnonKey,
-    );
-    getIt.registerLazySingleton<SupabaseClient>(() => Supabase.instance.client);
+    print('🔵 Initializing Supabase...');
+    print('URL: ${AppConfig.supabaseUrl}');
+    print('Key: ${AppConfig.supabaseAnonKey.substring(0, 20)}...');
+    
+    try {
+      // Allow self-signed certificates in development (NOT for production!)
+      HttpOverrides.global = _DevHttpOverrides();
+      
+      await Supabase.initialize(
+        url: AppConfig.supabaseUrl,
+        anonKey: AppConfig.supabaseAnonKey,
+      );
+      print('✅ Supabase initialized successfully');
+      getIt.registerLazySingleton<SupabaseClient>(() => Supabase.instance.client);
+    } catch (e) {
+      print('❌ Supabase initialization failed: $e');
+      rethrow;
+    }
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -85,4 +99,17 @@ Future<void> configureDependencies() async {
   getIt.registerLazySingleton(() => LogoutUseCase(getIt<AuthRepository>()));
   getIt.registerLazySingleton(
       () => GetCurrentUserUseCase(getIt<AuthRepository>()));
+}
+
+// ⚠️ DEVELOPMENT ONLY - Bypass SSL certificate verification
+// Remove this in production!
+class _DevHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) {
+        print('⚠️ Accepting certificate for $host');
+        return true;
+      };
+  }
 }
