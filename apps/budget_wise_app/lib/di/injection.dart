@@ -1,3 +1,6 @@
+import 'package:app_template/features/accounts/data/datasources/account_remote_datasource.dart';
+import 'package:app_template/features/accounts/data/repositories/account_repository_impl.dart';
+import 'package:app_template/features/accounts/domain/repositories/account_repository.dart';
 import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide LocalStorage;
 
@@ -42,6 +45,9 @@ Future<void> configureDependencies() async {
     getIt.registerLazySingleton<PlanDataSource>(
       () => PlanSupabaseDataSource(getIt<SupabaseClient>()),
     );
+    getIt.registerLazySingleton<AccountRemoteDataSource>(
+      () => AccountRemoteDataSource(getIt<SupabaseClient>()),
+    );
   } else {
     getIt.registerLazySingleton<AuthDataSource>(
       () => AuthRestDataSource(
@@ -65,6 +71,9 @@ Future<void> configureDependencies() async {
   if (BackendConfig.isSupabase) {
     getIt.registerLazySingleton<PlanRepository>(
       () => PlanRepositoryImpl(getIt<PlanDataSource>()),
+    );
+    getIt.registerLazySingleton<AccountRepository>(
+      () => AccountRepositoryImpl(getIt<AccountRemoteDataSource>()),
     );
   }
 
