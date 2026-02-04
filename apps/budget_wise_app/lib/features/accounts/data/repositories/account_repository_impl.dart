@@ -20,4 +20,16 @@ class AccountRepositoryImpl implements AccountRepository {
     final created = await remote.createAccount(model);
     return created.toEntity();
   }
+
+  @override
+  Future<Account> updateAccount(Account account) async {
+    final model = AccountModel.fromEntity(account);
+    final updated = await remote.updateAccount(model);
+    return updated.toEntity();
+  }
+
+  @override
+  Future<void> deleteAccount(String id) async {
+    await remote.deleteAccount(id);
+  }
 }

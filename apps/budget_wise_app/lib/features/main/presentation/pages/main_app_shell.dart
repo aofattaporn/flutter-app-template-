@@ -1,6 +1,6 @@
 import 'package:app_template/features/accounts/domain/entities/account.dart';
 import 'package:app_template/features/accounts/domain/repositories/account_repository.dart';
-import 'package:app_template/features/accounts/presentation/bloc/account_cubit.dart';
+import 'package:app_template/features/accounts/presentation/bloc/account_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -33,7 +33,7 @@ class MainAppShell extends StatefulWidget {
 class _MainAppShellState extends State<MainAppShell> {
   int _currentIndex = 1; // Default to Plans tab (index 1)
   late final ActivePlanBloc _activePlanBloc;
-  late final AccountCubit _accountCubit;
+  late final AccountBloc _accountBloc;
 
   @override
   void initState() {
@@ -41,12 +41,13 @@ class _MainAppShellState extends State<MainAppShell> {
     _activePlanBloc = ActivePlanBloc(
       planRepository: getIt<PlanRepository>(),
     );
-    _accountCubit = AccountCubit(accountRepository: getIt<AccountRepository>());
+    _accountBloc = AccountBloc(repository: getIt<AccountRepository>());
   }
 
   @override
   void dispose() {
     _activePlanBloc.close();
+    _accountBloc.close();
     super.dispose();
   }
 
@@ -74,7 +75,7 @@ class _MainAppShellState extends State<MainAppShell> {
           ),
           const TransactionsPlaceholderPage(),
           BlocProvider.value(
-            value: _accountCubit,
+            value: _accountBloc,
             child: const AccountScreen(),
           ),
           const SettingsPlaceholderPage(),
