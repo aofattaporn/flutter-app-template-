@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/utils/extensions.dart';
 import '../../domain/entities/account.dart';
 import '../bloc/account_bloc.dart';
 import 'account_create_screen.dart';
@@ -199,12 +200,7 @@ class _AccountScreenState extends State<AccountScreen> {
   /// Handle state changes (errors, success messages)
   void _handleStateChanges(BuildContext context, AccountState state) {
     if (state is AccountError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(state.message),
-          backgroundColor: Colors.red[700],
-        ),
-      );
+      context.showSnackBar(state.message, isError: true);
     }
   }
 

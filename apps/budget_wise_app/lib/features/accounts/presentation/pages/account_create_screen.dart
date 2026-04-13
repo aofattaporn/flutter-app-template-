@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/utils/extensions.dart';
 import '../../domain/entities/account.dart';
 import '../bloc/account_bloc.dart';
 
@@ -112,14 +113,8 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
         Navigator.pop(context, true);
       }
     } catch (e) {
-      print('❌ Account save error: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to save account: $e'),
-            backgroundColor: Colors.red[700],
-          ),
-        );
+        context.showSnackBar('Failed to save account: $e', isError: true);
       }
     } finally {
       if (mounted) {

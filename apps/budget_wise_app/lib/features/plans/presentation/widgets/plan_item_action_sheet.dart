@@ -1,0 +1,79 @@
+import 'package:flutter/material.dart';
+
+import '../../../../domain/entities/plan_item.dart';
+
+/// Bottom sheet menu for plan item actions (Edit / Delete).
+class PlanItemActionSheet extends StatelessWidget {
+  final PlanItem item;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  const PlanItemActionSheet({
+    super.key,
+    required this.item,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  /// Shows the bottom sheet and returns the selected action.
+  static void show({
+    required BuildContext context,
+    required PlanItem item,
+    required VoidCallback onEdit,
+    required VoidCallback onDelete,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => PlanItemActionSheet(
+        item: item,
+        onEdit: onEdit,
+        onDelete: onDelete,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildDragHandle(),
+          ListTile(
+            leading: const Icon(Icons.edit),
+            title: const Text('Edit Item'),
+            onTap: () {
+              Navigator.pop(context);
+              onEdit();
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.delete, color: Colors.red.shade700),
+            title: Text('Delete Item',
+                style: TextStyle(color: Colors.red.shade700)),
+            onTap: () {
+              Navigator.pop(context);
+              onDelete();
+            },
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDragHandle() {
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      width: 40,
+      height: 4,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(2),
+      ),
+    );
+  }
+}

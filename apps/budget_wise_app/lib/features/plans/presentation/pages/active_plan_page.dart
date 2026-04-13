@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../domain/entities/plan.dart';
 import '../../../../domain/entities/plan_item.dart';
 import '../bloc/active_plan_bloc.dart';
 import '../widgets/no_plan_widget.dart';
+import '../widgets/plan_item_action_sheet.dart';
 import '../widgets/plan_item_card.dart';
 import '../widgets/plan_overview_section.dart';
 import 'plan_editor_page.dart';
@@ -51,10 +53,10 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
     final state = context.read<ActivePlanBloc>().state;
     final result = await Navigator.of(context).push<dynamic>(
       MaterialPageRoute(
+        fullscreenDialog: true,
         builder: (context) => PlanEditorPage(
           currentTotalPlanned: state.totalPlannedExpenses,
         ),
-        fullscreenDialog: true,
       ),
     );
 
@@ -141,111 +143,39 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   // ═══════════════════════════════════════════════════════════════════════════
 
   void _showItemMenu(Plan plan, PlanItem item) {
-    showModalBottomSheet(
+    PlanItemActionSheet.show(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (sheetContext) =>
-          _buildItemMenuContent(sheetContext, plan, item),
+      item: item,
+      onEdit: () => _navigateToEditItem(plan, item),
+      onDelete: () => _confirmDeleteItem(item),
     );
   }
 
-  Widget _buildItemMenuContent(
-      BuildContext sheetContext, Plan plan, PlanItem item) {
-    return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildDragHandle(),
-          ListTile(
-            leading: const Icon(Icons.edit),
-            title: const Text('Edit Item'),
-            onTap: () {
-              Navigator.pop(sheetContext);
-              _navigateToEditItem(plan, item);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.delete, color: Colors.red.shade700),
-            title: Text('Delete Item',
-                style: TextStyle(color: Colors.red.shade700)),
-            onTap: () {
-              Navigator.pop(sheetContext);
-              _confirmDeleteItem(item);
-            },
-          ),
-          const SizedBox(height: 8),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDragHandle() {
-    return Container(
-      margin: const EdgeInsets.only(top: 8),
-      width: 40,
-      height: 4,
-      decoration: BoxDecoration(
-        color: Colors.grey.shade300,
-        borderRadius: BorderRadius.circular(2),
-      ),
-    );
-  }
-
-  void _confirmDeleteItem(PlanItem item) {
-    showDialog(
+  Future<void> _confirmDeleteItem(PlanItem item) async {
+    final confirmed = await ConfirmDialog.show(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Item'),
-        content: Text('Are you sure you want to delete "${item.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              context
-                  .read<ActivePlanBloc>()
-                  .add(DeletePlanItemRequested(item.id));
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+      title: 'Delete Item',
+      message: 'Are you sure you want to delete "${item.name}"?',
+      confirmLabel: 'Delete',
+      isDestructive: true,
     );
+    if (confirmed && mounted) {
+      context.read<ActivePlanBloc>().add(DeletePlanItemRequested(item.id));
+    }
   }
 
-  void _confirmClosePlan() {
-    showDialog(
+  Future<void> _confirmClosePlan() async {
+    final confirmed = await ConfirmDialog.show(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Close Plan'),
-        content: const Text(
-          'Are you sure you want to close this plan? '
+      title: 'Close Plan',
+      message: 'Are you sure you want to close this plan? '
           'This will make it inactive and you can create a new plan.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              context
-                  .read<ActivePlanBloc>()
-                  .add(const CloseActivePlanRequested());
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Close Plan'),
-          ),
-        ],
-      ),
+      confirmLabel: 'Close Plan',
+      isDestructive: true,
     );
+    if (confirmed && mounted) {
+      context.read<ActivePlanBloc>().add(const CloseActivePlanRequested());
+    }
   }
 
   void _showErrorSnackBar(String message) {
@@ -275,20 +205,25 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   }
 
   void _handleStateChanges(BuildContext context, ActivePlanState state) {
+    // error state - show snackbar with error message
     if (state.status == ActivePlanStatus.error && state.errorMessage != null) {
       _showErrorSnackBar(state.errorMessage!);
     }
   }
 
   Widget _buildBody(BuildContext context, ActivePlanState state) {
+
+    // Loading state - show spinner
     if (state.status == ActivePlanStatus.loading) {
       return _buildLoadingState();
     }
 
+    // No active plan - show empty state with options to create or view plans
     if (!state.hasActivePlan) {
       return _buildNoPlanState();
     }
 
+    // Active plan exists - show plan overview and items
     return _buildActivePlanContent(state);
   }
 
@@ -310,7 +245,7 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // BUILD - ACTIVE PLAN CONTENT
+  // BUILD - (existing items) ACTIVE PLAN CONTENT ****
   // ═══════════════════════════════════════════════════════════════════════════
 
   Widget _buildActivePlanContent(ActivePlanState state) {

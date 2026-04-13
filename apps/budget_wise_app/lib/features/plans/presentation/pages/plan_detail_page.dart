@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/utils/currency_utils.dart';
+import '../../../../core/utils/extensions.dart';
 import '../../../../di/injection.dart';
 import '../../../../domain/entities/plan.dart';
 import '../../../../domain/entities/plan_item.dart';
@@ -96,12 +97,7 @@ class _PlanDetailPageState extends State<PlanDetailPage> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to refresh: $e'),
-            backgroundColor: Colors.red.shade700,
-          ),
-        );
+        context.showSnackBar('Failed to refresh: $e', isError: true);
       }
     }
   }
@@ -151,12 +147,7 @@ class _PlanDetailPageState extends State<PlanDetailPage> {
         await _loadPlanItems();
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to create item: $e'),
-              backgroundColor: Colors.red.shade700,
-            ),
-          );
+          context.showSnackBar('Failed to create item: $e', isError: true);
         }
       }
     }
@@ -186,12 +177,7 @@ class _PlanDetailPageState extends State<PlanDetailPage> {
         await _loadPlanItems();
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to update item: $e'),
-              backgroundColor: Colors.red.shade700,
-            ),
-          );
+          context.showSnackBar('Failed to update item: $e', isError: true);
         }
       }
     }
@@ -267,12 +253,7 @@ class _PlanDetailPageState extends State<PlanDetailPage> {
                 await _loadPlanItems();
               } catch (e) {
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Failed to delete item: $e'),
-                      backgroundColor: Colors.red.shade700,
-                    ),
-                  );
+                  context.showSnackBar('Failed to delete item: $e', isError: true);
                 }
               }
             },
