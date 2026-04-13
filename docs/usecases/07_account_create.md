@@ -2,7 +2,7 @@
 
 > **Screen**: `account_create_screen.dart`
 > **BLoC**: `AccountBloc`
-> **Status**: COMPLETE (missing: negative balance toggle, notes field)
+> **Status**: COMPLETE
 > **Design Spec**: `propmt/account_create_screen.html`
 
 ---
@@ -75,8 +75,8 @@ Create a new account or edit an existing one. User provides account name, type, 
 | BR-ACC-CREATE-02  | Account type must be selected from predefined list          |
 | BR-ACC-CREATE-03  | Opening balance defaults to 0 if not provided               |
 | BR-ACC-CREATE-04  | Balance and opening balance are in Thai Baht (฿)            |
-| BR-ACC-CREATE-05  | Negative balance toggle is in design spec but NOT YET BUILT |
-| BR-ACC-CREATE-06  | Notes field is in design spec but NOT persisted to database  |
+| BR-ACC-CREATE-05  | Negative balance toggle — removed from scope              |
+| BR-ACC-CREATE-06  | Notes field — removed from scope                           |
 
 ---
 

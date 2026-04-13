@@ -21,7 +21,6 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _balanceController = TextEditingController();
-  final _notesController = TextEditingController();
 
   String _selectedType = 'bank';
   bool _isLoading = false;
@@ -52,7 +51,6 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
   void dispose() {
     _nameController.dispose();
     _balanceController.dispose();
-    _notesController.dispose();
     super.dispose();
   }
 
@@ -191,12 +189,6 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
                       color: Colors.grey[500],
                     ),
                   ),
-                  const SizedBox(height: 32),
-
-                  // Optional settings section
-                  _buildSectionLabel('Optional Settings'),
-                  const SizedBox(height: 16),
-                  _buildNotesField(),
                 ],
               ),
             ),
@@ -359,46 +351,6 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
         }
         return null;
       },
-    );
-  }
-
-  /// Build notes field
-  Widget _buildNotesField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Notes (Optional)',
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[700],
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: _notesController,
-          maxLines: 3,
-          decoration: InputDecoration(
-            hintText: 'Add any additional details...',
-            hintStyle: TextStyle(color: Colors.grey[400]),
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFD4D4D4)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFD4D4D4)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFF4D648D)),
-            ),
-            contentPadding: const EdgeInsets.all(12),
-          ),
-        ),
-      ],
     );
   }
 
