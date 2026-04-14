@@ -44,9 +44,11 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F8),
-      body: BlocConsumer<HomeBloc, HomeState>(
-        listener: _handleStateChanges,
-        builder: _buildBody,
+      body: SafeArea(
+        child: BlocConsumer<HomeBloc, HomeState>(
+          listener: _handleStateChanges,
+          builder: _buildBody,
+        ),
       ),
     );
   }
@@ -92,11 +94,9 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
     final now = DateTime.now();
     final dateFormat = DateFormat('EEEE, MMM d');
 
-    final topPadding = MediaQuery.of(context).padding.top;
-
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(20, topPadding + 20, 20, 16),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
       color: const Color(0xFF4D648D),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
