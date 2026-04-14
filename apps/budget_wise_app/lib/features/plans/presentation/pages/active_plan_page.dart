@@ -6,10 +6,10 @@ import '../../../../domain/entities/plan.dart';
 import '../../../../domain/entities/plan_item.dart';
 import '../bloc/active_plan_bloc.dart';
 import '../widgets/no_plan_widget.dart';
-import '../widgets/plan_item_action_sheet.dart';
 import '../widgets/plan_item_card.dart';
 import '../widgets/plan_overview_section.dart';
 import 'plan_editor_page.dart';
+import 'plan_item_detail_page.dart';
 import 'plan_item_editor_page.dart';
 import 'plan_list_page.dart';
 
@@ -142,13 +142,20 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   // DIALOG METHODS
   // ═══════════════════════════════════════════════════════════════════════════
 
-  void _showItemMenu(Plan plan, PlanItem item) {
-    PlanItemActionSheet.show(
-      context: context,
-      item: item,
-      onEdit: () => _navigateToEditItem(plan, item),
-      onDelete: () => _confirmDeleteItem(item),
+  Future<void> _navigateToItemDetail(PlanItem item) async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider.value(
+          value: context.read<ActivePlanBloc>(),
+          child: PlanItemDetailPage(item: item),
+        ),
+      ),
     );
+
+    if (mounted) {
+      _refreshActivePlan();
+    }
   }
 
   Future<void> _confirmDeleteItem(PlanItem item) async {
@@ -374,8 +381,8 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
       padding: const EdgeInsets.only(bottom: 12),
       child: PlanItemCard(
         item: item,
-        onTap: () => _showItemMenu(plan, item),
-        onMenuTap: () => _showItemMenu(plan, item),
+        onTap: () => _navigateToItemDetail(item),
+        onMenuTap: () => _navigateToItemDetail(item),
       ),
     );
   }

@@ -139,4 +139,38 @@ class TransactionRemoteDataSource {
       throw Exception('Failed to fetch transactions by date range: $e');
     }
   }
+
+  /// Fetch transactions for a specific account
+  Future<List<TransactionModel>> fetchByAccountId(String accountId) async {
+    try {
+      final response = await client
+          .from(_tableName)
+          .select()
+          .eq('account_id', accountId)
+          .order('occurred_at', ascending: false);
+
+      return (response as List)
+          .map((json) => TransactionModel.fromJson(json))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to fetch transactions by account: $e');
+    }
+  }
+
+  /// Fetch transactions for a specific plan item
+  Future<List<TransactionModel>> fetchByPlanItemId(String planItemId) async {
+    try {
+      final response = await client
+          .from(_tableName)
+          .select()
+          .eq('plan_item_id', planItemId)
+          .order('occurred_at', ascending: false);
+
+      return (response as List)
+          .map((json) => TransactionModel.fromJson(json))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to fetch transactions by plan item: $e');
+    }
+  }
 }

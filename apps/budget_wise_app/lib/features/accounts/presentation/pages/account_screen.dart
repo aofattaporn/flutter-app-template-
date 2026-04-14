@@ -6,6 +6,7 @@ import '../../domain/entities/account.dart';
 import '../bloc/account_bloc.dart';
 import '../widgets/dashed_border_painter.dart';
 import 'account_create_screen.dart';
+import 'account_detail_page.dart';
 
 /// ═══════════════════════════════════════════════════════════════════════════
 /// Account Screen - Main accounts list view
@@ -52,21 +53,20 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
 
-  /// Handle account item tap - navigate to edit
+  /// Handle account item tap - navigate to detail page
   Future<void> _onAccountTap(Account account) async {
     final result = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
         builder: (_) => BlocProvider.value(
           value: context.read<AccountBloc>(),
-          child: AccountCreateScreen(account: account),
+          child: AccountDetailPage(account: account),
         ),
       ),
     );
 
-    // Refresh accounts list if account was updated
-    if (result == true && mounted) {
-      context.read<AccountBloc>().add(const FetchAccountsRequested());
+    if (mounted) {
+      context.read<AccountBloc>().add(const RefreshAccountsRequested());
     }
   }
 

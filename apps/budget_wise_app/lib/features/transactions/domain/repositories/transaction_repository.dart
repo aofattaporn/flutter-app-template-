@@ -12,4 +12,6 @@ abstract class TransactionRepository {
     required DateTime start,
     required DateTime end,
   });
+  Future<List<Transaction>> getTransactionsByAccountId(String accountId);
+  Future<List<Transaction>> getTransactionsByPlanItemId(String planItemId);
 }

@@ -57,4 +57,16 @@ class TransactionRepositoryImpl implements TransactionRepository {
     final models = await remote.fetchByDateRange(start: start, end: end);
     return models.map((e) => e.toEntity()).toList();
   }
+
+  @override
+  Future<List<Transaction>> getTransactionsByAccountId(String accountId) async {
+    final models = await remote.fetchByAccountId(accountId);
+    return models.map((e) => e.toEntity()).toList();
+  }
+
+  @override
+  Future<List<Transaction>> getTransactionsByPlanItemId(String planItemId) async {
+    final models = await remote.fetchByPlanItemId(planItemId);
+    return models.map((e) => e.toEntity()).toList();
+  }
 }
