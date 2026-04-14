@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_theme.dart';
 import 'bottom_nav_item.dart';
 
 /// App-wide bottom navigation bar widget
@@ -8,12 +9,6 @@ import 'bottom_nav_item.dart';
 class AppBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
-
-  /// Primary color for active state (matches design: #4D648D)
-  static const Color _activeColor = Color(0xFF4D648D);
-
-  /// Inactive color for non-selected items
-  static const Color _inactiveColor = Color(0xFFA3A3A3);
 
   const AppBottomNavBar({
     super.key,
@@ -53,21 +48,14 @@ class AppBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
+      decoration: const BoxDecoration(
+        color: AppColors.cardBg,
         border: Border(
           top: BorderSide(
-            color: Colors.grey.shade200,
-            width: 1,
+            color: AppColors.divider,
+            width: 0.5,
           ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
       ),
       child: SafeArea(
         top: false,
@@ -81,8 +69,8 @@ class AppBottomNavBar extends StatelessWidget {
                 data: _navItems[index],
                 isSelected: currentIndex == index,
                 onTap: () => onTap(index),
-                activeColor: _activeColor,
-                inactiveColor: _inactiveColor,
+                activeColor: AppColors.primary,
+                inactiveColor: AppColors.textTertiary,
               ),
             ),
           ),

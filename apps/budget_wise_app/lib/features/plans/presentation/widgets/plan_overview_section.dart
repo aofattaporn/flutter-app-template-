@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../domain/entities/plan.dart';
 
@@ -39,7 +40,7 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
   // CONSTANTS
   // ═══════════════════════════════════════════════════════════════════════════
 
-  static const _primaryColor = Color(0xFF4D648D);
+  static const _primaryColor = AppColors.accent;
 
   // ═══════════════════════════════════════════════════════════════════════════
   // STATE
@@ -115,22 +116,9 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          widget.plan.name,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
+        Text(widget.plan.name, style: AppStyles.titleLarge),
         const SizedBox(height: 4),
-        Text(
-          widget.plan.formattedPeriod,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade500,
-          ),
-        ),
+        Text(widget.plan.formattedPeriod, style: AppStyles.caption),
       ],
     );
   }
@@ -139,17 +127,17 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
     final isActive = widget.plan.isActive;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: isActive ? _primaryColor.withOpacity(0.1) : Colors.grey.shade100,
+        color: isActive ? AppColors.accentLight : AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         isActive ? 'Active' : 'Inactive',
         style: TextStyle(
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: FontWeight.w500,
-          color: isActive ? _primaryColor : Colors.grey.shade600,
+          color: isActive ? AppColors.accent : AppColors.textTertiary,
         ),
       ),
     );
@@ -160,109 +148,55 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Widget _buildAvailableToSpendCard() {
+    final progress = (_percentageLeft / 100).clamp(0.0, 1.0);
+
     return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: _primaryColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: _primaryColor.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.all(20),
+      decoration: AppStyles.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildCardLabel(),
+          Text('Available to Spend', style: AppStyles.label),
           const SizedBox(height: 8),
-          _buildAvailableAmount(),
+          Text(
+            CurrencyUtils.formatCurrency(_availableToSpend.clamp(0, double.infinity)),
+            style: AppStyles.displayLarge,
+          ),
           const SizedBox(height: 16),
-          _buildProgressBar(),
-          const SizedBox(height: 16),
-          _buildSpentAndPercentageRow(),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 4,
+              backgroundColor: AppColors.surfaceLight,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                progress < 0.15 ? AppColors.expense : AppColors.accent,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${CurrencyUtils.formatCurrency(widget.totalSpent)} spent',
+                style: AppStyles.caption,
+              ),
+              Text(
+                '${_percentageLeft.toStringAsFixed(0)}% left',
+                style: AppStyles.caption,
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
-
-  Widget _buildCardLabel() {
-    return Text(
-      'Available to Spend',
-      style: TextStyle(
-        fontSize: 12,
-        color: Colors.white.withOpacity(0.7),
-      ),
-    );
-  }
-
-  Widget _buildAvailableAmount() {
-    return Text(
-      CurrencyUtils.formatCurrency(_availableToSpend.clamp(0, double.infinity)),
-      style: const TextStyle(
-        fontSize: 36,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
-    );
-  }
-
-  Widget _buildProgressBar() {
-    final progress = (_percentageLeft / 100).clamp(0.0, 1.0);
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(4),
-      child: LinearProgressIndicator(
-        value: progress,
-        minHeight: 6,
-        backgroundColor: Colors.white.withOpacity(0.2),
-        valueColor: AlwaysStoppedAnimation<Color>(
-          progress < 0.15 ? Colors.red.shade300 : Colors.white,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSpentAndPercentageRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          '${CurrencyUtils.formatCurrency(widget.totalSpent)} spent',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.white.withOpacity(0.8),
-          ),
-        ),
-        Text(
-          '${_percentageLeft.toStringAsFixed(0)}% left',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.white.withOpacity(0.8),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // BUILD - INCOME TRACKING SECTION
-  // ═══════════════════════════════════════════════════════════════════════════
+  // (Amount & progress now inline in _buildAvailableToSpendCard)
 
   Widget _buildIncomeTrackingSection() {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      decoration: AppStyles.card,
       child: Column(
         children: [
           _buildIncomeTrackingHeader(),
@@ -275,32 +209,17 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
   Widget _buildIncomeTrackingHeader() {
     return InkWell(
       onTap: _toggleDetailsExpanded,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppDimens.radiusMd),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(
-              Icons.analytics_outlined,
-              size: 20,
-              color: Colors.grey.shade600,
-            ),
+            Icon(Icons.analytics_outlined, size: 18, color: AppColors.textSecondary),
             const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                'Income Tracking',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey.shade700,
-                ),
-              ),
-            ),
+            Expanded(child: Text('Income Tracking', style: AppStyles.bodyLarge)),
             Icon(
-              _isDetailsExpanded
-                  ? Icons.keyboard_arrow_up
-                  : Icons.keyboard_arrow_down,
-              color: Colors.grey.shade400,
+              _isDetailsExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+              color: AppColors.textTertiary,
             ),
           ],
         ),
@@ -311,30 +230,21 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
   Widget _buildIncomeTrackingDetails() {
     return Column(
       children: [
-        Divider(height: 1, color: Colors.grey.shade100),
+        const Divider(height: 1, color: AppColors.divider),
         Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              _buildDetailRow(
-                label: 'Planned Income',
-                value: CurrencyUtils.formatCurrency(_expectedIncome),
-              ),
+              _buildDetailRow(label: 'Planned Income', value: CurrencyUtils.formatCurrency(_expectedIncome)),
               const SizedBox(height: 12),
-              _buildDetailRow(
-                label: 'Actual Income',
-                value: CurrencyUtils.formatCurrency(widget.actualIncome),
-              ),
+              _buildDetailRow(label: 'Actual Income', value: CurrencyUtils.formatCurrency(widget.actualIncome)),
               const SizedBox(height: 12),
-              Divider(height: 1, color: Colors.grey.shade100),
+              const Divider(height: 1, color: AppColors.divider),
               const SizedBox(height: 12),
               _buildDetailRow(
                 label: 'Difference',
-                value:
-                    '${_incomeDifference >= 0 ? '+' : ''}${CurrencyUtils.formatCurrency(_incomeDifference)}',
-                valueColor: _incomeDifference >= 0
-                    ? Colors.green.shade600
-                    : Colors.red.shade600,
+                value: '${_incomeDifference >= 0 ? '+' : ''}${CurrencyUtils.formatCurrency(_incomeDifference)}',
+                valueColor: _incomeDifference >= 0 ? AppColors.income : AppColors.expense,
               ),
             ],
           ),
@@ -389,19 +299,13 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.grey.shade600,
-          ),
-        ),
+        Text(label, style: AppStyles.bodySmall),
         Text(
           value,
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: valueColor ?? Colors.black87,
+            color: valueColor ?? AppColors.textPrimary,
           ),
         ),
       ],
@@ -415,36 +319,15 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppDimens.radiusMd),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+        decoration: AppStyles.card,
         child: Column(
           children: [
-            Icon(
-              icon,
-              size: 22,
-              color: _primaryColor,
-            ),
+            Icon(icon, size: 20, color: AppColors.accent),
             const SizedBox(height: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey.shade700,
-              ),
-            ),
+            Text(label, style: AppStyles.label),
           ],
         ),
       ),

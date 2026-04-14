@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../domain/entities/account.dart';
 import '../bloc/account_bloc.dart';
@@ -84,19 +85,9 @@ class _AccountScreenState extends State<AccountScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle indicator
-            Container(
-              margin: const EdgeInsets.only(top: 8, bottom: 16),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            // Menu options
+            AppStyles.sheetHandle(),
             ListTile(
-              leading: const Icon(Icons.edit),
+              leading: const Icon(Icons.edit_outlined, color: AppColors.accent),
               title: const Text('Edit Account'),
               onTap: () {
                 Navigator.pop(context);
@@ -104,11 +95,8 @@ class _AccountScreenState extends State<AccountScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.delete, color: Colors.red[700]),
-              title: Text(
-                'Delete Account',
-                style: TextStyle(color: Colors.red[700]),
-              ),
+              leading: Icon(Icons.delete_outline, color: AppColors.expense),
+              title: Text('Delete Account', style: TextStyle(color: AppColors.expense)),
               onTap: () {
                 Navigator.pop(context);
                 _showDeleteConfirmation(account);
@@ -163,8 +151,17 @@ class _AccountScreenState extends State<AccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6F8),
-      appBar: _buildAppBar(),
+      backgroundColor: AppColors.scaffoldBg,
+      appBar: AppStyles.appBar(
+        title: 'Accounts',
+        showBack: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: _navigateToCreateAccount,
+          ),
+        ],
+      ),
       body: BlocConsumer<AccountBloc, AccountState>(
         listener: _handleStateChanges,
         builder: (context, state) => _buildBody(state),
@@ -177,19 +174,12 @@ class _AccountScreenState extends State<AccountScreen> {
   // ═══════════════════════════════════════════════════════════════════════════
 
   PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: const Color(0xFF4D648D),
-      elevation: 0,
-      title: const Text(
-        'Accounts',
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+    return AppStyles.appBar(
+      title: 'Accounts',
+      showBack: false,
       actions: [
         IconButton(
-          icon: const Icon(Icons.add, color: Colors.white),
+          icon: const Icon(Icons.add),
           onPressed: _navigateToCreateAccount,
         ),
       ],
@@ -204,66 +194,30 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Widget _buildBody(AccountState state) {
     if (state is AccountLoading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          color: Color(0xFF4D648D),
-        ),
-      );
+      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
-
-    if (state is AccountLoaded) {
-      return _buildAccountsList(state);
-    }
-
-    if (state is AccountError) {
-      return _buildErrorState(state.message);
-    }
-
-    // Initial state
+    if (state is AccountLoaded) return _buildAccountsList(state);
+    if (state is AccountError) return _buildErrorState(state.message);
     return const SizedBox.shrink();
   }
 
   Widget _buildErrorState(String message) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(40),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red[300],
-            ),
+            Icon(Icons.error_outline, size: 48, color: AppColors.textTertiary),
             const SizedBox(height: 16),
-            Text(
-              'Oops! Something went wrong',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[800],
-              ),
-            ),
+            Text('Something went wrong', style: AppStyles.titleMedium),
             const SizedBox(height: 8),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
-            ),
+            Text(message, textAlign: TextAlign.center, style: AppStyles.bodySmall),
             const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () {
-                context.read<AccountBloc>().add(const FetchAccountsRequested());
-              },
-              icon: const Icon(Icons.refresh),
-              label: const Text('Try Again'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4D648D),
-                foregroundColor: Colors.white,
-              ),
+            ElevatedButton(
+              onPressed: () => context.read<AccountBloc>().add(const FetchAccountsRequested()),
+              style: AppStyles.primaryButton,
+              child: const Text('Try Again'),
             ),
           ],
         ),
@@ -276,8 +230,6 @@ class _AccountScreenState extends State<AccountScreen> {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Widget _buildAccountsList(AccountLoaded state) {
-    final currencyFormat = NumberFormat.currency(symbol: '฿', decimalDigits: 0);
-
     return RefreshIndicator(
       onRefresh: () async {
         context.read<AccountBloc>().add(const RefreshAccountsRequested());
@@ -287,7 +239,7 @@ class _AccountScreenState extends State<AccountScreen> {
         child: Column(
           children: [
             // Total balance summary
-            _buildTotalBalanceSummary(state, currencyFormat),
+            _buildTotalBalanceSummary(state),
             
             // Accounts section header
             _buildSectionHeader(state.accountCount),
@@ -303,79 +255,31 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  Widget _buildTotalBalanceSummary(
-    AccountLoaded state,
-    NumberFormat currencyFormat,
-  ) {
+  Widget _buildTotalBalanceSummary(AccountLoaded state) {
     return Container(
-      width: double.infinity,
+      margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: Color(0xFFFAFAFA),
-        border: Border(
-          bottom: BorderSide(color: Color(0xFFE5E5E5)),
-        ),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFE5E5E5)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Total Balance',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              currencyFormat.format(state.totalBalance),
-              style: const TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.normal,
-                color: Color(0xFF171717),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Across ${state.accountCount} ${state.accountCount == 1 ? 'account' : 'accounts'}',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[500],
-              ),
-            ),
-          ],
-        ),
+      decoration: AppStyles.card,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Total Balance', style: AppStyles.label),
+          const SizedBox(height: 8),
+          Text(CurrencyUtils.formatCurrency(state.totalBalance), style: AppStyles.displayLarge),
+          const SizedBox(height: 8),
+          Text(
+            'Across ${state.accountCount} ${state.accountCount == 1 ? 'account' : 'accounts'}',
+            style: AppStyles.caption,
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildSectionHeader(int count) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Color(0xFFF5F5F5), width: 1),
-        ),
-      ),
-      child: Row(
-        children: [
-          Text(
-            'Your Accounts',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-          ),
-        ],
-      ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+      child: Text('Your Accounts', style: AppStyles.titleMedium),
     );
   }
 
@@ -386,25 +290,11 @@ class _AccountScreenState extends State<AccountScreen> {
         child: Center(
           child: Column(
             children: [
-              Icon(
-                Icons.account_balance_wallet_outlined,
-                size: 48,
-                color: Colors.grey[400],
-              ),
+              Icon(Icons.account_balance_wallet_outlined, size: 36, color: AppColors.textTertiary),
               const SizedBox(height: 16),
-              Text(
-                'No accounts yet',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
-              ),
+              Text('No accounts yet', style: AppStyles.bodyLarge),
               const SizedBox(height: 8),
-              Text(
-                'Add an account to start tracking your finances',
-                style: TextStyle(fontSize: 14, color: Colors.grey[500]),
-              ),
+              Text('Add an account to start tracking', style: AppStyles.bodySmall),
             ],
           ),
         ),
@@ -414,9 +304,9 @@ class _AccountScreenState extends State<AccountScreen> {
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
       itemCount: accounts.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
         final account = accounts[index];
         return _AccountCard(
@@ -433,38 +323,22 @@ class _AccountScreenState extends State<AccountScreen> {
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: InkWell(
         onTap: _navigateToCreateAccount,
-        borderRadius: BorderRadius.circular(8),
-        child: CustomPaint(
-          painter: DashedBorderPainter(
-            color: const Color(0xFFD4D4D4),
-            strokeWidth: 2,
-            borderRadius: 8,
+        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          decoration: BoxDecoration(
+            color: AppColors.cardBg,
+            borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+            border: Border.all(color: AppColors.border, style: BorderStyle.solid, width: 1),
           ),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.add,
-                  size: 24,
-                  color: Colors.grey[400],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Add New Account',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add_rounded, size: 20, color: AppColors.textTertiary),
+              const SizedBox(height: 4),
+              Text('Add Account', style: AppStyles.bodySmall),
+            ],
           ),
         ),
       ),
@@ -488,104 +362,40 @@ class _AccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(symbol: '฿', decimalDigits: 2);
-
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppDimens.radiusMd),
       child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFE5E5E5)),
-        ),
-        child: Column(
+        padding: const EdgeInsets.all(AppDimens.cardPadding),
+        decoration: AppStyles.card,
+        child: Row(
           children: [
-            // Header row with icon, name, and menu
-            Row(
+            AppStyles.iconBox(
+              icon: _getIconForType(account.type),
+              size: AppDimens.iconMd,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(account.name, style: AppStyles.bodyLarge),
+                  const SizedBox(height: 2),
+                  Text(_getTypeName(account.type), style: AppStyles.caption),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                // Account icon
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    _getIconForType(account.type),
-                    color: const Color(0xFF4D648D),
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                
-                // Account name and type
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        account.name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _getTypeName(account.type),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                // Menu button
-                IconButton(
-                  onPressed: onMenuTap,
-                  icon: Icon(
-                    Icons.more_vert,
-                    color: Colors.grey[400],
-                  ),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+                Text(
+                  CurrencyUtils.formatCurrency(account.balance),
+                  style: AppStyles.titleMedium,
                 ),
               ],
             ),
-            
-            // Divider
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: Divider(height: 1),
-            ),
-            
-            // Balance row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Balance',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                Text(
-                  currencyFormat.format(account.balance),
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-              ],
-            ),
+            const SizedBox(width: 4),
+            Icon(Icons.chevron_right, color: AppColors.textTertiary, size: 20),
           ],
         ),
       ),

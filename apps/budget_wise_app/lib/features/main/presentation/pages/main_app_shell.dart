@@ -1,4 +1,3 @@
-import 'package:app_template/features/accounts/domain/entities/account.dart';
 import 'package:app_template/features/accounts/domain/repositories/account_repository.dart';
 import 'package:app_template/features/accounts/presentation/bloc/account_bloc.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +11,6 @@ import '../../../home/presentation/pages/home_overview_page.dart';
 import '../../../plans/presentation/bloc/active_plan_bloc.dart';
 import '../../../plans/presentation/pages/active_plan_page.dart';
 import '../../../transactions/transactions.dart';
-import '../../../transactions/presentation/bloc/transaction_history_bloc.dart';
-import '../../../transactions/presentation/pages/transaction_history_page.dart';
 import '../../../accounts/accounts.dart';
 import '../../../settings/settings.dart';
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../domain/entities/plan.dart';
 import '../../../../domain/entities/plan_item.dart';
@@ -201,7 +202,7 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.scaffoldBg,
       body: SafeArea(
         child: BlocConsumer<ActivePlanBloc, ActivePlanState>(
           listener: _handleStateChanges,
@@ -240,7 +241,7 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
 
   Widget _buildLoadingState() {
     return const Center(
-      child: CircularProgressIndicator(color: Color(0xFF4D648D)),
+      child: CircularProgressIndicator(color: AppColors.primary),
     );
   }
 
@@ -289,7 +290,7 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
 
   Widget _buildPlanItemsSection(ActivePlanState state) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -305,14 +306,7 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          'Budget Items',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF2C3E50),
-          ),
-        ),
+        Text('Budget Items', style: AppStyles.titleMedium),
         TextButton.icon(
           onPressed: () {
             final state = context.read<ActivePlanBloc>().state;
@@ -320,9 +314,9 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
               _navigateToAddItem(state.plan!);
             }
           },
-          icon: const Icon(Icons.add, size: 18),
-          label: const Text('Add Item'),
-          style: TextButton.styleFrom(foregroundColor: const Color(0xFF4D648D)),
+          icon: const Icon(Icons.add, size: 16),
+          label: const Text('Add'),
+          style: TextButton.styleFrom(foregroundColor: AppColors.accent),
         ),
       ],
     );
@@ -343,31 +337,16 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   Widget _buildEmptyItemsState() {
     return Container(
       padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
+      decoration: AppStyles.card,
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.category_outlined,
-                size: 48, color: Colors.grey.shade400),
+            Icon(Icons.category_outlined, size: 36, color: AppColors.textTertiary),
             const SizedBox(height: 16),
-            Text(
-              'No budget items yet',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey.shade600,
-              ),
-            ),
+            Text('No budget items yet', style: AppStyles.bodyLarge),
             const SizedBox(height: 8),
-            Text(
-              'Add items to organize your budget',
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
-            ),
+            Text('Add items to organize your budget', style: AppStyles.bodySmall),
           ],
         ),
       ),

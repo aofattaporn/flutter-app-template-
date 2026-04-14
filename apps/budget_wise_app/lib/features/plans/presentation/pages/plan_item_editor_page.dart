@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../domain/entities/plan.dart';
 import '../../../../domain/entities/plan_item.dart';
@@ -167,8 +168,8 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4D648D),
-              foregroundColor: Colors.white,
+            backgroundColor: AppColors.primary,
+            foregroundColor: AppColors.textOnPrimary,
             ),
             child: const Text('OK'),
           ),
@@ -188,7 +189,7 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
     final isEditMode = widget.existingItem != null;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.scaffoldBg,
       body: SafeArea(
         child: Column(
           children: [
@@ -199,7 +200,7 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   child: Form(
                     key: _formKey,
                     child: Column(
@@ -263,30 +264,23 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
   Widget _buildHeader(bool isEditMode) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF4D648D),
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade200),
-        ),
+      decoration: const BoxDecoration(
+        color: AppColors.cardBg,
+        border: Border(bottom: BorderSide(color: AppColors.divider)),
       ),
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.close, color: Colors.white),
+            icon: const Icon(Icons.close, color: AppColors.textPrimary),
             onPressed: () => Navigator.of(context).pop(),
           ),
           Expanded(
             child: Text(
               isEditMode ? 'Edit Plan Item' : 'Create Plan Item',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-              ),
+              style: AppStyles.titleMedium,
               textAlign: TextAlign.center,
             ),
           ),
-          // Placeholder for symmetry
           const SizedBox(width: 48),
         ],
       ),
@@ -295,30 +289,14 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
 
   Widget _buildPlanContext() {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
-        borderRadius: BorderRadius.circular(12),
-      ),
+      padding: const EdgeInsets.all(AppDimens.cardPadding),
+      decoration: AppStyles.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Adding to Plan',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade600,
-            ),
-          ),
+          Text('Adding to Plan', style: AppStyles.label),
           const SizedBox(height: 4),
-          Text(
-            widget.plan.formattedPeriod,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
-          ),
+          Text(widget.plan.formattedPeriod, style: AppStyles.bodyMedium),
         ],
       ),
     );
@@ -328,43 +306,12 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        RichText(
-          text: TextSpan(
-            text: 'Item Name ',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
-            children: [
-              TextSpan(
-                text: '*',
-                style: TextStyle(color: Colors.grey.shade400),
-              ),
-            ],
-          ),
-        ),
+        Text('Item Name *', style: AppStyles.label),
         const SizedBox(height: 8),
         TextFormField(
           controller: _nameController,
-          decoration: InputDecoration(
-            hintText: 'e.g. Food & Dining, Rent, Salary',
-            hintStyle: TextStyle(color: Colors.grey.shade400),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFF4D648D)),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 14,
-            ),
+          decoration: AppStyles.input(
+            hint: 'e.g. Food & Dining, Rent, Salary',
           ),
           textCapitalization: TextCapitalization.words,
           validator: (value) {
@@ -382,21 +329,7 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        RichText(
-          text: TextSpan(
-            text: 'Type ',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
-            children: [
-              TextSpan(
-                text: '*',
-                style: TextStyle(color: Colors.grey.shade400),
-              ),
-            ],
-          ),
-        ),
+        Text('Type *', style: AppStyles.label),
         const SizedBox(height: 8),
         Row(
           children: [
@@ -434,12 +367,12 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.cardBg,
           border: Border.all(
-            color: isSelected ? const Color(0xFF4D648D) : Colors.grey.shade300,
-            width: isSelected ? 2 : 1,
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: isSelected ? 1.5 : 0.5,
           ),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimens.radiusSm),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -447,16 +380,13 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
             Icon(
               icon,
               size: 18,
-              color:
-                  isSelected ? const Color(0xFF4D648D) : Colors.grey.shade600,
+              color: isSelected ? AppColors.primary : AppColors.textSecondary,
             ),
             const SizedBox(width: 8),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 14,
-                color:
-                    isSelected ? const Color(0xFF4D648D) : Colors.grey.shade600,
+              style: AppStyles.bodyMedium.copyWith(
+                color: isSelected ? AppColors.primary : AppColors.textSecondary,
               ),
             ),
           ],
@@ -469,51 +399,30 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        RichText(
-          text: TextSpan(
-            text: 'Icon ',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
-            children: [
-              TextSpan(
-                text: '(Optional)',
-                style: TextStyle(color: Colors.grey.shade400),
-              ),
-            ],
-          ),
-        ),
+        Text('Icon (Optional)', style: AppStyles.label),
         const SizedBox(height: 4),
         Text(
           'Choose an icon to represent this plan item',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade500,
-          ),
+          style: AppStyles.caption,
         ),
         const SizedBox(height: 12),
 
         // Selected Icon Display
         Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(8),
-          ),
+          padding: const EdgeInsets.all(AppDimens.cardPadding),
+          decoration: AppStyles.card,
           child: Row(
             children: [
               Container(
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4D648D),
-                  borderRadius: BorderRadius.circular(8),
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                 ),
                 child: Icon(
                   _availableIcons[_selectedIconIndex].icon,
-                  color: Colors.white,
+                  color: AppColors.textOnPrimary,
                   size: 24,
                 ),
               ),
@@ -521,10 +430,7 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
               Expanded(
                 child: Text(
                   'Tap below to change icon',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade700,
-                  ),
+                  style: AppStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                 ),
               ),
             ],
@@ -535,11 +441,11 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
 
         // Icon Grid
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppDimens.cardPadding),
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
-            border: Border.all(color: Colors.grey.shade200),
-            borderRadius: BorderRadius.circular(8),
+            color: AppColors.surfaceLight,
+            border: Border.all(color: AppColors.border),
+            borderRadius: BorderRadius.circular(AppDimens.radiusSm),
           ),
           child: GridView.builder(
             shrinkWrap: true,
@@ -556,17 +462,15 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
                 onTap: () => setState(() => _selectedIconIndex = index),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFF4D648D) : Colors.white,
+                    color: isSelected ? AppColors.primary : AppColors.cardBg,
                     border: Border.all(
-                      color: isSelected
-                          ? const Color(0xFF4D648D)
-                          : Colors.grey.shade300,
+                      color: isSelected ? AppColors.primary : AppColors.border,
                     ),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                   ),
                   child: Icon(
                     _availableIcons[index].icon,
-                    color: isSelected ? Colors.white : Colors.grey.shade600,
+                    color: isSelected ? AppColors.textOnPrimary : AppColors.textSecondary,
                     size: 20,
                   ),
                 ),
@@ -582,48 +486,13 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        RichText(
-          text: TextSpan(
-            text: 'Planned Amount ',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
-            children: [
-              TextSpan(
-                text: '*',
-                style: TextStyle(color: Colors.grey.shade400),
-              ),
-            ],
-          ),
-        ),
+        Text('Planned Amount *', style: AppStyles.label),
         const SizedBox(height: 8),
         TextFormField(
           controller: _amountController,
-          decoration: InputDecoration(
-            hintText: '0.00',
-            hintStyle: TextStyle(color: Colors.grey.shade400),
-            prefixText: '฿ ',
-            prefixStyle: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 16,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFF4D648D)),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 14,
-            ),
+          decoration: AppStyles.input(
+            hint: '0.00',
+            prefixText: '\u0E3F ',
           ),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           inputFormatters: [
@@ -644,10 +513,7 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
         const SizedBox(height: 8),
         Text(
           'This is your intended budget for this category',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade500,
-          ),
+          style: AppStyles.caption,
         ),
       ],
     );
@@ -657,44 +523,13 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        RichText(
-          text: TextSpan(
-            text: 'Description ',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
-            children: [
-              TextSpan(
-                text: '(Optional)',
-                style: TextStyle(color: Colors.grey.shade400),
-              ),
-            ],
-          ),
-        ),
+        Text('Description (Optional)', style: AppStyles.label),
         const SizedBox(height: 8),
         TextFormField(
           controller: _descriptionController,
           maxLines: 3,
-          decoration: InputDecoration(
-            hintText: 'Add notes about this plan item...',
-            hintStyle: TextStyle(color: Colors.grey.shade400),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFF4D648D)),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 14,
-            ),
+          decoration: AppStyles.input(
+            hint: 'Add notes about this plan item...',
           ),
         ),
       ],
@@ -713,26 +548,20 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
         expectedIncome > 0 && amount > 0 && newTotalPlanned > expectedIncome;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimens.cardPadding),
       decoration: BoxDecoration(
-        color: hasBudgetIssue ? Colors.orange.shade50 : Colors.grey.shade50,
+        color: hasBudgetIssue ? Colors.orange.shade50 : AppColors.surfaceLight,
         border: Border.all(
-          color: hasBudgetIssue ? Colors.orange.shade300 : Colors.grey.shade200,
+          color: hasBudgetIssue ? Colors.orange.shade300 : AppColors.border,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text(
-                'Preview',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
-                ),
-              ),
+              Text('Preview', style: AppStyles.label),
               if (hasBudgetIssue) ...[
                 const Spacer(),
                 Icon(
@@ -743,8 +572,7 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
                 const SizedBox(width: 4),
                 Text(
                   'Exceeds Budget',
-                  style: TextStyle(
-                    fontSize: 12,
+                  style: AppStyles.caption.copyWith(
                     fontWeight: FontWeight.w500,
                     color: Colors.orange.shade700,
                   ),
@@ -760,20 +588,20 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
           _buildPreviewRow('Remaining', amount),
           if (expectedIncome > 0) ...[
             const SizedBox(height: 12),
-            Divider(height: 1, color: Colors.grey.shade200),
+            Divider(height: 1, color: AppColors.border),
             const SizedBox(height: 12),
             _buildPreviewRowWithColor(
               'Available Budget',
               CurrencyUtils.formatCurrency(
                   availableBudget.clamp(0, double.infinity)),
-              Colors.grey.shade600,
+              AppColors.textSecondary,
             ),
             const SizedBox(height: 8),
             _buildPreviewRowWithColor(
               'After Adding',
               CurrencyUtils.formatCurrency((availableBudget - amount)
                   .clamp(double.negativeInfinity, double.infinity)),
-              hasBudgetIssue ? Colors.red.shade600 : Colors.green.shade600,
+              hasBudgetIssue ? AppColors.expense : AppColors.income,
             ),
           ],
           const SizedBox(height: 12),
@@ -782,8 +610,8 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
             child: LinearProgressIndicator(
               value: 0,
               minHeight: 8,
-              backgroundColor: Colors.grey.shade200,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.grey.shade600),
+              backgroundColor: AppColors.border,
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.textSecondary),
             ),
           ),
           if (hasBudgetIssue) ...[
@@ -792,7 +620,7 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.orange.shade100,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimens.radiusSm),
               ),
               child: Row(
                 children: [
@@ -824,19 +652,10 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade600,
-          ),
-        ),
+        Text(label, style: AppStyles.caption),
         Text(
           CurrencyUtils.formatCurrency(amount),
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.black87,
-          ),
+          style: AppStyles.bodySmall.copyWith(color: AppColors.textPrimary),
         ),
       ],
     );
@@ -847,17 +666,10 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade600,
-          ),
-        ),
+        Text(label, style: AppStyles.caption),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 12,
+          style: AppStyles.bodySmall.copyWith(
             fontWeight: FontWeight.w500,
             color: valueColor,
           ),
@@ -868,40 +680,22 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
 
   Widget _buildHelperNote() {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
-        borderRadius: BorderRadius.circular(12),
-      ),
+      padding: const EdgeInsets.all(AppDimens.cardPadding),
+      decoration: AppStyles.card,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.lightbulb_outline,
-            size: 16,
-            color: Colors.grey.shade500,
-          ),
+          Icon(Icons.lightbulb_outline, size: 16, color: AppColors.textTertiary),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'About Plan Items',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey.shade700,
-                  ),
-                ),
+                Text('About Plan Items', style: AppStyles.label),
                 const SizedBox(height: 4),
                 Text(
-                  'Plan items represent your intentions. They don\'t lock money or restrict spending—they help you stay aware of your goals.',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade500,
-                  ),
+                  'Plan items represent your intentions. They don\'t lock money or restrict spending\u2014they help you stay aware of your goals.',
+                  style: AppStyles.caption,
                 ),
               ],
             ),
@@ -909,6 +703,7 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
         ],
       ),
     );
+
   }
 
   Widget _buildBottomActionBar(bool isEditMode) {
@@ -918,11 +713,9 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
 
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200),
-        ),
+      decoration: const BoxDecoration(
+        color: AppColors.cardBg,
+        border: Border(top: BorderSide(color: AppColors.divider)),
       ),
       child: SafeArea(
         child: Row(
@@ -930,14 +723,7 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
             Expanded(
               child: OutlinedButton(
                 onPressed: () => Navigator.of(context).pop(),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.grey.shade700,
-                  side: BorderSide(color: Colors.grey.shade300),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                style: AppStyles.secondaryButton,
                 child: const Text('Cancel'),
               ),
             ),
@@ -945,15 +731,7 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
             Expanded(
               child: ElevatedButton(
                 onPressed: isValid ? _submit : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      isValid ? const Color(0xFF4D648D) : Colors.grey.shade300,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                style: AppStyles.primaryButton,
                 child: Text(isEditMode ? 'Save Changes' : 'Save Plan Item'),
               ),
             ),

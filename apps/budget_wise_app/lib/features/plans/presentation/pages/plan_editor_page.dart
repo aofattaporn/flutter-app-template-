@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../di/injection.dart';
 import '../../../../domain/entities/plan.dart';
@@ -35,9 +36,9 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
   final _expectedIncomeController = TextEditingController();
   final PlanRepository _planRepository = getIt<PlanRepository>();
 
-  // ═══════════════════════════════════════════════════════════════════════════
+  // โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•
   // state usage
-  // ═══════════════════════════════════════════════════════════════════════════
+  // โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now().add(const Duration(days: 30));
   bool _setAsActive = true;
@@ -51,9 +52,9 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
     return _endDate.difference(_startDate).inDays + 1;
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
+  // โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•
   // LIFECYCLE
-  // ═══════════════════════════════════════════════════════════════════════════
+  // โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•
   @override
   void initState() {
     super.initState();
@@ -90,9 +91,9 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
     super.dispose();
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
+  // โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•
   // DIALOG METHODS
-  // ═══════════════════════════════════════════════════════════════════════════
+  // โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•
   Future<void> _selectStartDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -239,7 +240,7 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4D648D),
+              backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
             ),
             child: const Text('OK'),
@@ -249,22 +250,19 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
+  // โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•
   // BUILD - MAIN
-  // ═══════════════════════════════════════════════════════════════════════════
+  // โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•
   @override
   Widget build(BuildContext context) {
     final isEditMode = widget.existingPlan != null;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.scaffoldBg,
       body: SafeArea(
         child: Column(
           children: [
-            // Header
             _buildHeader(isEditMode),
-
-            // Form Content
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
@@ -322,30 +320,23 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
   Widget _buildHeader(bool isEditMode) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF4D648D),
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade200),
-        ),
+      decoration: const BoxDecoration(
+        color: AppColors.cardBg,
+        border: Border(bottom: BorderSide(color: AppColors.divider, width: 0.5)),
       ),
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.close, color: Colors.white),
+            icon: const Icon(Icons.close, color: AppColors.textPrimary),
             onPressed: () => Navigator.of(context).pop(),
           ),
           Expanded(
             child: Text(
               isEditMode ? 'Edit Plan' : 'Create New Plan',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-              ),
+              style: AppStyles.titleMedium,
               textAlign: TextAlign.center,
             ),
           ),
-          // Placeholder for symmetry
           const SizedBox(width: 48),
         ],
       ),
@@ -356,49 +347,14 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        RichText(
-          text: TextSpan(
-            text: 'Plan Name ',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
-            children: [
-              TextSpan(
-                text: '*',
-                style: TextStyle(color: Colors.grey.shade400),
-              ),
-            ],
-          ),
-        ),
+        Text('Plan Name', style: AppStyles.label),
         const SizedBox(height: 8),
         TextFormField(
           controller: _nameController,
-          decoration: InputDecoration(
-            hintText: 'e.g. January 2025 Budget',
-            hintStyle: TextStyle(color: Colors.grey.shade400),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFF4D648D)),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 14,
-            ),
-          ),
+          decoration: AppStyles.input(hint: 'e.g. January 2025 Budget'),
           textCapitalization: TextCapitalization.words,
           validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'Please enter a plan name';
-            }
+            if (value == null || value.trim().isEmpty) return 'Please enter a plan name';
             return null;
           },
         ),
@@ -410,21 +366,7 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        RichText(
-          text: TextSpan(
-            text: 'Plan Period ',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
-            children: [
-              TextSpan(
-                text: '*',
-                style: TextStyle(color: Colors.grey.shade400),
-              ),
-            ],
-          ),
-        ),
+        Text('Plan Period', style: AppStyles.label),
         const SizedBox(height: 8),
         Row(
           children: [
@@ -437,11 +379,7 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Icon(
-                Icons.arrow_forward,
-                color: Colors.grey.shade400,
-                size: 20,
-              ),
+              child: Icon(Icons.arrow_forward, color: AppColors.textTertiary, size: 20),
             ),
             Expanded(
               child: _buildDateButton(
@@ -453,13 +391,7 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
           ],
         ),
         const SizedBox(height: 8),
-        Text(
-          '$_planDuration days',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade500,
-          ),
-        ),
+        Text('$_planDuration days', style: AppStyles.caption),
       ],
     );
   }
@@ -473,37 +405,17 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(8),
-        ),
+        decoration: AppStyles.card,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade500,
-              ),
-            ),
+            Text(label, style: AppStyles.caption),
             const SizedBox(height: 4),
             Row(
               children: [
-                Icon(
-                  Icons.calendar_today,
-                  size: 16,
-                  color: Colors.grey.shade600,
-                ),
+                Icon(Icons.calendar_today, size: 16, color: AppColors.textTertiary),
                 const SizedBox(width: 8),
-                Text(
-                  _formatDate(date),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black87,
-                  ),
-                ),
+                Text(_formatDate(date), style: AppStyles.bodyMedium),
               ],
             ),
           ],
@@ -537,18 +449,18 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
           decoration: InputDecoration(
             hintText: '0.00',
             hintStyle: TextStyle(color: Colors.grey.shade400),
-            prefixText: '฿ ',
+            prefixText: 'เธฟ ',
             prefixStyle: TextStyle(
               color: Colors.grey.shade600,
               fontSize: 16,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade300),
+              borderSide: BorderSide(color: const Color(0xFFE5E5E5)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade300),
+              borderSide: BorderSide(color: const Color(0xFFE5E5E5)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -578,35 +490,19 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
 
   Widget _buildActiveToggle(bool isEditMode) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
-        borderRadius: BorderRadius.circular(12),
-      ),
+      padding: const EdgeInsets.all(AppDimens.cardPadding),
+      decoration: AppStyles.card,
       child: Row(
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Set as Active Plan',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87,
-                  ),
-                ),
+                Text('Set as Active Plan', style: AppStyles.bodyLarge),
                 const SizedBox(height: 4),
                 Text(
-                  isEditMode
-                      ? 'This plan is currently active'
-                      : 'Make this your current budget plan',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade500,
-                  ),
+                  isEditMode ? 'This plan is currently active' : 'Make this your current budget plan',
+                  style: AppStyles.caption,
                 ),
               ],
             ),
@@ -614,7 +510,8 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
           Switch(
             value: _setAsActive,
             onChanged: (value) => setState(() => _setAsActive = value),
-            activeColor: const Color(0xFF4D648D),
+            activeTrackColor: AppColors.accent,
+            activeThumbColor: Colors.white,
           ),
         ],
       ),
@@ -631,38 +528,27 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
         expectedIncome < widget.currentTotalPlanned;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimens.cardPadding),
       decoration: BoxDecoration(
-        color: hasBudgetIssue ? Colors.orange.shade50 : Colors.grey.shade50,
+        color: hasBudgetIssue ? Colors.orange.shade50 : AppColors.surfaceLight,
         border: Border.all(
-          color: hasBudgetIssue ? Colors.orange.shade300 : Colors.grey.shade200,
+          color: hasBudgetIssue ? Colors.orange.shade300 : AppColors.border,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text(
-                'Preview',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
-                ),
-              ),
+              Text('Preview', style: AppStyles.label),
               if (hasBudgetIssue) ...[
                 const Spacer(),
-                Icon(
-                  Icons.warning_amber_rounded,
-                  size: 16,
-                  color: Colors.orange.shade700,
-                ),
+                Icon(Icons.warning_amber_rounded, size: 16, color: Colors.orange.shade700),
                 const SizedBox(width: 4),
                 Text(
                   'Budget Issue',
-                  style: TextStyle(
-                    fontSize: 12,
+                  style: AppStyles.caption.copyWith(
                     fontWeight: FontWeight.w500,
                     color: Colors.orange.shade700,
                   ),
@@ -698,7 +584,7 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
               CurrencyUtils.formatCurrency(
                   expectedIncome - widget.currentTotalPlanned),
               valueColor:
-                  hasBudgetIssue ? Colors.red.shade600 : Colors.green.shade600,
+                  hasBudgetIssue ? AppColors.expense : AppColors.income,
             ),
           ],
           const SizedBox(height: 8),
@@ -709,23 +595,16 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.orange.shade100,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimens.radiusSm),
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.info_outline,
-                    size: 16,
-                    color: Colors.orange.shade800,
-                  ),
+                  Icon(Icons.info_outline, size: 16, color: Colors.orange.shade800),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Expected income is less than total planned. Increase income or reduce plan items.',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.orange.shade800,
-                      ),
+                      style: AppStyles.caption.copyWith(color: Colors.orange.shade800, fontSize: 11),
                     ),
                   ),
                 ],
@@ -741,60 +620,30 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade600,
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 12,
-            color: valueColor ?? Colors.black87,
-          ),
-        ),
+        Text(label, style: AppStyles.caption),
+        Text(value, style: AppStyles.bodySmall.copyWith(color: valueColor ?? AppColors.textPrimary)),
       ],
     );
   }
 
   Widget _buildHelperNote() {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
-        borderRadius: BorderRadius.circular(12),
-      ),
+      padding: const EdgeInsets.all(AppDimens.cardPadding),
+      decoration: AppStyles.card,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.lightbulb_outline,
-            size: 16,
-            color: Colors.grey.shade500,
-          ),
+          Icon(Icons.lightbulb_outline, size: 16, color: AppColors.textTertiary),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'About Plans',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey.shade700,
-                  ),
-                ),
+                Text('About Plans', style: AppStyles.label),
                 const SizedBox(height: 4),
                 Text(
                   'A plan helps you organize your budget for a specific period. You can have multiple plans but only one can be active at a time.',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade500,
-                  ),
+                  style: AppStyles.caption,
                 ),
               ],
             ),
@@ -809,27 +658,17 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
 
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200),
-        ),
+      decoration: const BoxDecoration(
+        color: AppColors.cardBg,
+        border: Border(top: BorderSide(color: AppColors.divider)),
       ),
       child: SafeArea(
         child: Row(
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed:
-                    _isLoading ? null : () => Navigator.of(context).pop(),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.grey.shade700,
-                  side: BorderSide(color: Colors.grey.shade300),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+                style: AppStyles.secondaryButton,
                 child: const Text('Cancel'),
               ),
             ),
@@ -837,23 +676,11 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
             Expanded(
               child: ElevatedButton(
                 onPressed: isValid ? _submit : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      isValid ? const Color(0xFF4D648D) : Colors.grey.shade300,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                style: AppStyles.primaryButton,
                 child: _isLoading
                     ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
+                        height: 20, width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
                     : Text(isEditMode ? 'Save Changes' : 'Create Plan'),
               ),

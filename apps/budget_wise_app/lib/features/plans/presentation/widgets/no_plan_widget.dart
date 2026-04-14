@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_theme.dart';
+
 /// Widget for empty state when no active plan exists
 class NoPlanWidget extends StatelessWidget {
   final VoidCallback? onCreatePlan;
@@ -15,67 +17,41 @@ class NoPlanWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(40),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 80,
-              height: 80,
+              width: 64,
+              height: 64,
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: AppColors.surfaceLight,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.checklist,
-                size: 40,
-                color: Colors.grey.shade400,
-              ),
+              child: const Icon(Icons.checklist, size: 28, color: AppColors.textTertiary),
             ),
             const SizedBox(height: 24),
-            Text(
-              'No Active Plan',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey.shade800,
-              ),
-            ),
+            Text('No Active Plan', style: AppStyles.titleLarge),
             const SizedBox(height: 8),
             Text(
               'Create a plan to start tracking your budget',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade500,
-              ),
+              style: AppStyles.bodySmall,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
+              child: ElevatedButton(
                 onPressed: onCreatePlan,
-                icon: const Icon(Icons.add),
-                label: const Text('Create New Plan'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4D648D),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                style: AppStyles.primaryButton,
+                child: const Text('Create New Plan'),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             TextButton(
               onPressed: onViewAllPlans,
-              child: const Text(
-                'View All Plans',
-                style: TextStyle(
-                  color: Color(0xFF4D648D),
-                ),
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.accent),
+              child: const Text('View All Plans'),
             ),
           ],
         ),

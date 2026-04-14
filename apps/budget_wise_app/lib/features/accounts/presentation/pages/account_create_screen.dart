@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../domain/entities/account.dart';
 import '../bloc/account_bloc.dart';
@@ -128,28 +129,9 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: _buildAppBar(),
+      backgroundColor: AppColors.scaffoldBg,
+      appBar: AppStyles.appBar(title: _isEditMode ? 'Edit Account' : 'Create Account'),
       body: _buildBody(),
-    );
-  }
-
-  /// Build app bar
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: const Color(0xFF4D648D),
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: Colors.white),
-        onPressed: () => Navigator.pop(context),
-      ),
-      title: Text(
-        _isEditMode ? 'Edit Account' : 'Create Account',
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
     );
   }
 
@@ -184,10 +166,7 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
                   const SizedBox(height: 8),
                   Text(
                     'This reflects how much money is currently in this account.',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[500],
-                    ),
+                    style: AppStyles.caption,
                   ),
                 ],
               ),
@@ -199,39 +178,15 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
     );
   }
 
-  /// Build section label
   Widget _buildSectionLabel(String label) {
-    return Text(
-      label,
-      style: TextStyle(
-        fontSize: 14,
-        color: Colors.grey[700],
-      ),
-    );
+    return Text(label, style: AppStyles.label);
   }
 
-  /// Build account name field
   Widget _buildNameField() {
     return TextFormField(
       controller: _nameController,
-      decoration: InputDecoration(
-        hintText: 'e.g. Main Bank, Cash, Wallet',
-        hintStyle: TextStyle(color: Colors.grey[400]),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFD4D4D4)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFD4D4D4)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF4D648D)),
-        ),
-        contentPadding: const EdgeInsets.all(12),
+      decoration: AppStyles.input(
+        hint: 'e.g. Main Bank, Cash, Wallet',
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
@@ -242,7 +197,6 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
     );
   }
 
-  /// Build account type selector
   Widget _buildTypeSelector() {
     return GridView.count(
       crossAxisCount: 2,
@@ -258,34 +212,30 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
         
         return InkWell(
           onTap: isEnabled ? () => setState(() => _selectedType = type['value']) : null,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimens.radiusSm),
           child: Opacity(
             opacity: isEnabled ? 1.0 : 0.5,
             child: Container(
-              padding: const EdgeInsets.all(0),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF4D648D).withValues(alpha: 0.05) : Colors.white,
-                borderRadius: BorderRadius.circular(8),
+                color: isSelected ? AppColors.accentLight : AppColors.cardBg,
+                borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                 border: Border.all(
-                  color: isSelected ? const Color(0xFF4D648D) : const Color(0xFFD4D4D4),
-                  width: isSelected ? 2 : 1,
+                  color: isSelected ? AppColors.accent : AppColors.border,
+                  width: isSelected ? 1.5 : 0.5,
                 ),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    type['icon'],
-                    size: 24,
-                    color: isSelected ? const Color(0xFF4D648D) : Colors.grey[400],
-                  ),
+                  Icon(type['icon'], size: 22, color: isSelected ? AppColors.accent : AppColors.textTertiary),
                   if (type['label'].isNotEmpty) ...[
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Text(
                       type['label'],
                       style: TextStyle(
-                        fontSize: 14,
-                        color: isSelected ? const Color(0xFF4D648D) : Colors.grey[600],
+                        fontSize: 13,
+                        fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+                        color: isSelected ? AppColors.accent : AppColors.textSecondary,
                       ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
@@ -300,7 +250,6 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
     );
   }
 
-  /// Build balance field
   Widget _buildBalanceField() {
     return TextFormField(
       controller: _balanceController,
@@ -308,120 +257,58 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
       ],
-      decoration: InputDecoration(
-        hintText: '0.00',
-        hintStyle: TextStyle(color: Colors.grey[400]),
-        prefixIcon: Padding(
+      decoration: AppStyles.input(
+        hint: '0.00',
+        prefix: Padding(
           padding: const EdgeInsets.only(left: 16, right: 8),
-          child: Text(
-            '฿',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-            ),
-          ),
-        ),
-        prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFD4D4D4)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFD4D4D4)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF4D648D)),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
+          child: Text('฿', style: TextStyle(fontSize: 16, color: AppColors.textSecondary)),
         ),
       ),
       validator: (value) {
-        if (value == null || value.trim().isEmpty) {
-          return null; // Optional field
-        }
+        if (value == null || value.trim().isEmpty) return null;
         final amount = double.tryParse(value);
-        if (amount == null) {
-          return 'Please enter valid amount';
-        }
+        if (amount == null) return 'Please enter valid amount';
         return null;
       },
     );
   }
 
-  /// Build bottom action buttons
   Widget _buildBottomActions() {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200),
-        ),
+      decoration: const BoxDecoration(
+        color: AppColors.cardBg,
+        border: Border(top: BorderSide(color: AppColors.divider)),
       ),
       padding: const EdgeInsets.all(20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Save button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _isLoading ? null : _handleSaveAccount,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4D648D),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                elevation: 0,
-                disabledBackgroundColor: Colors.grey[300],
-              ),
-              child: _isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  : Text(
-                      _isEditMode ? 'Save Changes' : 'Create Account',
-                      style: const TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          // Cancel button
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: _isLoading ? null : () => Navigator.pop(context),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.grey[600],
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                side: BorderSide(color: Colors.grey.shade300),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(
-                  fontSize: 16,
-                ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _handleSaveAccount,
+                style: AppStyles.primaryButton,
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 20, width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
+                      )
+                    : Text(_isEditMode ? 'Save Changes' : 'Create Account'),
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: _isLoading ? null : () => Navigator.pop(context),
+                style: AppStyles.secondaryButton,
+                child: const Text('Cancel'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

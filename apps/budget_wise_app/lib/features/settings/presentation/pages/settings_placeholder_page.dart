@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// Settings/More placeholder page
 /// 
@@ -14,24 +15,14 @@ class SettingsPlaceholderPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.settings,
-              size: 64,
-              color: Colors.grey.shade400,
+              Icons.settings_outlined,
+              size: 48,
+              color: AppColors.textTertiary,
             ),
             const SizedBox(height: 16),
-            Text(
-              'Settings',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-            ),
+            Text('Settings', style: AppStyles.displayMedium),
             const SizedBox(height: 8),
-            Text(
-              'Coming soon...',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey.shade500,
-                  ),
-            ),
+            Text('Coming soon...', style: AppStyles.bodySmall),
           ],
         ),
       ),

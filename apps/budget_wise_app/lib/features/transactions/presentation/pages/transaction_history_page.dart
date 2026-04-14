@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
@@ -125,32 +126,17 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
+                AppStyles.sheetHandle(),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
-                    txn.description ??
-                        txn.type.name[0].toUpperCase() +
-                            txn.type.name.substring(1),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2C3E50),
-                    ),
+                    txn.description ?? txn.type.name[0].toUpperCase() + txn.type.name.substring(1),
+                    style: AppStyles.titleMedium,
                   ),
                 ),
                 const SizedBox(height: 8),
                 ListTile(
-                  leading: const Icon(Icons.edit_outlined,
-                      color: Color(0xFF4D648D)),
+                  leading: const Icon(Icons.edit_outlined, color: AppColors.accent),
                   title: const Text('Edit Transaction'),
                   onTap: () {
                     Navigator.pop(sheetContext);
@@ -158,9 +144,8 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.delete_outline, color: Colors.red[400]),
-                  title: Text('Delete Transaction',
-                      style: TextStyle(color: Colors.red[400])),
+                  leading: Icon(Icons.delete_outline, color: AppColors.expense),
+                  title: Text('Delete Transaction', style: TextStyle(color: AppColors.expense)),
                   onTap: () {
                     Navigator.pop(sheetContext);
                     _confirmDeleteTransaction(txn);
@@ -257,7 +242,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6F8),
+      backgroundColor: AppColors.scaffoldBg,
       body: SafeArea(
         child: BlocConsumer<TransactionHistoryBloc, TransactionHistoryState>(
           listener: (context, state) {
@@ -272,11 +257,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       floatingActionButton: FloatingActionButton(
         heroTag: 'historyCreateTransaction',
         onPressed: _navigateToCreateTransaction,
-        backgroundColor: const Color(0xFF4D648D),
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        elevation: 6,
+        elevation: 0,
         shape: const CircleBorder(),
-        child: const Icon(Icons.add, size: 28),
+        child: const Icon(Icons.add, size: 24),
       ),
     );
   }
@@ -298,18 +283,9 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Widget _buildHeader(TransactionHistoryState state) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-      color: const Color(0xFF4D648D),
-      child: const Text(
-        'Transactions',
-        style: TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+      child: Text('Transactions', style: AppStyles.displayMedium),
     );
   }
 
@@ -323,30 +299,22 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     final isCurrentMonth = state.selectedMonth.year == now.year &&
         state.selectedMonth.month == now.month;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: Colors.white,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
             onPressed: _previousMonth,
-            icon: const Icon(Icons.chevron_left, color: Color(0xFF4D648D)),
+            icon: const Icon(Icons.chevron_left, color: AppColors.accent),
             splashRadius: 20,
           ),
-          Text(
-            monthFormat.format(state.selectedMonth),
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF2C3E50),
-            ),
-          ),
+          Text(monthFormat.format(state.selectedMonth), style: AppStyles.titleMedium),
           IconButton(
             onPressed: isCurrentMonth ? null : _nextMonth,
             icon: Icon(
               Icons.chevron_right,
-              color: isCurrentMonth ? Colors.grey[300] : const Color(0xFF4D648D),
+              color: isCurrentMonth ? AppColors.textTertiary : AppColors.accent,
             ),
             splashRadius: 20,
           ),
@@ -361,45 +329,19 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
 
   Widget _buildSummaryRow(TransactionHistoryState state) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+      padding: const EdgeInsets.all(AppDimens.cardPadding),
+      decoration: AppStyles.card,
       child: Row(
         children: [
-          _buildSummaryItem(
-            'Income',
-            state.totalIncome,
-            Colors.green[600]!,
-          ),
-          Container(
-            width: 1,
-            height: 36,
-            color: Colors.grey[200],
-          ),
-          _buildSummaryItem(
-            'Expense',
-            state.totalExpense,
-            Colors.red[600]!,
-          ),
-          Container(
-            width: 1,
-            height: 36,
-            color: Colors.grey[200],
-          ),
+          _buildSummaryItem('Income', state.totalIncome, AppColors.income),
+          Container(width: 1, height: 36, color: AppColors.divider),
+          _buildSummaryItem('Expense', state.totalExpense, AppColors.expense),
+          Container(width: 1, height: 36, color: AppColors.divider),
           _buildSummaryItem(
             'Net',
             state.netAmount,
-            state.netAmount >= 0 ? Colors.green[600]! : Colors.red[600]!,
+            state.netAmount >= 0 ? AppColors.income : AppColors.expense,
           ),
         ],
       ),
@@ -410,21 +352,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     return Expanded(
       child: Column(
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              color: Colors.grey[500],
-            ),
-          ),
+          Text(label, style: AppStyles.caption),
           const SizedBox(height: 4),
           Text(
             CurrencyUtils.formatCurrency(amount.abs()),
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: color,
-            ),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: color),
           ),
         ],
       ),
@@ -437,7 +369,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
 
   Widget _buildTypeFilter(TransactionHistoryState state) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
       child: Row(
         children: [
           _buildFilterChip('All', null, state.typeFilter),
@@ -452,35 +384,22 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     );
   }
 
-  Widget _buildFilterChip(
-      String label, TransactionType? type, TransactionType? current) {
-    final isSelected = (type == null && current == null) ||
-        (type != null && type == current);
+  Widget _buildFilterChip(String label, TransactionType? type, TransactionType? current) {
+    final isSelected = (type == null && current == null) || (type != null && type == current);
     return GestureDetector(
       onTap: () {
-        if (type == null) {
-          // "All" chip - clear filter
-          context
-              .read<TransactionHistoryBloc>()
-              .add(const ChangeTypeFilter(null));
-        } else {
-          // Toggle specific type filter
-          context
-              .read<TransactionHistoryBloc>()
-              .add(ChangeTypeFilter(isSelected ? null : type));
-        }
+        context.read<TransactionHistoryBloc>().add(
+          ChangeTypeFilter(type == null ? null : (isSelected ? null : type)),
+        );
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF4D648D)
-              : Colors.white,
+          color: isSelected ? AppColors.primary : AppColors.cardBg,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected
-                ? const Color(0xFF4D648D)
-                : Colors.grey[300]!,
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: 0.5,
           ),
         ),
         child: Text(
@@ -488,7 +407,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,
-            color: isSelected ? Colors.white : Colors.grey[600],
+            color: isSelected ? Colors.white : AppColors.textSecondary,
           ),
         ),
       ),
@@ -502,33 +421,25 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   Widget _buildTransactionList(TransactionHistoryState state) {
     if (state.status == TransactionHistoryStatus.loading ||
         state.status == TransactionHistoryStatus.initial) {
-      return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF4D648D)),
-      );
+      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
 
     final grouped = state.groupedTransactions;
+    if (grouped.isEmpty) return _buildEmptyState();
 
-    if (grouped.isEmpty) {
-      return _buildEmptyState();
-    }
-
-    final sortedDates = grouped.keys.toList()
-      ..sort((a, b) => b.compareTo(a));
+    final sortedDates = grouped.keys.toList()..sort((a, b) => b.compareTo(a));
 
     return RefreshIndicator(
+      color: AppColors.primary,
       onRefresh: () async {
-        context
-            .read<TransactionHistoryBloc>()
-            .add(const RefreshTransactionHistory());
+        context.read<TransactionHistoryBloc>().add(const RefreshTransactionHistory());
       },
       child: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
         itemCount: sortedDates.length,
         itemBuilder: (context, index) {
           final date = sortedDates[index];
-          final txns = grouped[date]!;
-          return _buildDateGroup(date, txns);
+          return _buildDateGroup(date, grouped[date]!);
         },
       ),
     );
@@ -539,21 +450,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey[400]),
+          Icon(Icons.receipt_long_outlined, size: 36, color: AppColors.textTertiary),
           const SizedBox(height: 16),
-          Text(
-            'No transactions this month',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
-            ),
-          ),
+          Text('No transactions this month', style: AppStyles.bodyLarge),
           const SizedBox(height: 4),
-          Text(
-            'Tap + to add a transaction',
-            style: TextStyle(fontSize: 13, color: Colors.grey[500]),
-          ),
+          Text('Tap + to add a transaction', style: AppStyles.bodySmall),
         ],
       ),
     );
@@ -562,30 +463,17 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   Widget _buildDateGroup(DateTime date, List<Transaction> txns) {
     final dateFormat = DateFormat('EEEE, MMM d');
     final today = DateTime.now();
-    final isToday = date.year == today.year &&
-        date.month == today.month &&
-        date.day == today.day;
+    final isToday = date.year == today.year && date.month == today.month && date.day == today.day;
     final yesterday = today.subtract(const Duration(days: 1));
-    final isYesterday = date.year == yesterday.year &&
-        date.month == yesterday.month &&
-        date.day == yesterday.day;
-
-    final label =
-        isToday ? 'Today' : isYesterday ? 'Yesterday' : dateFormat.format(date);
+    final isYesterday = date.year == yesterday.year && date.month == yesterday.month && date.day == yesterday.day;
+    final label = isToday ? 'Today' : isYesterday ? 'Yesterday' : dateFormat.format(date);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 12, bottom: 8),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[500],
-            ),
-          ),
+          child: Text(label, style: AppStyles.label),
         ),
         ...txns.map(_buildTransactionRow),
       ],
@@ -598,82 +486,41 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     final isIncome = txn.type == TransactionType.income;
 
     final icon = isExpense
-        ? Icons.remove_circle_outline
+        ? Icons.arrow_downward_rounded
         : isIncome
-            ? Icons.add_circle_outline
+            ? Icons.arrow_upward_rounded
             : Icons.swap_horiz;
-    final iconColor = isExpense
-        ? Colors.red[400]
-        : isIncome
-            ? Colors.green[400]
-            : const Color(0xFF4D648D);
+    final iconColor = isExpense ? AppColors.expense : isIncome ? AppColors.income : AppColors.accent;
+    final bgColor = isExpense ? AppColors.expenseLight : isIncome ? AppColors.incomeLight : AppColors.accentLight;
     final amountPrefix = isExpense ? '-' : isIncome ? '+' : '';
-    final amountColor = isExpense
-        ? Colors.red[600]
-        : isIncome
-            ? Colors.green[600]
-            : const Color(0xFF171717);
+    final amountColor = isExpense ? AppColors.expense : isIncome ? AppColors.income : AppColors.textPrimary;
 
     return GestureDetector(
       onTap: () => _showTransactionActionSheet(txn),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+        padding: const EdgeInsets.all(AppDimens.cardPadding),
+        decoration: AppStyles.card,
         child: Row(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: iconColor!.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: iconColor, size: 20),
-            ),
+            AppStyles.iconBox(icon: icon, size: 36, bgColor: bgColor, iconColor: iconColor),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    txn.description ??
-                        txn.type.name[0].toUpperCase() +
-                            txn.type.name.substring(1),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF171717),
-                    ),
+                    txn.description ?? txn.type.name[0].toUpperCase() + txn.type.name.substring(1),
+                    style: AppStyles.bodyLarge,
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    timeFormat.format(txn.occurredAt),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[500],
-                    ),
-                  ),
+                  Text(timeFormat.format(txn.occurredAt), style: AppStyles.caption),
                 ],
               ),
             ),
             Text(
               '$amountPrefix${CurrencyUtils.formatCurrency(txn.amount)}',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: amountColor,
-              ),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: amountColor),
             ),
           ],
         ),

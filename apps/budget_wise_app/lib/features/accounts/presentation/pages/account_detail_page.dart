@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
@@ -207,18 +208,9 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
+                AppStyles.sheetHandle(),
                 ListTile(
-                  leading:
-                      const Icon(Icons.edit_outlined, color: Color(0xFF4D648D)),
+                  leading: const Icon(Icons.edit_outlined, color: AppColors.accent),
                   title: const Text('Edit Transaction'),
                   onTap: () {
                     Navigator.pop(sheetContext);
@@ -226,9 +218,8 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.delete_outline, color: Colors.red[400]),
-                  title: Text('Delete Transaction',
-                      style: TextStyle(color: Colors.red[400])),
+                  leading: Icon(Icons.delete_outline, color: AppColors.expense),
+                  title: Text('Delete Transaction', style: TextStyle(color: AppColors.expense)),
                   onTap: () {
                     Navigator.pop(sheetContext);
                     _confirmDeleteTransaction(txn);
@@ -249,26 +240,16 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6F8),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF4D648D),
-        elevation: 0,
-        title: Text(_account.name,
-            style: const TextStyle(
-                color: Colors.white, fontWeight: FontWeight.w600)),
-        iconTheme: const IconThemeData(color: Colors.white),
+      backgroundColor: AppColors.scaffoldBg,
+      appBar: AppStyles.appBar(
+        title: _account.name,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit, color: Colors.white),
-            onPressed: _navigateToEditAccount,
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete, color: Colors.white),
-            onPressed: _confirmDeleteAccount,
-          ),
+          IconButton(icon: const Icon(Icons.edit_outlined), onPressed: _navigateToEditAccount),
+          IconButton(icon: const Icon(Icons.delete_outline), onPressed: _confirmDeleteAccount),
         ],
       ),
       body: RefreshIndicator(
+        color: AppColors.primary,
         onRefresh: _loadTransactions,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -285,76 +266,40 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
   }
 
   Widget _buildInfoCard() {
-    final currencyFormat =
-        NumberFormat.currency(symbol: '฿', decimalDigits: 2);
-
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppDimens.cardPadding),
+      decoration: AppStyles.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(_getIconForType(_account.type),
-                    color: const Color(0xFF4D648D), size: 24),
-              ),
+              AppStyles.iconBox(icon: _getIconForType(_account.type), size: AppDimens.iconMd),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      _account.name,
-                      style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF2C3E50)),
-                    ),
+                    Text(_account.name, style: AppStyles.titleLarge),
                     const SizedBox(height: 2),
-                    Text(_getTypeName(_account.type),
-                        style:
-                            TextStyle(fontSize: 12, color: Colors.grey[500])),
+                    Text(_getTypeName(_account.type), style: AppStyles.caption),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          _buildInfoRow(
-              'Current Balance', currencyFormat.format(_account.balance),
-              isBold: true),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 10),
-            child: Divider(height: 1),
+          _buildInfoRow('Current Balance', CurrencyUtils.formatCurrency(_account.balance), isBold: true),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Divider(height: 1, color: AppColors.divider),
           ),
-          _buildInfoRow('Opening Balance',
-              currencyFormat.format(_account.openingBalance)),
+          _buildInfoRow('Opening Balance', CurrencyUtils.formatCurrency(_account.openingBalance)),
           const SizedBox(height: 10),
           _buildInfoRow('Currency', _account.currency),
           const SizedBox(height: 10),
-          _buildInfoRow(
-            'Created',
-            DateFormat('MMM d, yyyy').format(_account.createdAt),
-          ),
+          _buildInfoRow('Created', DateFormat('MMM d, yyyy').format(_account.createdAt)),
         ],
       ),
     );
@@ -364,14 +309,10 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+        Text(label, style: AppStyles.bodySmall),
         Text(
           value,
-          style: TextStyle(
-            fontSize: isBold ? 20 : 14,
-            fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
-            color: const Color(0xFF171717),
-          ),
+          style: isBold ? AppStyles.titleLarge : AppStyles.bodyMedium.copyWith(fontWeight: FontWeight.w500),
         ),
       ],
     );
@@ -383,29 +324,22 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
 
   Widget _buildTransactionsSection() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Transaction History',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
-            ),
-          ),
+          Text('Transaction History', style: AppStyles.titleMedium),
           const SizedBox(height: 4),
           Text(
             '${_transactions.length} transaction${_transactions.length == 1 ? '' : 's'}',
-            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+            style: AppStyles.caption,
           ),
           const SizedBox(height: 12),
           if (_isLoading)
             const Center(
               child: Padding(
                 padding: EdgeInsets.all(24),
-                child: CircularProgressIndicator(color: Color(0xFF4D648D)),
+                child: CircularProgressIndicator(color: AppColors.primary),
               ),
             )
           else if (_transactions.isEmpty)
@@ -421,18 +355,12 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: AppStyles.card,
       child: Column(
         children: [
-          Icon(Icons.receipt_long_outlined, size: 36, color: Colors.grey[400]),
+          Icon(Icons.receipt_long_outlined, size: 32, color: AppColors.textTertiary),
           const SizedBox(height: 8),
-          Text(
-            'No transactions yet',
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-          ),
+          Text('No transactions yet', style: AppStyles.bodySmall),
         ],
       ),
     );
@@ -444,75 +372,41 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
     final isIncome = txn.type == TransactionType.income;
 
     final icon = isExpense
-        ? Icons.remove_circle_outline
+        ? Icons.arrow_downward_rounded
         : isIncome
-            ? Icons.add_circle_outline
+            ? Icons.arrow_upward_rounded
             : Icons.swap_horiz;
-    final iconColor = isExpense
-        ? Colors.red[400]
-        : isIncome
-            ? Colors.green[400]
-            : const Color(0xFF4D648D);
+    final iconColor = isExpense ? AppColors.expense : isIncome ? AppColors.income : AppColors.accent;
+    final bgColor = isExpense ? AppColors.expenseLight : isIncome ? AppColors.incomeLight : AppColors.accentLight;
     final amountPrefix = isExpense ? '-' : isIncome ? '+' : '';
-    final amountColor = isExpense
-        ? Colors.red[600]
-        : isIncome
-            ? Colors.green[600]
-            : const Color(0xFF171717);
+    final amountColor = isExpense ? AppColors.expense : isIncome ? AppColors.income : AppColors.textPrimary;
 
     return GestureDetector(
       onTap: () => _showTransactionActionSheet(txn),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+        padding: const EdgeInsets.all(AppDimens.cardPadding),
+        decoration: AppStyles.card,
         child: Row(
           children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: iconColor!.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: iconColor, size: 18),
-            ),
+            AppStyles.iconBox(icon: icon, size: 36, bgColor: bgColor, iconColor: iconColor),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    txn.description ??
-                        txn.type.name[0].toUpperCase() +
-                            txn.type.name.substring(1),
-                    style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF171717)),
+                    txn.description ?? txn.type.name[0].toUpperCase() + txn.type.name.substring(1),
+                    style: AppStyles.bodyLarge,
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    timeFormat.format(txn.occurredAt),
-                    style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-                  ),
+                  Text(timeFormat.format(txn.occurredAt), style: AppStyles.caption),
                 ],
               ),
             ),
             Text(
               '$amountPrefix${CurrencyUtils.formatCurrency(txn.amount)}',
-              style: TextStyle(
-                  fontSize: 15, fontWeight: FontWeight.w600, color: amountColor),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: amountColor),
             ),
           ],
         ),

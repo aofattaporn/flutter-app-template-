@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../domain/entities/plan_item.dart';
 
-/// Widget displaying a single plan item card
+/// Widget displaying a single plan item card — minimal flat style
 class PlanItemCard extends StatelessWidget {
   final PlanItem item;
   final VoidCallback? onTap;
@@ -16,135 +17,47 @@ class PlanItemCard extends StatelessWidget {
     this.onMenuTap,
   });
 
-  Color _getBorderColor() {
-    switch (item.status) {
-      case PlanItemStatus.overBudget:
-        return Colors.grey.shade400;
-      case PlanItemStatus.nearLimit:
-        return const Color(0xFFB1A296);
-      default:
-        return Colors.grey.shade200;
-    }
-  }
-
   Color _getProgressColor() {
     switch (item.status) {
       case PlanItemStatus.overBudget:
-        return Colors.grey.shade700;
+        return AppColors.expense;
       case PlanItemStatus.nearLimit:
-        return const Color(0xFFB1A296);
+        return const Color(0xFFD97706); // amber
       default:
-        return const Color(0xFF4D648D);
-    }
-  }
-
-  Widget _buildStatusIndicator() {
-    switch (item.status) {
-      case PlanItemStatus.overBudget:
-        return Row(
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 14,
-              color: Colors.grey.shade700,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              'Over planned amount',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade700,
-              ),
-            ),
-          ],
-        );
-      case PlanItemStatus.nearLimit:
-        return Row(
-          children: [
-            const Icon(
-              Icons.warning_amber_outlined,
-              size: 14,
-              color: Color(0xFFB1A296),
-            ),
-            const SizedBox(width: 4),
-            Text(
-              'Near limit',
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFFB1A296),
-              ),
-            ),
-          ],
-        );
-      default:
-        return const SizedBox.shrink();
+        return AppColors.accent;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final remaining = item.remainingAmount;
-    final hasStatusIndicator =
-        item.status == PlanItemStatus.overBudget ||
+    final hasStatus = item.status == PlanItemStatus.overBudget ||
         item.status == PlanItemStatus.nearLimit;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: _getBorderColor()),
-          borderRadius: BorderRadius.circular(12),
-        ),
+        decoration: AppStyles.card,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Row
+            // Header
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                AppStyles.iconBox(
+                  icon: _getCategoryIcon(item.name),
+                  size: 36,
+                  iconSize: 18,
+                  radius: 8,
+                ),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(
-                              _getCategoryIcon(item.name),
-                              size: 18,
-                              color: const Color(0xFF4D648D),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              item.name,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black87,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Expense',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade500,
-                        ),
-                      ),
+                      Text(item.name, style: AppStyles.bodyLarge, overflow: TextOverflow.ellipsis),
+                      Text('Expense', style: AppStyles.caption),
                     ],
                   ),
                 ),
@@ -152,48 +65,38 @@ class PlanItemCard extends StatelessWidget {
                   onTap: onMenuTap,
                   child: Padding(
                     padding: const EdgeInsets.all(4),
-                    child: Icon(
-                      Icons.more_horiz,
-                      color: Colors.grey.shade400,
-                    ),
+                    child: Icon(Icons.chevron_right, size: 20, color: AppColors.textTertiary),
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 14),
 
-            const SizedBox(height: 12),
-
-            // Amount Details
-            Column(
-              children: [
-                _buildAmountRow('Planned', item.expectedAmount),
-                const SizedBox(height: 8),
-                _buildAmountRow('Actual', item.actualAmount),
-                const SizedBox(height: 8),
-                _buildAmountRow(
-                  item.isOverBudget ? 'Over' : 'Remaining',
-                  item.isOverBudget ? item.overAmount : remaining,
-                  isRemaining: true,
-                  isOver: item.isOverBudget,
-                ),
-              ],
+            // Amounts
+            _buildAmountRow('Planned', item.expectedAmount),
+            const SizedBox(height: 6),
+            _buildAmountRow('Actual', item.actualAmount),
+            const SizedBox(height: 6),
+            _buildAmountRow(
+              item.isOverBudget ? 'Over' : 'Remaining',
+              item.isOverBudget ? item.overAmount : remaining,
+              isHighlight: true,
+              isOver: item.isOverBudget,
             ),
-
             const SizedBox(height: 12),
 
-            // Progress Bar
+            // Progress
             ClipRRect(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(2),
               child: LinearProgressIndicator(
                 value: item.progressPercentage,
-                backgroundColor: Colors.grey.shade100,
+                backgroundColor: AppColors.surfaceLight,
                 valueColor: AlwaysStoppedAnimation<Color>(_getProgressColor()),
-                minHeight: 8,
+                minHeight: 4,
               ),
             ),
 
-            // Status Indicator
-            if (hasStatusIndicator) ...[
+            if (hasStatus) ...[
               const SizedBox(height: 8),
               _buildStatusIndicator(),
             ],
@@ -203,29 +106,33 @@ class PlanItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildAmountRow(
-    String label,
-    double amount, {
-    bool isRemaining = false,
-    bool isOver = false,
-  }) {
+  Widget _buildAmountRow(String label, double amount, {bool isHighlight = false, bool isOver = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade600,
-          ),
-        ),
+        Text(label, style: AppStyles.caption),
         Text(
           CurrencyUtils.formatCurrency(amount),
           style: TextStyle(
             fontSize: 12,
-            color: isOver ? Colors.red.shade700 : Colors.black87,
-            fontWeight: isRemaining ? FontWeight.w500 : FontWeight.normal,
+            color: isOver ? AppColors.expense : AppColors.textPrimary,
+            fontWeight: isHighlight ? FontWeight.w600 : FontWeight.normal,
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusIndicator() {
+    final isOver = item.status == PlanItemStatus.overBudget;
+    final color = isOver ? AppColors.expense : const Color(0xFFD97706);
+    return Row(
+      children: [
+        Icon(isOver ? Icons.error_outline : Icons.warning_amber_outlined, size: 13, color: color),
+        const SizedBox(width: 4),
+        Text(
+          isOver ? 'Over planned amount' : 'Near limit',
+          style: TextStyle(fontSize: 11, color: color),
         ),
       ],
     );

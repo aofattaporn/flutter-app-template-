@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
@@ -13,7 +14,6 @@ import '../../../accounts/presentation/bloc/account_bloc.dart';
 import '../../../plans/presentation/bloc/active_plan_bloc.dart';
 import '../../../main/presentation/pages/main_app_shell.dart';
 import '../../../transactions/transactions.dart';
-import '../../../transactions/presentation/bloc/transaction_history_bloc.dart';
 import '../bloc/home_bloc.dart';
 
 /// Home Overview Page - Main dashboard showing financial summary
@@ -73,7 +73,7 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6F8),
+      backgroundColor: AppColors.scaffoldBg,
       body: SafeArea(
         child: BlocConsumer<HomeBloc, HomeState>(
           listener: _handleStateChanges,
@@ -83,11 +83,12 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
       floatingActionButton: FloatingActionButton(
         heroTag: 'homeCreateTransaction',
         onPressed: _navigateToCreateTransaction,
-        backgroundColor: const Color(0xFF4D648D),
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        elevation: 6,
+        elevation: 0,
+        highlightElevation: 0,
         shape: const CircleBorder(),
-        child: const Icon(Icons.add, size: 28),
+        child: const Icon(Icons.add, size: 24),
       ),
     );
   }
@@ -153,29 +154,17 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
+                AppStyles.sheetHandle(),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
                     txn.description ?? txn.type.name[0].toUpperCase() + txn.type.name.substring(1),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2C3E50),
-                    ),
+                    style: AppStyles.titleMedium,
                   ),
                 ),
                 const SizedBox(height: 8),
                 ListTile(
-                  leading: const Icon(Icons.edit_outlined, color: Color(0xFF4D648D)),
+                  leading: const Icon(Icons.edit_outlined, color: AppColors.accent),
                   title: const Text('Edit Transaction'),
                   onTap: () {
                     Navigator.pop(sheetContext);
@@ -183,8 +172,9 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.delete_outline, color: Colors.red[400]),
-                  title: Text('Delete Transaction', style: TextStyle(color: Colors.red[400])),
+                  leading: Icon(Icons.delete_outline, color: AppColors.expense),
+                  title: Text('Delete Transaction',
+                      style: TextStyle(color: AppColors.expense)),
                   onTap: () {
                     Navigator.pop(sheetContext);
                     _confirmDeleteTransaction(txn);
@@ -272,12 +262,13 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
   Widget _buildBody(BuildContext context, HomeState state) {
     if (state.status == HomeStatus.loading) {
       return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF4D648D)),
+        child: CircularProgressIndicator(color: AppColors.primary),
       );
     }
 
     return RefreshIndicator(
       onRefresh: () async => _refreshData(),
+      color: AppColors.primary,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: Column(
@@ -289,7 +280,7 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
             if (!state.hasActivePlan) _buildNoPlanCard(),
             _buildAccountsSection(state),
             _buildRecentTransactionsSection(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 100),
           ],
         ),
       ),
@@ -304,28 +295,16 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
     final now = DateTime.now();
     final dateFormat = DateFormat('EEEE, MMM d');
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-      color: const Color(0xFF4D648D),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            _getGreeting(),
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
+          Text(_getGreeting(), style: AppStyles.displayMedium),
           const SizedBox(height: 4),
           Text(
             dateFormat.format(now),
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white.withValues(alpha: 0.8),
-            ),
+            style: AppStyles.bodySmall,
           ),
         ],
       ),
@@ -346,56 +325,26 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
   Widget _buildTotalBalanceCard(HomeState state) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      decoration: AppStyles.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Text('Total Balance', style: AppStyles.label),
               Text(
-                'Total Balance',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4D648D).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '${state.accountCount} ${state.accountCount == 1 ? 'account' : 'accounts'}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF4D648D),
-                  ),
-                ),
+                '${state.accountCount} ${state.accountCount == 1 ? 'account' : 'accounts'}',
+                style: AppStyles.caption,
               ),
             ],
           ),
           const SizedBox(height: 12),
           Text(
             CurrencyUtils.formatCurrency(state.totalBalance),
-            style: const TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF171717),
-            ),
+            style: AppStyles.displayLarge,
           ),
         ],
       ),
@@ -415,109 +364,56 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
 
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF4D648D),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      decoration: AppStyles.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Active Plan',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white70,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  plan.formattedPeriod,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+              Text('Active Plan', style: AppStyles.label),
+              Text(plan.formattedPeriod, style: AppStyles.caption),
             ],
           ),
           const SizedBox(height: 4),
-          Text(
-            plan.name,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
+          Text(plan.name, style: AppStyles.titleLarge),
           const SizedBox(height: 16),
-
-          // Remaining budget
-          Text(
-            'Remaining Budget',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.white.withValues(alpha: 0.7),
-            ),
-          ),
+          Text('Remaining Budget', style: AppStyles.caption),
           const SizedBox(height: 4),
           Text(
             CurrencyUtils.formatCurrency(remaining),
             style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: remaining >= 0 ? Colors.white : Colors.red[300],
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.5,
+              color: remaining >= 0 ? AppColors.textPrimary : AppColors.expense,
             ),
           ),
           const SizedBox(height: 16),
-
-          // Progress bar
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: progress,
-              minHeight: 6,
-              backgroundColor: Colors.white.withValues(alpha: 0.2),
+              minHeight: 4,
+              backgroundColor: AppColors.surfaceLight,
               valueColor: AlwaysStoppedAnimation<Color>(
-                progress < 0.15 ? Colors.red[300]! : Colors.white,
+                progress < 0.15 ? AppColors.expense : AppColors.accent,
               ),
             ),
           ),
-          const SizedBox(height: 8),
-
-          // Spent vs Budget
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Spent: ${CurrencyUtils.formatCurrency(spent)}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.white.withValues(alpha: 0.7),
-                ),
+                style: AppStyles.caption,
               ),
               Text(
                 'Budget: ${CurrencyUtils.formatCurrency(budget)}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.white.withValues(alpha: 0.7),
-                ),
+                style: AppStyles.caption,
               ),
             ],
           ),
@@ -529,36 +425,18 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
   Widget _buildNoPlanCard() {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E5E5)),
-      ),
+      margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+      padding: const EdgeInsets.all(24),
+      decoration: AppStyles.card,
       child: Column(
         children: [
-          Icon(
-            Icons.calendar_today_outlined,
-            size: 40,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.calendar_today_outlined, size: 32, color: AppColors.textTertiary),
           const SizedBox(height: 12),
-          Text(
-            'No Active Plan',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
-            ),
-          ),
+          Text('No Active Plan', style: AppStyles.bodyLarge),
           const SizedBox(height: 4),
           Text(
             'Create a plan to start tracking your budget',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[500],
-            ),
+            style: AppStyles.bodySmall,
           ),
         ],
       ),
@@ -571,18 +449,11 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
 
   Widget _buildAccountsSection(HomeState state) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Accounts',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2C3E50),
-            ),
-          ),
+          Text('Accounts', style: AppStyles.titleMedium),
           const SizedBox(height: 12),
           if (state.accounts.isEmpty)
             _buildNoAccountsCard()
@@ -596,36 +467,15 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
   Widget _buildNoAccountsCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E5E5)),
-      ),
+      padding: const EdgeInsets.all(24),
+      decoration: AppStyles.card,
       child: Column(
         children: [
-          Icon(
-            Icons.account_balance_wallet_outlined,
-            size: 40,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.account_balance_wallet_outlined, size: 32, color: AppColors.textTertiary),
           const SizedBox(height: 12),
-          Text(
-            'No accounts yet',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
-            ),
-          ),
+          Text('No accounts yet', style: AppStyles.bodyLarge),
           const SizedBox(height: 4),
-          Text(
-            'Add an account to start tracking',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[500],
-            ),
-          ),
+          Text('Add an account to start tracking', style: AppStyles.bodySmall),
         ],
       ),
     );
@@ -635,63 +485,24 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      decoration: AppStyles.card,
       child: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: const Color(0xFF4D648D).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              _getAccountIcon(account.type),
-              color: const Color(0xFF4D648D),
-              size: 20,
-            ),
-          ),
+          AppStyles.iconBox(icon: _getAccountIcon(account.type)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  account.name,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF171717),
-                  ),
-                ),
+                Text(account.name, style: AppStyles.bodyLarge),
                 const SizedBox(height: 2),
-                Text(
-                  _getAccountTypeName(account.type),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[500],
-                  ),
-                ),
+                Text(_getAccountTypeName(account.type), style: AppStyles.caption),
               ],
             ),
           ),
           Text(
             CurrencyUtils.formatCurrency(account.balance),
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF171717),
-            ),
+            style: AppStyles.bodyLarge,
           ),
         ],
       ),
@@ -738,18 +549,11 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
     return BlocBuilder<HomeBloc, HomeState>(
       builder: (context, state) {
         return Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Recent Transactions',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C3E50),
-                ),
-              ),
+              Text('Recent Transactions', style: AppStyles.titleMedium),
               const SizedBox(height: 12),
               if (state.recentTransactions.isEmpty)
                 _buildNoTransactionsCard()
@@ -766,35 +570,14 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E5E5)),
-      ),
+      decoration: AppStyles.card,
       child: Column(
         children: [
-          Icon(
-            Icons.receipt_long_outlined,
-            size: 40,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.receipt_long_outlined, size: 32, color: AppColors.textTertiary),
           const SizedBox(height: 12),
-          Text(
-            'No transactions yet',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
-            ),
-          ),
+          Text('No transactions yet', style: AppStyles.bodyLarge),
           const SizedBox(height: 4),
-          Text(
-            'Transactions will appear here once recorded',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[500],
-            ),
-          ),
+          Text('Transactions will appear here once recorded', style: AppStyles.bodySmall),
         ],
       ),
     );
@@ -806,83 +589,61 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
     final isIncome = txn.type == TransactionType.income;
 
     final icon = isExpense
-        ? Icons.remove_circle_outline
+        ? Icons.arrow_downward_rounded
         : isIncome
-            ? Icons.add_circle_outline
-            : Icons.swap_horiz;
+            ? Icons.arrow_upward_rounded
+            : Icons.swap_horiz_rounded;
     final iconColor = isExpense
-        ? Colors.red[400]
+        ? AppColors.expense
         : isIncome
-            ? Colors.green[400]
-            : const Color(0xFF4D648D);
+            ? AppColors.income
+            : AppColors.accent;
     final amountPrefix = isExpense ? '-' : isIncome ? '+' : '';
     final amountColor = isExpense
-        ? Colors.red[600]
+        ? AppColors.expense
         : isIncome
-            ? Colors.green[600]
-            : const Color(0xFF171717);
+            ? AppColors.income
+            : AppColors.textPrimary;
 
     return GestureDetector(
       onTap: () => _showTransactionActionSheet(txn),
       child: Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: iconColor!.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: AppStyles.card,
+        child: Row(
+          children: [
+            AppStyles.iconBox(
+              icon: icon,
+              bgColor: iconColor.withValues(alpha: 0.08),
+              iconColor: iconColor,
+              size: 40,
+              iconSize: 18,
             ),
-            child: Icon(icon, color: iconColor, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  txn.description ?? txn.type.name[0].toUpperCase() + txn.type.name.substring(1),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF171717),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    txn.description ?? txn.type.name[0].toUpperCase() + txn.type.name.substring(1),
+                    style: AppStyles.bodyLarge,
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  dateFormat.format(txn.occurredAt),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[500],
-                  ),
-                ),
-              ],
+                  const SizedBox(height: 2),
+                  Text(dateFormat.format(txn.occurredAt), style: AppStyles.caption),
+                ],
+              ),
             ),
-          ),
-          Text(
-            '$amountPrefix${CurrencyUtils.formatCurrency(txn.amount)}',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: amountColor,
+            Text(
+              '$amountPrefix${CurrencyUtils.formatCurrency(txn.amount)}',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: amountColor,
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }
