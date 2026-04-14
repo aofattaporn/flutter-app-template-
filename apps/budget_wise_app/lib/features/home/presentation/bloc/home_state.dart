@@ -8,6 +8,7 @@ class HomeState extends Equatable {
   final List<PlanItem> planItems;
   final double actualIncome;
   final List<Account> accounts;
+  final List<Transaction> recentTransactions;
   final String? errorMessage;
 
   const HomeState({
@@ -16,6 +17,7 @@ class HomeState extends Equatable {
     this.planItems = const [],
     this.actualIncome = 0,
     this.accounts = const [],
+    this.recentTransactions = const [],
     this.errorMessage,
   });
 
@@ -41,6 +43,7 @@ class HomeState extends Equatable {
     List<PlanItem>? planItems,
     double? actualIncome,
     List<Account>? accounts,
+    List<Transaction>? recentTransactions,
     String? errorMessage,
     bool clearPlan = false,
   }) {
@@ -50,6 +53,7 @@ class HomeState extends Equatable {
       planItems: planItems ?? this.planItems,
       actualIncome: actualIncome ?? this.actualIncome,
       accounts: accounts ?? this.accounts,
+      recentTransactions: recentTransactions ?? this.recentTransactions,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -61,6 +65,7 @@ class HomeState extends Equatable {
         planItems,
         actualIncome,
         accounts,
+        recentTransactions,
         errorMessage,
       ];
 }

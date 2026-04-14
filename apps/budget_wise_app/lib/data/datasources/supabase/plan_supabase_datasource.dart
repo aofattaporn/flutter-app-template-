@@ -193,17 +193,59 @@ class PlanSupabaseDataSource implements PlanDataSource {
 
   @override
   Future<Map<String, double>> getPlanItemActuals(String planId) async {
-    // TODO: Implement when transactions table is available
-    // This would aggregate transaction amounts by plan_item_id
-    // For now, return empty map
-    return {};
+    try {
+      // Get all plan_item IDs for this plan
+      final itemsResponse = await _client
+          .from(_planItemsTable)
+          .select('id')
+          .eq('plan_id', planId);
+
+      final itemIds =
+          (itemsResponse as List).map((e) => e['id'] as String).toList();
+
+      if (itemIds.isEmpty) return {};
+
+      // Get expense transactions linked to these plan items
+      final txnResponse = await _client
+          .from('transactions')
+          .select('plan_item_id, amount')
+          .eq('type', 'expense')
+          .inFilter('plan_item_id', itemIds);
+
+      final result = <String, double>{};
+      for (final row in txnResponse as List) {
+        final itemId = row['plan_item_id'] as String;
+        final amount = double.parse(row['amount'].toString());
+        result[itemId] = (result[itemId] ?? 0) + amount;
+      }
+      return result;
+    } catch (e) {
+      throw Exception('Failed to get plan item actuals: $e');
+    }
   }
 
   @override
   Future<double> getActualIncome(String planId) async {
-    // TODO: Implement when transactions table is available
-    // This would sum income transactions within the plan period
-    // For now, return 0
-    return 0;
+    try {
+      // Get plan to determine the period
+      final plan = await getPlanById(planId);
+      if (plan == null) return 0;
+
+      // Sum income transactions within the plan period
+      final response = await _client
+          .from('transactions')
+          .select('amount')
+          .eq('type', 'income')
+          .gte('occurred_at', plan.startDate.toIso8601String())
+          .lte('occurred_at', plan.endDate.toIso8601String());
+
+      double total = 0;
+      for (final row in response as List) {
+        total += double.parse(row['amount'].toString());
+      }
+      return total;
+    } catch (e) {
+      throw Exception('Failed to get actual income: $e');
+    }
   }
 }

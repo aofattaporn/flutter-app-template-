@@ -4,7 +4,13 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/extensions.dart';
+import '../../../../di/injection.dart';
+import '../../../../domain/repositories/plan_repository.dart';
 import '../../../accounts/domain/entities/account.dart';
+import '../../../accounts/domain/repositories/account_repository.dart';
+import '../../../accounts/presentation/bloc/account_bloc.dart';
+import '../../../plans/presentation/bloc/active_plan_bloc.dart';
+import '../../../transactions/transactions.dart';
 import '../bloc/home_bloc.dart';
 
 /// Home Overview Page - Main dashboard showing financial summary
@@ -50,7 +56,39 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
           builder: _buildBody,
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'homeCreateTransaction',
+        onPressed: _navigateToCreateTransaction,
+        backgroundColor: const Color(0xFF4D648D),
+        foregroundColor: Colors.white,
+        elevation: 6,
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add, size: 28),
+      ),
     );
+  }
+
+  Future<void> _navigateToCreateTransaction() async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => TransactionEditorBloc(
+            transactionRepository: getIt<TransactionRepository>(),
+            accountRepository: getIt<AccountRepository>(),
+            planRepository: getIt<PlanRepository>(),
+          ),
+          child: const TransactionEditorPage(),
+        ),
+        fullscreenDialog: true,
+      ),
+    );
+
+    if (result == true && mounted) {
+      _refreshData();
+      context.read<AccountBloc>().add(const RefreshAccountsRequested());
+      context.read<ActivePlanBloc>().add(const RefreshActivePlan());
+    }
   }
 
   void _handleStateChanges(BuildContext context, HomeState state) {
@@ -525,53 +563,148 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Widget _buildRecentTransactionsSection() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, state) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Recent Transactions',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2C3E50),
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (state.recentTransactions.isEmpty)
+                _buildNoTransactionsCard()
+              else
+                ...state.recentTransactions.map(_buildTransactionRow),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildNoTransactionsCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE5E5E5)),
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Recent Transactions',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2C3E50),
-            ),
+          Icon(
+            Icons.receipt_long_outlined,
+            size: 40,
+            color: Colors.grey[400],
           ),
           const SizedBox(height: 12),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE5E5E5)),
+          Text(
+            'No transactions yet',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[600],
             ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Transactions will appear here once recorded',
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey[500],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTransactionRow(Transaction txn) {
+    final dateFormat = DateFormat('MMM d, h:mm a');
+    final isExpense = txn.type == TransactionType.expense;
+    final isIncome = txn.type == TransactionType.income;
+
+    final icon = isExpense
+        ? Icons.remove_circle_outline
+        : isIncome
+            ? Icons.add_circle_outline
+            : Icons.swap_horiz;
+    final iconColor = isExpense
+        ? Colors.red[400]
+        : isIncome
+            ? Colors.green[400]
+            : const Color(0xFF4D648D);
+    final amountPrefix = isExpense ? '-' : isIncome ? '+' : '';
+    final amountColor = isExpense
+        ? Colors.red[600]
+        : isIncome
+            ? Colors.green[600]
+            : const Color(0xFF171717);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: iconColor!.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: iconColor, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.receipt_long_outlined,
-                  size: 40,
-                  color: Colors.grey[400],
-                ),
-                const SizedBox(height: 12),
                 Text(
-                  'No transactions yet',
-                  style: TextStyle(
+                  txn.description ?? txn.type.name[0].toUpperCase() + txn.type.name.substring(1),
+                  style: const TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF171717),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
-                  'Transactions will appear here once recorded',
+                  dateFormat.format(txn.occurredAt),
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     color: Colors.grey[500],
                   ),
                 ),
               ],
+            ),
+          ),
+          Text(
+            '$amountPrefix${CurrencyUtils.formatCurrency(txn.amount)}',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: amountColor,
             ),
           ),
         ],

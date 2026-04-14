@@ -2,6 +2,9 @@ import 'dart:io';
 import 'package:app_template/features/accounts/data/datasources/account_remote_datasource.dart';
 import 'package:app_template/features/accounts/data/repositories/account_repository_impl.dart';
 import 'package:app_template/features/accounts/domain/repositories/account_repository.dart';
+import 'package:app_template/features/transactions/data/datasources/transaction_remote_datasource.dart';
+import 'package:app_template/features/transactions/data/repositories/transaction_repository_impl.dart';
+import 'package:app_template/features/transactions/domain/repositories/transaction_repository.dart';
 import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide LocalStorage;
 
@@ -62,6 +65,9 @@ Future<void> configureDependencies() async {
     getIt.registerLazySingleton<AccountRemoteDataSource>(
       () => AccountRemoteDataSource(getIt<SupabaseClient>()),
     );
+    getIt.registerLazySingleton<TransactionRemoteDataSource>(
+      () => TransactionRemoteDataSource(getIt<SupabaseClient>()),
+    );
   } else {
     getIt.registerLazySingleton<AuthDataSource>(
       () => AuthRestDataSource(
@@ -88,6 +94,9 @@ Future<void> configureDependencies() async {
     );
     getIt.registerLazySingleton<AccountRepository>(
       () => AccountRepositoryImpl(getIt<AccountRemoteDataSource>()),
+    );
+    getIt.registerLazySingleton<TransactionRepository>(
+      () => TransactionRepositoryImpl(getIt<TransactionRemoteDataSource>()),
     );
   }
 

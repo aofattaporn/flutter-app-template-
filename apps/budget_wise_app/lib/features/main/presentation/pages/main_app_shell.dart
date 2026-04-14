@@ -43,6 +43,7 @@ class _MainAppShellState extends State<MainAppShell> {
     _homeBloc = HomeBloc(
       planRepository: getIt<PlanRepository>(),
       accountRepository: getIt<AccountRepository>(),
+      transactionRepository: getIt<TransactionRepository>(),
     );
     _activePlanBloc = ActivePlanBloc(
       planRepository: getIt<PlanRepository>(),
@@ -62,33 +63,53 @@ class _MainAppShellState extends State<MainAppShell> {
     setState(() {
       _currentIndex = index;
     });
+    // Auto-refresh the target tab's data
+    _refreshTab(index);
+  }
+
+  void _refreshTab(int index) {
+    switch (index) {
+      case 0:
+        _homeBloc.add(const RefreshHomeData());
+        break;
+      case 1:
+        _activePlanBloc.add(const RefreshActivePlan());
+        break;
+      case 3:
+        _accountBloc.add(const RefreshAccountsRequested());
+        break;
+    }
+  }
+
+  void _refreshAllBlocs() {
+    _homeBloc.add(const RefreshHomeData());
+    _activePlanBloc.add(const RefreshActivePlan());
+    _accountBloc.add(const RefreshAccountsRequested());
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: [
-          BlocProvider.value(
-            value: _homeBloc,
-            child: const HomeOverviewPage(),
-          ),
-          BlocProvider.value(
-            value: _activePlanBloc,
-            child: const ActivePlanPage(),
-          ),
-          const TransactionsPlaceholderPage(),
-          BlocProvider.value(
-            value: _accountBloc,
-            child: const AccountScreen(),
-          ),
-          const SettingsPlaceholderPage(),
-        ],
-      ),
-      bottomNavigationBar: AppBottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _homeBloc),
+        BlocProvider.value(value: _activePlanBloc),
+        BlocProvider.value(value: _accountBloc),
+      ],
+      child: Scaffold(
+        body: IndexedStack(
+          index: _currentIndex,
+          children: [
+            const HomeOverviewPage(),
+            const ActivePlanPage(),
+            const TransactionsPlaceholderPage(),
+            const AccountScreen(),
+            const SettingsPlaceholderPage(),
+          ],
+        ),
+        bottomNavigationBar: AppBottomNavBar(
+          currentIndex: _currentIndex,
+          onTap: _onTabTapped,
+        ),
       ),
     );
   }

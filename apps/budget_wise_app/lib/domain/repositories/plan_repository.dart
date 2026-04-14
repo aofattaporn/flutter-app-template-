@@ -57,4 +57,7 @@ abstract class PlanRepository {
 
   /// Get total actual income for a plan
   Future<double> getActualIncome(String planId);
+
+  /// Invalidate any cached data so next fetch is fresh
+  void invalidateCache();
 }

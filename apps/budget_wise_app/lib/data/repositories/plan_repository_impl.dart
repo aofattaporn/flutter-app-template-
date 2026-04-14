@@ -34,6 +34,9 @@ class PlanRepositoryImpl implements PlanRepository {
     _lastFetch = null;
   }
 
+  @override
+  void invalidateCache() => _invalidateCache();
+
   /// Invalidate only active plan cache - called when active status might change
   void _invalidateActivePlanCache() {
     _cachedActivePlan = null;

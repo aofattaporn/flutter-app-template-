@@ -6,6 +6,8 @@ import '../../../../domain/entities/plan_item.dart';
 import '../../../../domain/repositories/plan_repository.dart';
 import '../../../accounts/domain/entities/account.dart';
 import '../../../accounts/domain/repositories/account_repository.dart';
+import '../../../transactions/domain/entities/transaction.dart';
+import '../../../transactions/domain/repositories/transaction_repository.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
@@ -13,12 +15,15 @@ part 'home_state.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final PlanRepository _planRepository;
   final AccountRepository _accountRepository;
+  final TransactionRepository _transactionRepository;
 
   HomeBloc({
     required PlanRepository planRepository,
     required AccountRepository accountRepository,
+    required TransactionRepository transactionRepository,
   })  : _planRepository = planRepository,
         _accountRepository = accountRepository,
+        _transactionRepository = transactionRepository,
         super(const HomeState()) {
     on<LoadHomeData>(_onLoadHomeData);
     on<RefreshHomeData>(_onRefreshHomeData);
@@ -51,6 +56,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
 
       final accounts = await _accountRepository.getAccounts();
+      final recentTransactions =
+          await _transactionRepository.getRecentTransactions(limit: 5);
 
       emit(state.copyWith(
         status: HomeStatus.loaded,
@@ -58,6 +65,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         planItems: planItems,
         actualIncome: actualIncome,
         accounts: accounts,
+        recentTransactions: recentTransactions,
         clearPlan: activePlan == null,
       ));
     } catch (e) {
