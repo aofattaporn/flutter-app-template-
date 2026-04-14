@@ -22,12 +22,12 @@
 | Feature        | Status             | Use Cases | Done | Notes                                       |
 |---------------|--------------------|-----------|----- |----------------------------------------------|
 | Plans          | ~90% Complete      | 19        | 17   | Missing: filter tabs, actuals from txn       |
-| Accounts       | ~80% Complete      | 8         | 8    | Missing: error handling, notes field          |
+| Accounts       | ~80% Complete      | 8         | 8    | Removed: neg balance, notes (out of scope)   |
 | Transactions   | NOT STARTED        | 11        | 0    | No entity/model/repo/BLoC                     |
-| Home Overview  | NOT STARTED        | 3         | 0    | Placeholder only                              |
+| Home Overview  | ~60% Complete      | 3         | 1    | Pending: transactions feature               |
 | Settings       | NOT STARTED        | 4         | 0    | Placeholder only, no design spec              |
-| Navigation     | COMPLETE           | 2         | 2    | Bottom nav + FAB working                      |
-| **TOTAL**      |                    | **47**    | **27** | **57% complete**                            |
+| Navigation     | COMPLETE           | 2         | 2    | Bottom nav working, FAB removed              |
+| **TOTAL**      |                    | **47**    | **28** | **60% complete**                            |
 
 ---
 

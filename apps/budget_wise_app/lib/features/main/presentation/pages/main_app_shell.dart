@@ -7,7 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../di/injection.dart';
 import '../../../../domain/repositories/plan_repository.dart';
 import '../widgets/widgets.dart';
-import '../../../home/presentation/pages/home_placeholder_page.dart';
+import '../../../home/presentation/bloc/home_bloc.dart';
+import '../../../home/presentation/pages/home_overview_page.dart';
 import '../../../plans/presentation/bloc/active_plan_bloc.dart';
 import '../../../plans/presentation/pages/active_plan_page.dart';
 import '../../../transactions/transactions.dart';
@@ -31,13 +32,18 @@ class MainAppShell extends StatefulWidget {
 }
 
 class _MainAppShellState extends State<MainAppShell> {
-  int _currentIndex = 1; // Default to Plans tab (index 1)
+  int _currentIndex = 0; // Default to Home tab (index 0)
+  late final HomeBloc _homeBloc;
   late final ActivePlanBloc _activePlanBloc;
   late final AccountBloc _accountBloc;
 
   @override
   void initState() {
     super.initState();
+    _homeBloc = HomeBloc(
+      planRepository: getIt<PlanRepository>(),
+      accountRepository: getIt<AccountRepository>(),
+    );
     _activePlanBloc = ActivePlanBloc(
       planRepository: getIt<PlanRepository>(),
     );
@@ -46,6 +52,7 @@ class _MainAppShellState extends State<MainAppShell> {
 
   @override
   void dispose() {
+    _homeBloc.close();
     _activePlanBloc.close();
     _accountBloc.close();
     super.dispose();
@@ -63,7 +70,10 @@ class _MainAppShellState extends State<MainAppShell> {
       body: IndexedStack(
         index: _currentIndex,
         children: [
-          const HomePlaceholderPage(),
+          BlocProvider.value(
+            value: _homeBloc,
+            child: const HomeOverviewPage(),
+          ),
           BlocProvider.value(
             value: _activePlanBloc,
             child: const ActivePlanPage(),

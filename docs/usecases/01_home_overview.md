@@ -1,7 +1,8 @@
 # Use Cases: Home Overview Screen
 
-> **Screen**: `home_placeholder_page.dart`
-> **Status**: NOT STARTED (placeholder only)
+> **Screen**: `home_overview_page.dart`
+> **BLoC**: `HomeBloc`
+> **Status**: PARTIAL (~60% — pending transactions feature)
 > **Design Spec**: `propmt/home_overview_screen.html`
 
 ---
@@ -16,9 +17,9 @@ The Home Overview screen serves as the app's landing dashboard, showing a quick 
 
 | # | Use Case | Status |
 |---|----------|--------|
-| UC-HOME-01 | View Financial Summary | ⬜ Not Started |
-| UC-HOME-02 | Quick Create Transaction | ⬜ Not Started |
-| UC-HOME-03 | View Recent Transactions | ⬜ Not Started |
+| UC-HOME-01 | View Financial Summary | ✅ Done |
+| UC-HOME-02 | Quick Create Transaction | ⬜ Blocked (needs transactions feature) |
+| UC-HOME-03 | View Recent Transactions | ⬜ Blocked (needs transactions feature) |
 
 ---
 
