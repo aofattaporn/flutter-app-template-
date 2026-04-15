@@ -31,8 +31,8 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
   final List<Map<String, dynamic>> _accountTypes = [
     {'value': 'bank', 'label': 'Bank', 'icon': Icons.account_balance, 'enabled': true},
     {'value': 'cash', 'label': 'Cash', 'icon': Icons.money, 'enabled': true},
-    {'value': 'ewallet', 'label': 'Wallet', 'icon': Icons.wallet, 'enabled': true},
-    {'value': 'other', 'label': '', 'icon': Icons.help_outline, 'enabled': false},
+    {'value': 'ewallet', 'label': 'E-Wallet', 'icon': Icons.phone_android, 'enabled': true},
+    {'value': 'debit', 'label': 'Wallet', 'icon': Icons.wallet, 'enabled': false}
   ];
 
   @override
@@ -185,6 +185,7 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
   Widget _buildNameField() {
     return TextFormField(
       controller: _nameController,
+      style: AppStyles.inputText,
       decoration: AppStyles.input(
         hint: 'e.g. Main Bank, Cash, Wallet',
       ),
@@ -253,16 +254,14 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
   Widget _buildBalanceField() {
     return TextFormField(
       controller: _balanceController,
+      style: AppStyles.inputText,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
       ],
       decoration: AppStyles.input(
         hint: '0.00',
-        prefix: Padding(
-          padding: const EdgeInsets.only(left: 16, right: 8),
-          child: Text('฿', style: TextStyle(fontSize: 16, color: AppColors.textSecondary)),
-        ),
+        prefixText: 'THB ',
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) return null;

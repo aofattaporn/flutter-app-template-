@@ -351,6 +351,7 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
         const SizedBox(height: 8),
         TextFormField(
           controller: _nameController,
+          style: AppStyles.inputText,
           decoration: AppStyles.input(hint: 'e.g. January 2025 Budget'),
           textCapitalization: TextCapitalization.words,
           validator: (value) {
@@ -432,9 +433,11 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
         const SizedBox(height: 8),
         TextFormField(
           controller: _expectedIncomeController,
+          style: AppStyles.inputText,
           decoration: AppStyles.input(
             hint: '0.00',
-            prefixText: 'THB ',
+          ).copyWith(
+            prefix: const Text('THB ', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: AppColors.textSecondary)),
           ),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           inputFormatters: [

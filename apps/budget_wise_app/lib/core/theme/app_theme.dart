@@ -123,6 +123,12 @@ class AppStyles {
   );
 
   // ── Input ──────────────────────────────────────────────────────────────
+  static const TextStyle inputText = TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textPrimary,
+  );
+
   static InputDecoration input({
     String? label,
     String? hint,
