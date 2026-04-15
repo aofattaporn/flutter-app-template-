@@ -6,7 +6,7 @@ packages:
     description:
       name: _fe_analyzer_shared
       sha256: "0b2f2bd91ba804e53a61d757b986f89f1f9eaed5b11e4b2f5a2468d86d6c9fc7"
-      url: "https://pub.dev"
+      url: "https://pub.dev" 
     source: hosted
     version: "67.0.0"
   adaptive_number:
