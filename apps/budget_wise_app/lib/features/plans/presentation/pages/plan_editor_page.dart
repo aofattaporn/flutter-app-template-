@@ -428,48 +428,13 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        RichText(
-          text: TextSpan(
-            text: 'Expected Income ',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
-            children: [
-              TextSpan(
-                text: '(Optional)',
-                style: TextStyle(color: Colors.grey.shade400),
-              ),
-            ],
-          ),
-        ),
+        Text('Expected Income (Optional)', style: AppStyles.label),
         const SizedBox(height: 8),
         TextFormField(
           controller: _expectedIncomeController,
-          decoration: InputDecoration(
-            hintText: '0.00',
-            hintStyle: TextStyle(color: Colors.grey.shade400),
-            prefixText: 'เธฟ ',
-            prefixStyle: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 16,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: const Color(0xFFE5E5E5)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: const Color(0xFFE5E5E5)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFF4D648D)),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 14,
-            ),
+          decoration: AppStyles.input(
+            hint: '0.00',
+            prefixText: 'THB ',
           ),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           inputFormatters: [
@@ -479,10 +444,7 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
         const SizedBox(height: 8),
         Text(
           'Track your expected income for this period (salary, freelance, etc.)',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade500,
-          ),
+          style: AppStyles.caption,
         ),
       ],
     );

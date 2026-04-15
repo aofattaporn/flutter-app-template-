@@ -121,8 +121,18 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
       final newTotalPlanned =
           widget.currentTotalPlanned - existingItemAmount + amount;
 
+      // Validate: must have expected income set before adding items
+      if (expectedIncome <= 0) {
+        _showValidationError(
+          'No Budget Set',
+          'Please set an expected income for this plan before adding items.\n\n'
+              'Go back and edit the plan\'s expected income first.',
+        );
+        return;
+      }
+
       // Validate: new total should not exceed expected income
-      if (expectedIncome > 0 && newTotalPlanned > expectedIncome) {
+      if (newTotalPlanned > expectedIncome) {
         final availableBudget =
             expectedIncome - widget.currentTotalPlanned + existingItemAmount;
         _showValidationError(
