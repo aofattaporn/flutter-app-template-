@@ -30,7 +30,7 @@ class AppTemplateApp extends ConsumerWidget {
     final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
-      title: 'App Template',
+      title: 'BudgetWise',
       debugShowCheckedModeBanner: false,
 
       // Theme
