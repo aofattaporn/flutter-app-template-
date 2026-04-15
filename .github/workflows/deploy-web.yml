@@ -24,6 +24,16 @@ jobs:
         with:
           channel: stable
 
+      - name: Create .env file
+        working-directory: apps/budget_wise_app
+        run: |
+          cat <<EOF > .env
+          DEBUG=false
+          BACKEND_TYPE=supabase
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          EOF
+
       - name: Install dependencies
         working-directory: apps/budget_wise_app
         run: flutter pub get
