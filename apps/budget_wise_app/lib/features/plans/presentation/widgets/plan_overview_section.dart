@@ -37,18 +37,6 @@ class PlanOverviewSection extends StatefulWidget {
 
 class _PlanOverviewSectionState extends State<PlanOverviewSection> {
   // ═══════════════════════════════════════════════════════════════════════════
-  // CONSTANTS
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  static const _primaryColor = AppColors.accent;
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // STATE
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  bool _isDetailsExpanded = false;
-
-  // ═══════════════════════════════════════════════════════════════════════════
   // COMPUTED PROPERTIES
   // ═══════════════════════════════════════════════════════════════════════════
 
@@ -61,18 +49,6 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
       return ((1 - (widget.totalSpent / _expectedIncome)) * 100).clamp(0, 100);
     }
     return widget.totalSpent > 0 ? 0.0 : 100.0;
-  }
-
-  double get _incomeDifference => _expectedIncome - widget.actualIncome;
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // ACTIONS
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  void _toggleDetailsExpanded() {
-    setState(() {
-      _isDetailsExpanded = !_isDetailsExpanded;
-    });
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -89,8 +65,6 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
           _buildPlanHeader(),
           const SizedBox(height: 20),
           _buildAvailableToSpendCard(),
-          const SizedBox(height: 16),
-          _buildIncomeTrackingSection(),
           const SizedBox(height: 20),
           _buildActionButtons(),
         ],
@@ -192,67 +166,6 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
       ),
     );
   }
-  // (Amount & progress now inline in _buildAvailableToSpendCard)
-
-  Widget _buildIncomeTrackingSection() {
-    return Container(
-      decoration: AppStyles.card,
-      child: Column(
-        children: [
-          _buildIncomeTrackingHeader(),
-          if (_isDetailsExpanded) _buildIncomeTrackingDetails(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIncomeTrackingHeader() {
-    return InkWell(
-      onTap: _toggleDetailsExpanded,
-      borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(Icons.analytics_outlined, size: 18, color: AppColors.textSecondary),
-            const SizedBox(width: 12),
-            Expanded(child: Text('Income Tracking', style: AppStyles.bodyLarge)),
-            Icon(
-              _isDetailsExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-              color: AppColors.textTertiary,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIncomeTrackingDetails() {
-    return Column(
-      children: [
-        const Divider(height: 1, color: AppColors.divider),
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              _buildDetailRow(label: 'Planned Income', value: CurrencyUtils.formatCurrency(_expectedIncome)),
-              const SizedBox(height: 12),
-              _buildDetailRow(label: 'Actual Income', value: CurrencyUtils.formatCurrency(widget.actualIncome)),
-              const SizedBox(height: 12),
-              const Divider(height: 1, color: AppColors.divider),
-              const SizedBox(height: 12),
-              _buildDetailRow(
-                label: 'Difference',
-                value: '${_incomeDifference >= 0 ? '+' : ''}${CurrencyUtils.formatCurrency(_incomeDifference)}',
-                valueColor: _incomeDifference >= 0 ? AppColors.income : AppColors.expense,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   // ═══════════════════════════════════════════════════════════════════════════
   // BUILD - ACTION BUTTONS
   // ═══════════════════════════════════════════════════════════════════════════
