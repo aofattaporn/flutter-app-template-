@@ -142,6 +142,7 @@ class _PlanDetailPageState extends State<PlanDetailPage> {
         await _planRepository.addPlanItem(
           planId: _currentPlan.id,
           name: result['name'] as String,
+          description: result['description'] as String?,
           expectedAmount: result['amount'] as double,
         );
         await _loadPlanItems();
@@ -171,6 +172,7 @@ class _PlanDetailPageState extends State<PlanDetailPage> {
         await _planRepository.updatePlanItem(
           item.copyWith(
             name: result['name'] as String,
+            description: result['description'] as String?,
             expectedAmount: result['amount'] as double,
           ),
         );

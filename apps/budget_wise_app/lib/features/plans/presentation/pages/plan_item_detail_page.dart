@@ -78,6 +78,7 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
             UpdatePlanItemRequested(
               itemId: _item.id,
               name: result['name'] as String,
+              description: result['description'] as String?,
               expectedAmount: result['amount'] as double,
             ),
           );
@@ -87,6 +88,7 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
       setState(() {
         _item = _item.copyWith(
           name: result['name'] as String,
+          description: result['description'] as String?,
           expectedAmount: result['amount'] as double,
         );
       });
