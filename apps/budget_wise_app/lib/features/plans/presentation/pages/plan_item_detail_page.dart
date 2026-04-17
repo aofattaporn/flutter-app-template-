@@ -8,6 +8,7 @@ import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../di/injection.dart';
 import '../../../../domain/entities/plan_item.dart';
+import 'plan_item_editor_page.dart';
 import '../../../../domain/repositories/plan_repository.dart';
 import '../../../accounts/domain/repositories/account_repository.dart';
 import '../../../transactions/domain/entities/transaction.dart';
@@ -80,6 +81,7 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
               name: result['name'] as String,
               description: result['description'] as String?,
               expectedAmount: result['amount'] as double,
+              iconIndex: result['iconIndex'] as int?,
             ),
           );
       // Refresh the plan to get updated item
@@ -90,6 +92,7 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
           name: result['name'] as String,
           description: result['description'] as String?,
           expectedAmount: result['amount'] as double,
+          iconIndex: result['iconIndex'] as int?,
         );
       });
     }
@@ -285,7 +288,7 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
         children: [
           Row(
             children: [
-              AppStyles.iconBox(icon: Icons.category),
+              AppStyles.iconBox(icon: PlanItemIcon.getIcon(_item.iconIndex)),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(

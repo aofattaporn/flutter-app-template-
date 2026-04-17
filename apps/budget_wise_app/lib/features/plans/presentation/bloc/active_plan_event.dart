@@ -28,15 +28,17 @@ class AddPlanItemRequested extends ActivePlanEvent {
   final String name;
   final String? description;
   final double expectedAmount;
+  final int? iconIndex;
 
   const AddPlanItemRequested({
     required this.name,
     this.description,
     required this.expectedAmount,
+    this.iconIndex,
   });
 
   @override
-  List<Object?> get props => [name, description, expectedAmount];
+  List<Object?> get props => [name, description, expectedAmount, iconIndex];
 }
 
 /// Delete a plan item
@@ -55,12 +57,14 @@ class UpdatePlanItemRequested extends ActivePlanEvent {
   final String? name;
   final String? description;
   final double? expectedAmount;
+  final int? iconIndex;
 
   const UpdatePlanItemRequested({
     required this.itemId,
     this.name,
     this.description,
     this.expectedAmount,
+    this.iconIndex,
   });
 
   @override

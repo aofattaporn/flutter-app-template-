@@ -111,6 +111,7 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
               name: result['name'] as String,
               description: result['description'] as String?,
               expectedAmount: result['amount'] as double,
+              iconIndex: result['iconIndex'] as int?,
             ),
           );
     }
@@ -136,6 +137,7 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
               name: result['name'] as String,
               description: result['description'] as String?,
               expectedAmount: result['amount'] as double,
+              iconIndex: result['iconIndex'] as int?,
             ),
           );
     }

@@ -8,6 +8,7 @@ class PlanItemModel extends PlanItem {
     required super.name,
     super.description,
     required super.expectedAmount,
+    super.iconIndex,
     super.actualAmount,
     super.createdAt,
     super.updatedAt,
@@ -21,6 +22,7 @@ class PlanItemModel extends PlanItem {
       name: json['name'] as String,
       description: json['description'] as String?,
       expectedAmount: (json['expected_amount'] as num).toDouble(),
+      iconIndex: json['icon_index'] as int?,
       actualAmount: json['actual_amount'] != null
           ? (json['actual_amount'] as num).toDouble()
           : 0,
@@ -50,6 +52,7 @@ class PlanItemModel extends PlanItem {
       'name': name,
       'description': description,
       'expected_amount': expectedAmount,
+      'icon_index': iconIndex,
     };
   }
 
@@ -59,6 +62,7 @@ class PlanItemModel extends PlanItem {
       'name': name,
       'description': description,
       'expected_amount': expectedAmount,
+      'icon_index': iconIndex,
       'updated_at': DateTime.now().toIso8601String(),
     };
   }
@@ -71,6 +75,7 @@ class PlanItemModel extends PlanItem {
       name: item.name,
       description: item.description,
       expectedAmount: item.expectedAmount,
+      iconIndex: item.iconIndex,
       actualAmount: item.actualAmount,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
@@ -85,6 +90,7 @@ class PlanItemModel extends PlanItem {
       name: name,
       description: description,
       expectedAmount: expectedAmount,
+      iconIndex: iconIndex,
       actualAmount: actualAmount,
       createdAt: createdAt,
       updatedAt: updatedAt,
@@ -99,6 +105,7 @@ class PlanItemModel extends PlanItem {
       name: name,
       description: description,
       expectedAmount: expectedAmount,
+      iconIndex: iconIndex,
       actualAmount: actual,
       createdAt: createdAt,
       updatedAt: updatedAt,

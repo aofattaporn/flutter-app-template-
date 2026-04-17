@@ -46,6 +46,7 @@ abstract class PlanDataSource {
     required String name,
     String? description,
     required double expectedAmount,
+    int? iconIndex,
   });
 
   /// Update a plan item

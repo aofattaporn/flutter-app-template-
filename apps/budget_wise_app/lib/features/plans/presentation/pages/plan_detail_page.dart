@@ -144,6 +144,7 @@ class _PlanDetailPageState extends State<PlanDetailPage> {
           name: result['name'] as String,
           description: result['description'] as String?,
           expectedAmount: result['amount'] as double,
+          iconIndex: result['iconIndex'] as int?,
         );
         await _loadPlanItems();
       } catch (e) {
@@ -174,6 +175,7 @@ class _PlanDetailPageState extends State<PlanDetailPage> {
             name: result['name'] as String,
             description: result['description'] as String?,
             expectedAmount: result['amount'] as double,
+            iconIndex: result['iconIndex'] as int?,
           ),
         );
         await _loadPlanItems();

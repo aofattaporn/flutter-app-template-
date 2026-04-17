@@ -148,12 +148,14 @@ class PlanRepositoryImpl implements PlanRepository {
     required String name,
     String? description,
     required double expectedAmount,
+    int? iconIndex,
   }) async {
     final model = await _dataSource.addPlanItem(
       planId: planId,
       name: name,
       description: description,
       expectedAmount: expectedAmount,
+      iconIndex: iconIndex,
     );
     _cachedPlanItems.remove(planId); // Invalidate only this plan's items
     return model.toEntity();

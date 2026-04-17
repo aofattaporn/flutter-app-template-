@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../domain/entities/plan_item.dart';
+import '../pages/plan_item_editor_page.dart';
 
 /// Widget displaying a single plan item card — minimal flat style
 class PlanItemCard extends StatelessWidget {
@@ -46,7 +47,7 @@ class PlanItemCard extends StatelessWidget {
             Row(
               children: [
                 AppStyles.iconBox(
-                  icon: _getCategoryIcon(item.name),
+                  icon: PlanItemIcon.getIcon(item.iconIndex),
                   size: 36,
                   iconSize: 18,
                   radius: 8,
@@ -85,11 +86,11 @@ class PlanItemCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // Progress
+            // Progress (remaining — 100% when unused, decreases as spent)
             ClipRRect(
               borderRadius: BorderRadius.circular(2),
               child: LinearProgressIndicator(
-                value: item.progressPercentage,
+                value: 1.0 - item.progressPercentage,
                 backgroundColor: AppColors.surfaceLight,
                 valueColor: AlwaysStoppedAnimation<Color>(_getProgressColor()),
                 minHeight: 4,
@@ -138,21 +139,4 @@ class PlanItemCard extends StatelessWidget {
     );
   }
 
-  IconData _getCategoryIcon(String name) {
-    final lowerName = name.toLowerCase();
-    if (lowerName.contains('food') || lowerName.contains('grocery')) {
-      return Icons.restaurant;
-    } else if (lowerName.contains('transport')) {
-      return Icons.directions_car;
-    } else if (lowerName.contains('entertainment')) {
-      return Icons.movie;
-    } else if (lowerName.contains('health')) {
-      return Icons.local_hospital;
-    } else if (lowerName.contains('shopping')) {
-      return Icons.shopping_bag;
-    } else if (lowerName.contains('salary') || lowerName.contains('income')) {
-      return Icons.attach_money;
-    }
-    return Icons.category;
-  }
 }

@@ -12,6 +12,42 @@ class PlanItemIcon {
   final String name;
 
   const PlanItemIcon({required this.icon, required this.name});
+
+  /// Shared list of available icons for plan items
+  static const List<PlanItemIcon> all = [
+    PlanItemIcon(icon: Icons.restaurant, name: 'Food'),
+    PlanItemIcon(icon: Icons.shopping_cart, name: 'Shopping'),
+    PlanItemIcon(icon: Icons.directions_car, name: 'Car'),
+    PlanItemIcon(icon: Icons.home, name: 'Home'),
+    PlanItemIcon(icon: Icons.directions_bus, name: 'Transport'),
+    PlanItemIcon(icon: Icons.local_cafe, name: 'Coffee'),
+    PlanItemIcon(icon: Icons.favorite, name: 'Health'),
+    PlanItemIcon(icon: Icons.medical_services, name: 'Medical'),
+    PlanItemIcon(icon: Icons.school, name: 'Education'),
+    PlanItemIcon(icon: Icons.movie, name: 'Entertainment'),
+    PlanItemIcon(icon: Icons.flight, name: 'Travel'),
+    PlanItemIcon(icon: Icons.card_giftcard, name: 'Gift'),
+    PlanItemIcon(icon: Icons.checkroom, name: 'Clothing'),
+    PlanItemIcon(icon: Icons.fitness_center, name: 'Fitness'),
+    PlanItemIcon(icon: Icons.book, name: 'Books'),
+    PlanItemIcon(icon: Icons.phone_android, name: 'Phone'),
+    PlanItemIcon(icon: Icons.computer, name: 'Computer'),
+    PlanItemIcon(icon: Icons.pets, name: 'Pets'),
+    PlanItemIcon(icon: Icons.work, name: 'Work'),
+    PlanItemIcon(icon: Icons.attach_money, name: 'Salary'),
+    PlanItemIcon(icon: Icons.savings, name: 'Savings'),
+    PlanItemIcon(icon: Icons.trending_up, name: 'Investment'),
+    PlanItemIcon(icon: Icons.account_balance, name: 'Bank'),
+    PlanItemIcon(icon: Icons.category, name: 'Other'),
+  ];
+
+  /// Get icon by index (with fallback)
+  static IconData getIcon(int? index) {
+    if (index == null || index < 0 || index >= all.length) {
+      return Icons.category;
+    }
+    return all[index].icon;
+  }
 }
 
 /// Plan Item Editor page for creating and editing plan items
@@ -49,33 +85,8 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
   bool _isExpenseType = true;
   int _selectedIconIndex = 0;
 
-  // Available icons for selection
-  static const List<PlanItemIcon> _availableIcons = [
-    PlanItemIcon(icon: Icons.restaurant, name: 'Food'),
-    PlanItemIcon(icon: Icons.shopping_cart, name: 'Shopping'),
-    PlanItemIcon(icon: Icons.directions_car, name: 'Car'),
-    PlanItemIcon(icon: Icons.home, name: 'Home'),
-    PlanItemIcon(icon: Icons.directions_bus, name: 'Transport'),
-    PlanItemIcon(icon: Icons.local_cafe, name: 'Coffee'),
-    PlanItemIcon(icon: Icons.favorite, name: 'Health'),
-    PlanItemIcon(icon: Icons.medical_services, name: 'Medical'),
-    PlanItemIcon(icon: Icons.school, name: 'Education'),
-    PlanItemIcon(icon: Icons.movie, name: 'Entertainment'),
-    PlanItemIcon(icon: Icons.flight, name: 'Travel'),
-    PlanItemIcon(icon: Icons.card_giftcard, name: 'Gift'),
-    PlanItemIcon(icon: Icons.checkroom, name: 'Clothing'),
-    PlanItemIcon(icon: Icons.fitness_center, name: 'Fitness'),
-    PlanItemIcon(icon: Icons.book, name: 'Books'),
-    PlanItemIcon(icon: Icons.phone_android, name: 'Phone'),
-    PlanItemIcon(icon: Icons.computer, name: 'Computer'),
-    PlanItemIcon(icon: Icons.pets, name: 'Pets'),
-    PlanItemIcon(icon: Icons.work, name: 'Work'),
-    PlanItemIcon(icon: Icons.attach_money, name: 'Salary'),
-    PlanItemIcon(icon: Icons.savings, name: 'Savings'),
-    PlanItemIcon(icon: Icons.trending_up, name: 'Investment'),
-    PlanItemIcon(icon: Icons.account_balance, name: 'Bank'),
-    PlanItemIcon(icon: Icons.category, name: 'Other'),
-  ];
+  // Reference shared icon list
+  static List<PlanItemIcon> get _availableIcons => PlanItemIcon.all;
 
   @override
   void initState() {
@@ -89,8 +100,8 @@ class _PlanItemEditorPageState extends State<PlanItemEditorPage> {
       _nameController.text = item.name;
       _amountController.text = item.expectedAmount.toStringAsFixed(2);
       _descriptionController.text = item.description ?? '';
-      // Try to find matching icon
-      _selectedIconIndex = _findIconIndexByName(item.name);
+      // Use stored iconIndex if available, otherwise guess from name
+      _selectedIconIndex = item.iconIndex ?? _findIconIndexByName(item.name);
     }
   }
 

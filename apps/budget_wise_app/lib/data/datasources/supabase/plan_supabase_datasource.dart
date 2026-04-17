@@ -159,12 +159,14 @@ class PlanSupabaseDataSource implements PlanDataSource {
     required String name,
     String? description,
     required double expectedAmount,
+    int? iconIndex,
   }) async {
     final data = {
       'plan_id': planId,
       'name': name,
       'description': description,
       'expected_amount': expectedAmount,
+      'icon_index': iconIndex,
     };
 
     final response = await _client
