@@ -367,7 +367,7 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
     final budget = state.totalPlannedExpenses;
     final remaining = state.remainingBudget;
     final progress = budget > 0 ? (remaining / budget).clamp(0.0, 1.0) : 0.0;
-    final daysLeft = plan.endDate.difference(DateTime.now()).inDays;
+    final daysLeft = plan.endDate.difference(DateTime.now()).inDays + 1; 
     final daysLeftText = daysLeft < 0
         ? 'Ended'
         : daysLeft == 0

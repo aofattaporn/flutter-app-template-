@@ -87,7 +87,7 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
   }
 
   Widget _buildPlanInfo() {
-    final daysLeft = widget.plan.endDate.difference(DateTime.now()).inDays;
+    final daysLeft = widget.plan.endDate.difference(DateTime.now()).inDays + 1; // plus 1 on diff day
     final daysLeftText = daysLeft < 0
         ? 'Ended'
         : daysLeft == 0
