@@ -479,9 +479,166 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 12, bottom: 8),
-          child: Text(label, style: AppStyles.label),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(label, style: AppStyles.label),
+              GestureDetector(
+                onTap: () => _showDaySummary(label, txns),
+                child: Text(
+                  'Summary',
+                  style: AppStyles.caption.copyWith(
+                    color: AppColors.accent,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         ...txns.map(_buildTransactionRow),
+      ],
+    );
+  }
+
+  void _showDaySummary(String dateLabel, List<Transaction> txns) {
+    double income = 0;
+    double expense = 0;
+    double transfer = 0;
+    int incomeCount = 0;
+    int expenseCount = 0;
+    int transferCount = 0;
+
+    for (final txn in txns) {
+      switch (txn.type) {
+        case TransactionType.income:
+          income += txn.amount;
+          incomeCount++;
+          break;
+        case TransactionType.expense:
+          expense += txn.amount;
+          expenseCount++;
+          break;
+        case TransactionType.transfer:
+          transfer += txn.amount;
+          transferCount++;
+          break;
+      }
+    }
+
+    final net = income - expense;
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AppStyles.sheetHandle(),
+                const SizedBox(height: 8),
+                Text(dateLabel, style: AppStyles.titleMedium),
+                Text(
+                  '${txns.length} transaction${txns.length == 1 ? '' : 's'}',
+                  style: AppStyles.caption,
+                ),
+                const SizedBox(height: 16),
+
+                // Summary rows
+                if (incomeCount > 0)
+                  _buildSummarySheetRow(
+                    Icons.arrow_upward_rounded,
+                    AppColors.income,
+                    'Income',
+                    '$incomeCount txn${incomeCount == 1 ? '' : 's'}',
+                    '+${CurrencyUtils.formatCurrency(income)}',
+                  ),
+                if (expenseCount > 0) ...[
+                  const SizedBox(height: 10),
+                  _buildSummarySheetRow(
+                    Icons.arrow_downward_rounded,
+                    AppColors.expense,
+                    'Expense',
+                    '$expenseCount txn${expenseCount == 1 ? '' : 's'}',
+                    '-${CurrencyUtils.formatCurrency(expense)}',
+                  ),
+                ],
+                if (transferCount > 0) ...[
+                  const SizedBox(height: 10),
+                  _buildSummarySheetRow(
+                    Icons.swap_horiz,
+                    AppColors.accent,
+                    'Transfer',
+                    '$transferCount txn${transferCount == 1 ? '' : 's'}',
+                    CurrencyUtils.formatCurrency(transfer),
+                  ),
+                ],
+
+                // Net
+                const SizedBox(height: 12),
+                const Divider(height: 1, color: AppColors.divider),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Net', style: AppStyles.bodyLarge),
+                    Text(
+                      '${net >= 0 ? '+' : '-'}${CurrencyUtils.formatCurrency(net.abs())}',
+                      style: AppStyles.bodyLarge.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: net >= 0 ? AppColors.income : AppColors.expense,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSummarySheetRow(
+    IconData icon,
+    Color color,
+    String label,
+    String count,
+    String amount,
+  ) {
+    return Row(
+      children: [
+        AppStyles.iconBox(
+          icon: icon,
+          size: 36,
+          bgColor: color.withValues(alpha: 0.1),
+          iconColor: color,
+          iconSize: 18,
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: AppStyles.bodyLarge),
+              Text(count, style: AppStyles.caption),
+            ],
+          ),
+        ),
+        Text(
+          amount,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
+        ),
       ],
     );
   }
