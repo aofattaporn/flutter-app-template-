@@ -48,11 +48,11 @@ class AppBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.cardBg,
+      decoration: BoxDecoration(
+        color: context.colors.cardBg,
         border: Border(
           top: BorderSide(
-            color: AppColors.divider,
+            color: context.colors.divider,
             width: 0.5,
           ),
         ),
@@ -69,8 +69,8 @@ class AppBottomNavBar extends StatelessWidget {
                 data: _navItems[index],
                 isSelected: currentIndex == index,
                 onTap: () => onTap(index),
-                activeColor: AppColors.primary,
-                inactiveColor: AppColors.textTertiary,
+                activeColor: context.colors.primary,
+                inactiveColor: context.colors.textTertiary,
               ),
             ),
           ),

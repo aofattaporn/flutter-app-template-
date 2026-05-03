@@ -62,11 +62,8 @@ class _AuthPageState extends State<AuthPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
-      backgroundColor:
-          isDark ? const Color(0xFF121212) : AppColors.scaffoldBg,
+      backgroundColor: context.colors.scaffoldBg,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -81,19 +78,19 @@ class _AuthPageState extends State<AuthPage> {
                 Icon(
                   Icons.account_balance_wallet_rounded,
                   size: 56,
-                  color: isDark ? Colors.white : AppColors.primary,
+                  color: context.colors.primary,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'BudgetWise',
-                  style: AppStyles.displayLarge.copyWith(
-                    color: isDark ? Colors.white : AppColors.primary,
+                  style: context.styles.displayLarge.copyWith(
+                    color: context.colors.primary,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   _isSignUp ? 'Create your account' : 'Welcome back',
-                  style: AppStyles.bodySmall,
+                  style: context.styles.bodySmall,
                 ),
                 const SizedBox(height: 40),
 
@@ -106,10 +103,8 @@ class _AuthPageState extends State<AuthPage> {
                       if (_isSignUp) ...[
                         TextFormField(
                           controller: _nameController,
-                          style: AppStyles.inputText.copyWith(
-                            color: isDark ? Colors.white : null,
-                          ),
-                          decoration: AppStyles.input(
+                          style: context.styles.inputText,
+                          decoration: context.styles.input(
                             label: 'Name',
                             hint: 'Enter your name',
                             prefix: const Icon(Icons.person_outline, size: 20),
@@ -122,10 +117,8 @@ class _AuthPageState extends State<AuthPage> {
                       // Email
                       TextFormField(
                         controller: _emailController,
-                        style: AppStyles.inputText.copyWith(
-                          color: isDark ? Colors.white : null,
-                        ),
-                        decoration: AppStyles.input(
+                        style: context.styles.inputText,
+                        decoration: context.styles.input(
                           label: 'Email',
                           hint: 'Enter your email',
                           prefix: const Icon(Icons.email_outlined, size: 20),
@@ -148,10 +141,8 @@ class _AuthPageState extends State<AuthPage> {
                       // Password
                       TextFormField(
                         controller: _passwordController,
-                        style: AppStyles.inputText.copyWith(
-                          color: isDark ? Colors.white : null,
-                        ),
-                        decoration: AppStyles.input(
+                        style: context.styles.inputText,
+                        decoration: context.styles.input(
                           label: 'Password',
                           hint: 'Enter your password',
                           prefix: const Icon(Icons.lock_outline, size: 20),
@@ -161,7 +152,7 @@ class _AuthPageState extends State<AuthPage> {
                                   ? Icons.visibility_off_outlined
                                   : Icons.visibility_outlined,
                               size: 20,
-                              color: AppColors.textTertiary,
+                              color: context.colors.textTertiary,
                             ),
                             onPressed: () => setState(
                               () => _obscurePassword = !_obscurePassword,
@@ -188,7 +179,7 @@ class _AuthPageState extends State<AuthPage> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _submit,
-                          style: AppStyles.primaryButton,
+                          style: context.styles.primaryButton,
                           child: _isLoading
                               ? const SizedBox(
                                   height: 20,
@@ -214,7 +205,7 @@ class _AuthPageState extends State<AuthPage> {
                       _isSignUp
                           ? 'Already have an account?'
                           : "Don't have an account?",
-                      style: AppStyles.bodySmall,
+                      style: context.styles.bodySmall,
                     ),
                     TextButton(
                       onPressed: _isLoading
@@ -225,8 +216,8 @@ class _AuthPageState extends State<AuthPage> {
                               }),
                       child: Text(
                         _isSignUp ? 'Sign In' : 'Sign Up',
-                        style: AppStyles.bodyMedium.copyWith(
-                          color: AppColors.accent,
+                        style: context.styles.bodyMedium.copyWith(
+                          color: context.colors.accent,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

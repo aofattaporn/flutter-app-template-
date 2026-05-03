@@ -214,9 +214,9 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                AppStyles.sheetHandle(),
+                context.styles.sheetHandle(),
                 ListTile(
-                  leading: const Icon(Icons.edit_outlined, color: AppColors.accent),
+                  leading: Icon(Icons.edit_outlined, color: context.colors.accent),
                   title: const Text('Edit Transaction'),
                   onTap: () {
                     Navigator.pop(sheetContext);
@@ -224,8 +224,8 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.delete_outline, color: AppColors.expense),
-                  title: Text('Delete Transaction', style: TextStyle(color: AppColors.expense)),
+                  leading: Icon(Icons.delete_outline, color: context.colors.expense),
+                  title: Text('Delete Transaction', style: TextStyle(color: context.colors.expense)),
                   onTap: () {
                     Navigator.pop(sheetContext);
                     _confirmDeleteTransaction(txn);
@@ -246,8 +246,8 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBg,
-      appBar: AppStyles.appBar(
+      backgroundColor: context.colors.scaffoldBg,
+      appBar: context.styles.appBar(
         title: _account.name,
         actions: [
           IconButton(icon: const Icon(Icons.edit_outlined), onPressed: _navigateToEditAccount),
@@ -255,7 +255,7 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
         ],
       ),
       body: RefreshIndicator(
-        color: AppColors.primary,
+        color: context.colors.primary,
         onRefresh: _loadTransactions,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -275,21 +275,21 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
     return Container(
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(AppDimens.cardPadding),
-      decoration: AppStyles.card,
+      decoration: context.styles.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              AppStyles.iconBox(icon: _getIconForType(_account.type), size: AppDimens.iconMd),
+              context.styles.iconBox(icon: _getIconForType(_account.type), size: AppDimens.iconMd),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(_account.name, style: AppStyles.titleLarge),
+                    Text(_account.name, style: context.styles.titleLarge),
                     const SizedBox(height: 2),
-                    Text(_getTypeName(_account.type), style: AppStyles.caption),
+                    Text(_getTypeName(_account.type), style: context.styles.caption),
                   ],
                 ),
               ),
@@ -299,7 +299,7 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
           _buildInfoRow('Current Balance', CurrencyUtils.formatCurrency(_account.balance), isBold: true),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Divider(height: 1, color: AppColors.divider),
+            child: Divider(height: 1, color: context.colors.divider),
           ),
           _buildInfoRow('Opening Balance', CurrencyUtils.formatCurrency(_account.openingBalance)),
           const SizedBox(height: 10),
@@ -315,10 +315,10 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: AppStyles.bodySmall),
+        Text(label, style: context.styles.bodySmall),
         Text(
           value,
-          style: isBold ? AppStyles.titleLarge : AppStyles.bodyMedium.copyWith(fontWeight: FontWeight.w500),
+          style: isBold ? context.styles.titleLarge : context.styles.bodyMedium.copyWith(fontWeight: FontWeight.w500),
         ),
       ],
     );
@@ -334,18 +334,18 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Transaction History', style: AppStyles.titleMedium),
+          Text('Transaction History', style: context.styles.titleMedium),
           const SizedBox(height: 4),
           Text(
             '${_transactions.length} transaction${_transactions.length == 1 ? '' : 's'}',
-            style: AppStyles.caption,
+            style: context.styles.caption,
           ),
           const SizedBox(height: 12),
           if (_isLoading)
-            const Center(
+            Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
-                child: CircularProgressIndicator(color: AppColors.primary),
+                padding: const EdgeInsets.all(24),
+                child: CircularProgressIndicator(color: context.colors.primary),
               ),
             )
           else if (_transactions.isEmpty)
@@ -361,12 +361,12 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      decoration: AppStyles.card,
+      decoration: context.styles.card,
       child: Column(
         children: [
-          Icon(Icons.receipt_long_outlined, size: 32, color: AppColors.textTertiary),
+          Icon(Icons.receipt_long_outlined, size: 32, color: context.colors.textTertiary),
           const SizedBox(height: 8),
-          Text('No transactions yet', style: AppStyles.bodySmall),
+          Text('No transactions yet', style: context.styles.bodySmall),
         ],
       ),
     );
@@ -382,20 +382,20 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
         : isIncome
             ? Icons.arrow_upward_rounded
             : Icons.swap_horiz;
-    final iconColor = isExpense ? AppColors.expense : isIncome ? AppColors.income : AppColors.accent;
-    final bgColor = isExpense ? AppColors.expenseLight : isIncome ? AppColors.incomeLight : AppColors.accentLight;
+    final iconColor = isExpense ? context.colors.expense : isIncome ? context.colors.income : context.colors.accent;
+    final bgColor = isExpense ? context.colors.expenseLight : isIncome ? context.colors.incomeLight : context.colors.accentLight;
     final amountPrefix = isExpense ? '-' : isIncome ? '+' : '';
-    final amountColor = isExpense ? AppColors.expense : isIncome ? AppColors.income : AppColors.textPrimary;
+    final amountColor = isExpense ? context.colors.expense : isIncome ? context.colors.income : context.colors.textPrimary;
 
     return GestureDetector(
       onTap: () => _showTransactionActionSheet(txn),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(AppDimens.cardPadding),
-        decoration: AppStyles.card,
+        decoration: context.styles.card,
         child: Row(
           children: [
-            AppStyles.iconBox(icon: icon, size: 36, bgColor: bgColor, iconColor: iconColor),
+            context.styles.iconBox(icon: icon, size: 36, bgColor: bgColor, iconColor: iconColor),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -403,10 +403,10 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                 children: [
                   Text(
                     txn.description ?? txn.type.name[0].toUpperCase() + txn.type.name.substring(1),
-                    style: AppStyles.bodyLarge,
+                    style: context.styles.bodyLarge,
                   ),
                   const SizedBox(height: 2),
-                  Text(timeFormat.format(txn.occurredAt), style: AppStyles.caption),
+                  Text(timeFormat.format(txn.occurredAt), style: context.styles.caption),
                 ],
               ),
             ),

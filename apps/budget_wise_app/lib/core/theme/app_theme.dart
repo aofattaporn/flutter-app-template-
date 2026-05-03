@@ -2,39 +2,91 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 /// ─────────────────────────────────────────────────────────────────────────────
-/// MINIMAL DESIGN SYSTEM
-/// Clean, flat, high-contrast. White backgrounds, no colored AppBars,
-/// no heavy shadows. Accent color used sparingly for interactive elements.
+/// DESIGN SYSTEM – Theme-aware colors, dimensions & styles
+/// Use `context.colors` and `context.styles` for theme-aware access.
 /// ─────────────────────────────────────────────────────────────────────────────
 
 class AppColors {
-  AppColors._();
+  final Color primary;
+  final Color accent;
+  final Color accentLight;
+  final Color scaffoldBg;
+  final Color cardBg;
+  final Color surfaceLight;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color textTertiary;
+  final Color textOnPrimary;
+  final Color income;
+  final Color expense;
+  final Color incomeLight;
+  final Color expenseLight;
+  final Color border;
+  final Color divider;
 
-  // ── Brand ──────────────────────────────────────────────────────────────
-  static const Color primary = Color(0xFF1A1A2E);
-  static const Color accent = Color(0xFF4D648D);
-  static const Color accentLight = Color(0xFFEEF1F6);
+  const AppColors._({
+    required this.primary,
+    required this.accent,
+    required this.accentLight,
+    required this.scaffoldBg,
+    required this.cardBg,
+    required this.surfaceLight,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.textTertiary,
+    required this.textOnPrimary,
+    required this.income,
+    required this.expense,
+    required this.incomeLight,
+    required this.expenseLight,
+    required this.border,
+    required this.divider,
+  });
 
-  // ── Backgrounds ────────────────────────────────────────────────────────
-  static const Color scaffoldBg = Color(0xFFFAFAFA);
-  static const Color cardBg = Colors.white;
-  static const Color surfaceLight = Color(0xFFF5F5F5);
+  // ── Light palette ─────────────────────────────────────────────────────
+  static const light = AppColors._(
+    primary: Color(0xFF1A1A2E),
+    accent: Color(0xFF4D648D),
+    accentLight: Color(0xFFEEF1F6),
+    scaffoldBg: Color(0xFFFAFAFA),
+    cardBg: Color(0xFFFFFFFF),
+    surfaceLight: Color(0xFFF5F5F5),
+    textPrimary: Color(0xFF1A1A1A),
+    textSecondary: Color(0xFF6B7280),
+    textTertiary: Color(0xFF9CA3AF),
+    textOnPrimary: Color(0xFFFFFFFF),
+    income: Color(0xFF059669),
+    expense: Color(0xFFDC2626),
+    incomeLight: Color(0xFFECFDF5),
+    expenseLight: Color(0xFFFEF2F2),
+    border: Color(0xFFE5E7EB),
+    divider: Color(0xFFF3F4F6),
+  );
 
-  // ── Text ───────────────────────────────────────────────────────────────
-  static const Color textPrimary = Color(0xFF1A1A1A);
-  static const Color textSecondary = Color(0xFF6B7280);
-  static const Color textTertiary = Color(0xFF9CA3AF);
-  static const Color textOnPrimary = Colors.white;
+  // ── Dark palette ──────────────────────────────────────────────────────
+  static const dark = AppColors._(
+    primary: Color(0xFFE0E0F0),
+    accent: Color(0xFF7B93BD),
+    accentLight: Color(0xFF2A2D3E),
+    scaffoldBg: Color(0xFF121212),
+    cardBg: Color(0xFF1E1E1E),
+    surfaceLight: Color(0xFF2C2C2C),
+    textPrimary: Color(0xFFE0E0E0),
+    textSecondary: Color(0xFF9CA3AF),
+    textTertiary: Color(0xFF6B7280),
+    textOnPrimary: Color(0xFFFFFFFF),
+    income: Color(0xFF34D399),
+    expense: Color(0xFFF87171),
+    incomeLight: Color(0xFF1A2E28),
+    expenseLight: Color(0xFF2E1A1A),
+    border: Color(0xFF374151),
+    divider: Color(0xFF2D2D2D),
+  );
 
-  // ── Semantic ───────────────────────────────────────────────────────────
-  static const Color income = Color(0xFF059669);
-  static const Color expense = Color(0xFFDC2626);
-  static const Color incomeLight = Color(0xFFECFDF5);
-  static const Color expenseLight = Color(0xFFFEF2F2);
-
-  // ── Borders / Dividers ─────────────────────────────────────────────────
-  static const Color border = Color(0xFFE5E7EB);
-  static const Color divider = Color(0xFFF3F4F6);
+  /// Resolve the palette for the current brightness.
+  static AppColors of(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark ? dark : light;
+  }
 }
 
 class AppDimens {
@@ -53,83 +105,88 @@ class AppDimens {
 }
 
 class AppStyles {
-  AppStyles._();
+  final AppColors _c;
+
+  const AppStyles._(this._c);
+
+  /// Resolve styles for the current theme.
+  static AppStyles of(BuildContext context) => AppStyles._(AppColors.of(context));
 
   // ── Card ───────────────────────────────────────────────────────────────
-  static BoxDecoration get card => BoxDecoration(
-        color: AppColors.cardBg,
+  BoxDecoration get card => BoxDecoration(
+        color: _c.cardBg,
         borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-        border: Border.all(color: AppColors.border, width: 0.5),
+        border: Border.all(color: _c.border, width: 0.5),
       );
 
-  static BoxDecoration get cardFlat => BoxDecoration(
-        color: AppColors.cardBg,
+  BoxDecoration get cardFlat => BoxDecoration(
+        color: _c.cardBg,
         borderRadius: BorderRadius.circular(AppDimens.radiusMd),
       );
 
   // ── Text ───────────────────────────────────────────────────────────────
-  static const TextStyle displayLarge = TextStyle(
-    fontSize: 28,
-    fontWeight: FontWeight.w700,
-    color: AppColors.textPrimary,
-    letterSpacing: -0.5,
-  );
+  TextStyle get displayLarge => TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.w700,
+        color: _c.textPrimary,
+        letterSpacing: -0.5,
+      );
 
-  static const TextStyle displayMedium = TextStyle(
-    fontSize: 22,
-    fontWeight: FontWeight.w600,
-    color: AppColors.textPrimary,
-    letterSpacing: -0.3,
-  );
+  TextStyle get displayMedium => TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
+        color: _c.textPrimary,
+        letterSpacing: -0.3,
+      );
 
-  static const TextStyle titleLarge = TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.w600,
-    color: AppColors.textPrimary,
-  );
+  TextStyle get titleLarge => TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+        color: _c.textPrimary,
+      );
 
-  static const TextStyle titleMedium = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-    color: AppColors.textPrimary,
-  );
+  TextStyle get titleMedium => TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: _c.textPrimary,
+      );
 
-  static const TextStyle bodyLarge = TextStyle(
-    fontSize: 15,
-    fontWeight: FontWeight.w500,
-    color: AppColors.textPrimary,
-  );
+  TextStyle get bodyLarge => TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+        color: _c.textPrimary,
+      );
 
-  static const TextStyle bodyMedium = TextStyle(
-    fontSize: 14,
-    color: AppColors.textPrimary,
-  );
+  TextStyle get bodyMedium => TextStyle(
+        fontSize: 14,
+        color: _c.textPrimary,
+      );
 
-  static const TextStyle bodySmall = TextStyle(
-    fontSize: 13,
-    color: AppColors.textSecondary,
-  );
+  TextStyle get bodySmall => TextStyle(
+        fontSize: 13,
+        color: _c.textSecondary,
+      );
 
-  static const TextStyle caption = TextStyle(
-    fontSize: 12,
-    color: AppColors.textTertiary,
-  );
+  TextStyle get caption => TextStyle(
+        fontSize: 12,
+        color: _c.textTertiary,
+      );
 
-  static const TextStyle label = TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.w500,
-    color: AppColors.textSecondary,
-    letterSpacing: 0.3,
-  );
+  TextStyle get label => TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+        color: _c.textSecondary,
+        letterSpacing: 0.3,
+      );
 
   // ── Input ──────────────────────────────────────────────────────────────
-  static const TextStyle inputText = TextStyle(
-    fontSize: 15,
-    fontWeight: FontWeight.w500,
-    color: AppColors.textPrimary,
-  );
+  TextStyle get inputText => TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+        color: _c.textPrimary,
+      );
 
-  static InputDecoration input({
+  InputDecoration input({
     String? label,
     String? hint,
     Widget? prefix,
@@ -139,13 +196,13 @@ class AppStyles {
     return InputDecoration(
       labelText: label,
       hintText: hint,
-      hintStyle: const TextStyle(color: AppColors.textTertiary, fontSize: 14),
+      hintStyle: TextStyle(color: _c.textTertiary, fontSize: 14),
       prefixIcon: prefix,
       suffixIcon: suffix,
       prefixText: prefixText,
-      prefixStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 16),
+      prefixStyle: TextStyle(color: _c.textSecondary, fontSize: 16),
       filled: true,
-      fillColor: AppColors.scaffoldBg,
+      fillColor: _c.surfaceLight,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppDimens.radiusSm),
         borderSide: BorderSide.none,
@@ -156,78 +213,83 @@ class AppStyles {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-        borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
+        borderSide: BorderSide(color: _c.accent, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-        borderSide: const BorderSide(color: AppColors.expense),
+        borderSide: BorderSide(color: _c.expense),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
 
   // ── Buttons ────────────────────────────────────────────────────────────
-  static ButtonStyle get primaryButton => ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-        ),
-        textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-      );
+  ButtonStyle get primaryButton {
+    final isDark = identical(_c, AppColors.dark);
+    return ElevatedButton.styleFrom(
+      backgroundColor: isDark ? _c.accent : _c.primary,
+      foregroundColor: _c.textOnPrimary,
+      elevation: 0,
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppDimens.radiusSm),
+      ),
+      textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+    );
+  }
 
-  static ButtonStyle get secondaryButton => OutlinedButton.styleFrom(
-        foregroundColor: AppColors.textSecondary,
+  ButtonStyle get secondaryButton => OutlinedButton.styleFrom(
+        foregroundColor: _c.textSecondary,
         elevation: 0,
         padding: const EdgeInsets.symmetric(vertical: 14),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimens.radiusSm),
         ),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: _c.border),
         textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
       );
 
   // ── Minimal AppBar ─────────────────────────────────────────────────────
-  static AppBar appBar({
+  AppBar appBar({
     required String title,
     List<Widget>? actions,
     bool showBack = true,
     Widget? leading,
   }) {
+    final isDark = identical(_c, AppColors.dark);
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: _c.cardBg,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       scrolledUnderElevation: 0,
       title: Text(title, style: titleMedium),
       centerTitle: false,
-      iconTheme: const IconThemeData(color: AppColors.textPrimary),
+      iconTheme: IconThemeData(color: _c.textPrimary),
       actions: actions,
       leading: leading,
       automaticallyImplyLeading: showBack,
-      systemOverlayStyle: SystemUiOverlayStyle.dark,
+      systemOverlayStyle:
+          isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(0.5),
-        child: Container(color: AppColors.border, height: 0.5),
+        child: Container(color: _c.border, height: 0.5),
       ),
     );
   }
 
   // ── Bottom Sheet ───────────────────────────────────────────────────────
-  static Widget sheetHandle() => Container(
+  Widget sheetHandle() => Container(
         width: 36,
         height: 4,
         margin: const EdgeInsets.only(top: 12, bottom: 8),
         decoration: BoxDecoration(
-          color: AppColors.border,
+          color: _c.border,
           borderRadius: BorderRadius.circular(2),
         ),
       );
 
   // ── Icon Container ─────────────────────────────────────────────────────
-  static Widget iconBox({
+  Widget iconBox({
     required IconData icon,
     double size = 40,
     Color? bgColor,
@@ -239,10 +301,17 @@ class AppStyles {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: bgColor ?? AppColors.surfaceLight,
+        color: bgColor ?? _c.surfaceLight,
         borderRadius: BorderRadius.circular(radius),
       ),
-      child: Icon(icon, size: iconSize, color: iconColor ?? AppColors.accent),
+      child: Icon(icon, size: iconSize, color: iconColor ?? _c.accent),
     );
   }
+}
+
+// ─── Convenience Extension ───────────────────────────────────────────────────
+
+extension AppThemeContext on BuildContext {
+  AppColors get colors => AppColors.of(this);
+  AppStyles get styles => AppStyles.of(this);
 }

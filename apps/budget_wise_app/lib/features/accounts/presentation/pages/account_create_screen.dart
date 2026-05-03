@@ -129,8 +129,8 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBg,
-      appBar: AppStyles.appBar(title: _isEditMode ? 'Edit Account' : 'Create Account'),
+      backgroundColor: context.colors.scaffoldBg,
+      appBar: context.styles.appBar(title: _isEditMode ? 'Edit Account' : 'Create Account'),
       body: _buildBody(),
     );
   }
@@ -166,7 +166,7 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
                   const SizedBox(height: 8),
                   Text(
                     'This reflects how much money is currently in this account.',
-                    style: AppStyles.caption,
+                    style: context.styles.caption,
                   ),
                 ],
               ),
@@ -179,14 +179,14 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
   }
 
   Widget _buildSectionLabel(String label) {
-    return Text(label, style: AppStyles.label);
+    return Text(label, style: context.styles.label);
   }
 
   Widget _buildNameField() {
     return TextFormField(
       controller: _nameController,
-      style: AppStyles.inputText,
-      decoration: AppStyles.input(
+      style: context.styles.inputText,
+      decoration: context.styles.input(
         hint: 'e.g. Main Bank, Cash, Wallet',
       ),
       validator: (value) {
@@ -218,17 +218,17 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
             opacity: isEnabled ? 1.0 : 0.5,
             child: Container(
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.accentLight : AppColors.cardBg,
+                color: isSelected ? context.colors.accentLight : context.colors.cardBg,
                 borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                 border: Border.all(
-                  color: isSelected ? AppColors.accent : AppColors.border,
+                  color: isSelected ? context.colors.accent : context.colors.border,
                   width: isSelected ? 1.5 : 0.5,
                 ),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(type['icon'], size: 22, color: isSelected ? AppColors.accent : AppColors.textTertiary),
+                  Icon(type['icon'], size: 22, color: isSelected ? context.colors.accent : context.colors.textTertiary),
                   if (type['label'].isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Text(
@@ -236,7 +236,7 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
-                        color: isSelected ? AppColors.accent : AppColors.textSecondary,
+                        color: isSelected ? context.colors.accent : context.colors.textSecondary,
                       ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
@@ -254,12 +254,12 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
   Widget _buildBalanceField() {
     return TextFormField(
       controller: _balanceController,
-      style: AppStyles.inputText,
+      style: context.styles.inputText,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
       ],
-      decoration: AppStyles.input(
+      decoration: context.styles.input(
         hint: '0.00',
         prefixText: 'THB ',
       ),
@@ -274,9 +274,9 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
 
   Widget _buildBottomActions() {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.cardBg,
-        border: Border(top: BorderSide(color: AppColors.divider)),
+      decoration: BoxDecoration(
+        color: context.colors.cardBg,
+        border: Border(top: BorderSide(color: context.colors.divider)),
       ),
       padding: const EdgeInsets.all(20),
       child: SafeArea(
@@ -288,7 +288,7 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _handleSaveAccount,
-                style: AppStyles.primaryButton,
+                style: context.styles.primaryButton,
                 child: _isLoading
                     ? const SizedBox(
                         height: 20, width: 20,
@@ -302,7 +302,7 @@ class _AccountCreateScreenState extends State<AccountCreateScreen> {
               width: double.infinity,
               child: OutlinedButton(
                 onPressed: _isLoading ? null : () => Navigator.pop(context),
-                style: AppStyles.secondaryButton,
+                style: context.styles.secondaryButton,
                 child: const Text('Cancel'),
               ),
             ),

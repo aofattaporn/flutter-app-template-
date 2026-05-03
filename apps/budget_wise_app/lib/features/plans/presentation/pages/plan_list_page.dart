@@ -31,12 +31,12 @@ class _PlanListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBg,
-      appBar: AppStyles.appBar(title: 'All Plans'),
+      backgroundColor: context.colors.scaffoldBg,
+      appBar: context.styles.appBar(title: 'All Plans'),
       body: BlocBuilder<PlanListBloc, PlanListState>(
         builder: (context, state) {
           if (state.status == PlanListStatus.loading) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+            return Center(child: CircularProgressIndicator(color: context.colors.primary));
           }
 
           if (state.status == PlanListStatus.error) {
@@ -44,13 +44,13 @@ class _PlanListView extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 48, color: AppColors.textTertiary),
+                  Icon(Icons.error_outline, size: 48, color: context.colors.textTertiary),
                   const SizedBox(height: 16),
-                  Text('Failed to load plans', style: AppStyles.bodyLarge),
+                  Text('Failed to load plans', style: context.styles.bodyLarge),
                   const SizedBox(height: 8),
                   TextButton(
                     onPressed: () => context.read<PlanListBloc>().add(const LoadAllPlans()),
-                    child: Text('Retry', style: TextStyle(color: AppColors.accent)),
+                    child: Text('Retry', style: TextStyle(color: context.colors.accent)),
                   ),
                 ],
               ),
@@ -60,7 +60,7 @@ class _PlanListView extends StatelessWidget {
           if (state.plans.isEmpty) return _buildEmptyState(context);
 
           return RefreshIndicator(
-            color: AppColors.primary,
+            color: context.colors.primary,
             onRefresh: () async {
               context.read<PlanListBloc>().add(const RefreshPlans());
             },
@@ -90,23 +90,23 @@ class _PlanListView extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(color: AppColors.surfaceLight, shape: BoxShape.circle),
-            child: Icon(Icons.calendar_month_outlined, size: 48, color: AppColors.textTertiary),
+            decoration: BoxDecoration(color: context.colors.surfaceLight, shape: BoxShape.circle),
+            child: Icon(Icons.calendar_month_outlined, size: 48, color: context.colors.textTertiary),
           ),
           const SizedBox(height: 24),
-          Text('No Plans Yet', style: AppStyles.titleLarge),
+          Text('No Plans Yet', style: context.styles.titleLarge),
           const SizedBox(height: 8),
           Text(
             'Create your first budget plan\nto start tracking expenses',
             textAlign: TextAlign.center,
-            style: AppStyles.bodySmall.copyWith(height: 1.5),
+            style: context.styles.bodySmall.copyWith(height: 1.5),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () => _navigateToCreatePlan(context),
             icon: const Icon(Icons.add),
             label: const Text('Create Plan'),
-            style: AppStyles.primaryButton.copyWith(
+            style: context.styles.primaryButton.copyWith(
               padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 24, vertical: 12)),
             ),
           ),
@@ -167,7 +167,7 @@ class _PlanListView extends StatelessWidget {
               bloc.add(SetActivePlanRequested(planId: plan.id));
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: context.colors.primary,
               foregroundColor: Colors.white,
             ),
             child: const Text('Set Active'),
@@ -197,7 +197,7 @@ class _PlanListView extends StatelessWidget {
               bloc.add(DeletePlanRequested(planId: plan.id));
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.expense,
+              backgroundColor: context.colors.expense,
               foregroundColor: Colors.white,
             ),
             child: const Text('Delete'),
@@ -234,24 +234,24 @@ class _PlanCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDimens.radiusMd),
         child: Container(
           padding: const EdgeInsets.all(AppDimens.cardPadding),
-          decoration: AppStyles.card,
+          decoration: context.styles.card,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Expanded(child: Text(plan.name, style: AppStyles.titleLarge)),
-                  _buildStatusBadge(isExpired),
+                  Expanded(child: Text(plan.name, style: context.styles.titleLarge)),
+                  _buildStatusBadge(context, isExpired),
                 ],
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.textTertiary),
+                  Icon(Icons.calendar_today_outlined, size: 14, color: context.colors.textTertiary),
                   const SizedBox(width: 6),
                   Text(
                     '${dateFormat.format(plan.startDate)} - ${dateFormat.format(plan.endDate)}',
-                    style: AppStyles.bodySmall,
+                    style: context.styles.bodySmall,
                   ),
                 ],
               ),
@@ -261,7 +261,7 @@ class _PlanCard extends StatelessWidget {
                   _InfoChip(
                     label: 'Expected Income',
                     value: CurrencyUtils.formatCurrency(plan.expectedIncome!),
-                    color: AppColors.accent,
+                    color: context.colors.accent,
                   ),
                 ]),
               ],
@@ -275,7 +275,7 @@ class _PlanCard extends StatelessWidget {
                       icon: const Icon(Icons.check_circle_outline, size: 18),
                       label: const Text('Set Active'),
                       style: TextButton.styleFrom(
-                        foregroundColor: AppColors.accent,
+                        foregroundColor: context.colors.accent,
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         visualDensity: VisualDensity.compact,
                       ),
@@ -283,7 +283,7 @@ class _PlanCard extends StatelessWidget {
                   IconButton(
                     onPressed: onDelete,
                     icon: const Icon(Icons.delete_outline, size: 20),
-                    color: AppColors.expense,
+                    color: context.colors.expense,
                     visualDensity: VisualDensity.compact,
                     tooltip: 'Delete plan',
                   ),
@@ -296,15 +296,15 @@ class _PlanCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge(bool isExpired) {
+  Widget _buildStatusBadge(BuildContext context, bool isExpired) {
     if (plan.isActive) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: AppColors.incomeLight,
+          color: context.colors.incomeLight,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Text('Active', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.income)),
+        child: Text('Active', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: context.colors.income)),
       );
     }
 
@@ -312,20 +312,20 @@ class _PlanCard extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: context.colors.surfaceLight,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Text('Expired', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textTertiary)),
+        child: Text('Expired', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: context.colors.textTertiary)),
       );
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.accentLight,
+        color: context.colors.accentLight,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text('Upcoming', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.accent)),
+      child: Text('Upcoming', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: context.colors.accent)),
     );
   }
 }
@@ -347,13 +347,13 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.accentLight,
+        color: context.colors.accentLight,
         borderRadius: BorderRadius.circular(AppDimens.radiusSm),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('$label: ', style: AppStyles.caption),
+          Text('$label: ', style: context.styles.caption),
           Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: color)),
         ],
       ),

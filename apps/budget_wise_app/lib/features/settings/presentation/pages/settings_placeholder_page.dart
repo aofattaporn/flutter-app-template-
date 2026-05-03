@@ -24,9 +24,9 @@ class SettingsPlaceholderPage extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            Text('More', style: AppStyles.displayMedium),
+            Text('More', style: context.styles.displayMedium),
             const SizedBox(height: 4),
-            Text('Settings & preferences', style: AppStyles.bodySmall),
+            Text('Settings & preferences', style: context.styles.bodySmall),
             const SizedBox(height: 24),
 
             // ── Appearance (ENABLED) ──────────────────────────────────
@@ -147,16 +147,16 @@ class _SectionCard extends StatelessWidget {
       opacity: enabled ? 1.0 : 0.45,
       child: Container(
         padding: const EdgeInsets.all(AppDimens.cardPadding),
-        decoration: AppStyles.card,
+        decoration: context.styles.card,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Text(title, style: AppStyles.label),
+                Text(title, style: context.styles.label),
                 if (!enabled) ...[
                   const Spacer(),
-                  Text('Coming soon', style: AppStyles.caption.copyWith(fontSize: 11)),
+                  Text('Coming soon', style: context.styles.caption.copyWith(fontSize: 11)),
                 ],
               ],
             ),
@@ -172,7 +172,7 @@ class _SectionCard extends StatelessWidget {
 class _SectionDivider extends StatelessWidget {
   const _SectionDivider();
   @override
-  Widget build(BuildContext context) => const Divider(height: 1, color: AppColors.divider);
+  Widget build(BuildContext context) => Divider(height: 1, color: context.colors.divider);
 }
 
 class _ThemeOption extends StatelessWidget {
@@ -191,10 +191,10 @@ class _ThemeOption extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: AppColors.textSecondary),
+            Icon(icon, size: 20, color: context.colors.textSecondary),
             const SizedBox(width: 12),
-            Expanded(child: Text(label, style: AppStyles.bodyMedium)),
-            if (isSelected) const Icon(Icons.check, size: 20, color: AppColors.accent),
+            Expanded(child: Text(label, style: context.styles.bodyMedium)),
+            if (isSelected) Icon(Icons.check, size: 20, color: context.colors.accent),
           ],
         ),
       ),
@@ -214,10 +214,10 @@ class _DisabledRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: AppColors.textSecondary),
+          Icon(icon, size: 20, color: context.colors.textSecondary),
           const SizedBox(width: 12),
-          Expanded(child: Text(label, style: AppStyles.bodyMedium)),
-          const Icon(Icons.chevron_right, size: 20, color: AppColors.textTertiary),
+          Expanded(child: Text(label, style: context.styles.bodyMedium)),
+          Icon(Icons.chevron_right, size: 20, color: context.colors.textTertiary),
         ],
       ),
     );
@@ -237,12 +237,12 @@ class _SignOutRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
-            Icon(Icons.logout, size: 20, color: AppColors.expense),
+            Icon(Icons.logout, size: 20, color: context.colors.expense),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 'Sign out',
-                style: AppStyles.bodyMedium.copyWith(color: AppColors.expense),
+                style: context.styles.bodyMedium.copyWith(color: context.colors.expense),
               ),
             ),
           ],

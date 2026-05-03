@@ -85,9 +85,9 @@ class _AccountScreenState extends State<AccountScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            AppStyles.sheetHandle(),
+            context.styles.sheetHandle(),
             ListTile(
-              leading: const Icon(Icons.edit_outlined, color: AppColors.accent),
+              leading: Icon(Icons.edit_outlined, color: context.colors.accent),
               title: const Text('Edit Account'),
               onTap: () {
                 Navigator.pop(context);
@@ -95,8 +95,8 @@ class _AccountScreenState extends State<AccountScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.delete_outline, color: AppColors.expense),
-              title: Text('Delete Account', style: TextStyle(color: AppColors.expense)),
+              leading: Icon(Icons.delete_outline, color: context.colors.expense),
+              title: Text('Delete Account', style: TextStyle(color: context.colors.expense)),
               onTap: () {
                 Navigator.pop(context);
                 _showDeleteConfirmation(account);
@@ -151,8 +151,8 @@ class _AccountScreenState extends State<AccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBg,
-      appBar: AppStyles.appBar(
+      backgroundColor: context.colors.scaffoldBg,
+      appBar: context.styles.appBar(
         title: 'Accounts',
         showBack: false,
         actions: [
@@ -174,7 +174,7 @@ class _AccountScreenState extends State<AccountScreen> {
   // ═══════════════════════════════════════════════════════════════════════════
 
   PreferredSizeWidget _buildAppBar() {
-    return AppStyles.appBar(
+    return context.styles.appBar(
       title: 'Accounts',
       showBack: false,
       actions: [
@@ -194,7 +194,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Widget _buildBody(AccountState state) {
     if (state is AccountLoading) {
-      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+      return Center(child: CircularProgressIndicator(color: context.colors.primary));
     }
     if (state is AccountLoaded) return _buildAccountsList(state);
     if (state is AccountError) return _buildErrorState(state.message);
@@ -208,15 +208,15 @@ class _AccountScreenState extends State<AccountScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.textTertiary),
+            Icon(Icons.error_outline, size: 48, color: context.colors.textTertiary),
             const SizedBox(height: 16),
-            Text('Something went wrong', style: AppStyles.titleMedium),
+            Text('Something went wrong', style: context.styles.titleMedium),
             const SizedBox(height: 8),
-            Text(message, textAlign: TextAlign.center, style: AppStyles.bodySmall),
+            Text(message, textAlign: TextAlign.center, style: context.styles.bodySmall),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => context.read<AccountBloc>().add(const FetchAccountsRequested()),
-              style: AppStyles.primaryButton,
+              style: context.styles.primaryButton,
               child: const Text('Try Again'),
             ),
           ],
@@ -259,17 +259,17 @@ class _AccountScreenState extends State<AccountScreen> {
     return Container(
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(20),
-      decoration: AppStyles.card,
+      decoration: context.styles.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Total Balance', style: AppStyles.label),
+          Text('Total Balance', style: context.styles.label),
           const SizedBox(height: 8),
-          Text(CurrencyUtils.formatCurrency(state.totalBalance), style: AppStyles.displayLarge),
+          Text(CurrencyUtils.formatCurrency(state.totalBalance), style: context.styles.displayLarge),
           const SizedBox(height: 8),
           Text(
             'Across ${state.accountCount} ${state.accountCount == 1 ? 'account' : 'accounts'}',
-            style: AppStyles.caption,
+            style: context.styles.caption,
           ),
         ],
       ),
@@ -279,7 +279,7 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget _buildSectionHeader(int count) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-      child: Text('Your Accounts', style: AppStyles.titleMedium),
+      child: Text('Your Accounts', style: context.styles.titleMedium),
     );
   }
 
@@ -290,11 +290,11 @@ class _AccountScreenState extends State<AccountScreen> {
         child: Center(
           child: Column(
             children: [
-              Icon(Icons.account_balance_wallet_outlined, size: 36, color: AppColors.textTertiary),
+              Icon(Icons.account_balance_wallet_outlined, size: 36, color: context.colors.textTertiary),
               const SizedBox(height: 16),
-              Text('No accounts yet', style: AppStyles.bodyLarge),
+              Text('No accounts yet', style: context.styles.bodyLarge),
               const SizedBox(height: 8),
-              Text('Add an account to start tracking', style: AppStyles.bodySmall),
+              Text('Add an account to start tracking', style: context.styles.bodySmall),
             ],
           ),
         ),
@@ -328,16 +328,16 @@ class _AccountScreenState extends State<AccountScreen> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 20),
           decoration: BoxDecoration(
-            color: AppColors.cardBg,
+            color: context.colors.cardBg,
             borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-            border: Border.all(color: AppColors.border, style: BorderStyle.solid, width: 1),
+            border: Border.all(color: context.colors.border, style: BorderStyle.solid, width: 1),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.add_rounded, size: 20, color: AppColors.textTertiary),
+              Icon(Icons.add_rounded, size: 20, color: context.colors.textTertiary),
               const SizedBox(height: 4),
-              Text('Add Account', style: AppStyles.bodySmall),
+              Text('Add Account', style: context.styles.bodySmall),
             ],
           ),
         ),
@@ -367,10 +367,10 @@ class _AccountCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppDimens.radiusMd),
       child: Container(
         padding: const EdgeInsets.all(AppDimens.cardPadding),
-        decoration: AppStyles.card,
+        decoration: context.styles.card,
         child: Row(
           children: [
-            AppStyles.iconBox(
+            context.styles.iconBox(
               icon: _getIconForType(account.type),
               size: AppDimens.iconMd,
             ),
@@ -379,9 +379,9 @@ class _AccountCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(account.name, style: AppStyles.bodyLarge),
+                  Text(account.name, style: context.styles.bodyLarge),
                   const SizedBox(height: 2),
-                  Text(_getTypeName(account.type), style: AppStyles.caption),
+                  Text(_getTypeName(account.type), style: context.styles.caption),
                 ],
               ),
             ),
@@ -390,12 +390,12 @@ class _AccountCard extends StatelessWidget {
               children: [
                 Text(
                   CurrencyUtils.formatCurrency(account.balance),
-                  style: AppStyles.titleMedium,
+                  style: context.styles.titleMedium,
                 ),
               ],
             ),
             const SizedBox(width: 4),
-            Icon(Icons.chevron_right, color: AppColors.textTertiary, size: 20),
+            Icon(Icons.chevron_right, color: context.colors.textTertiary, size: 20),
           ],
         ),
       ),

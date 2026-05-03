@@ -61,12 +61,12 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
             state.status == TransactionEditorStatus.saving ||
             state.status == TransactionEditorStatus.error;
         return Scaffold(
-          backgroundColor: AppColors.scaffoldBg,
-          appBar: AppStyles.appBar(
+          backgroundColor: context.colors.scaffoldBg,
+          appBar: context.styles.appBar(
             title: state.isEditing ? 'Edit Transaction' : 'Create Transaction',
           ),
           body: isLoading
-              ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+              ? Center(child: CircularProgressIndicator(color: context.colors.primary))
               : Column(
                   children: [
                     Expanded(child: _buildForm(state)),
@@ -142,7 +142,7 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Transaction Type', style: AppStyles.label),
+        Text('Transaction Type', style: context.styles.label),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -187,22 +187,22 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary : AppColors.cardBg,
+            color: isSelected ? context.colors.primary : context.colors.cardBg,
             borderRadius: BorderRadius.circular(AppDimens.radiusSm),
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.border,
+              color: isSelected ? context.colors.primary : context.colors.border,
               width: isSelected ? 1.5 : 0.5,
             ),
           ),
           child: Column(
             children: [
-              Icon(icon, size: 22, color: isSelected ? Colors.white : AppColors.textSecondary),
+              Icon(icon, size: 22, color: isSelected ? Colors.white : context.colors.textSecondary),
               const SizedBox(height: 8),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 13,
-                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                  color: isSelected ? Colors.white : context.colors.textSecondary,
                 ),
               ),
             ],
@@ -220,18 +220,18 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Amount', style: AppStyles.label),
+        Text('Amount', style: context.styles.label),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: context.colors.surfaceLight,
             borderRadius: BorderRadius.circular(AppDimens.radiusSm),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('฿', style: TextStyle(fontSize: 24, color: AppColors.textTertiary)),
+              Text('฿', style: TextStyle(fontSize: 24, color: context.colors.textTertiary)),
               const SizedBox(width: 8),
               Expanded(
                 child: TextField(
@@ -239,11 +239,11 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}'))],
                   textAlign: TextAlign.center,
-                  style: AppStyles.displayLarge,
-                  decoration: const InputDecoration(
+                  style: context.styles.displayLarge,
+                  decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: '0.00',
-                    hintStyle: TextStyle(fontSize: 28, color: AppColors.textTertiary),
+                    hintStyle: TextStyle(fontSize: 28, color: context.colors.textTertiary),
                   ),
                   onChanged: (value) => context.read<TransactionEditorBloc>().add(TransactionAmountChanged(value)),
                 ),
@@ -265,16 +265,16 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppStyles.label),
+        Text(label, style: context.styles.label),
         const SizedBox(height: 12),
         GestureDetector(
           onTap: () => _showAccountPicker(state),
           child: Container(
             padding: const EdgeInsets.all(AppDimens.cardPadding),
-            decoration: AppStyles.card,
+            decoration: context.styles.card,
             child: Row(
               children: [
-                AppStyles.iconBox(icon: Icons.account_balance_wallet, size: 36),
+                context.styles.iconBox(icon: Icons.account_balance_wallet, size: 36),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -282,17 +282,17 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
                     children: [
                       Text(
                         state.selectedAccount?.name ?? 'Select Account',
-                        style: state.selectedAccount != null ? AppStyles.bodyLarge : AppStyles.bodySmall,
+                        style: state.selectedAccount != null ? context.styles.bodyLarge : context.styles.bodySmall,
                       ),
                       if (state.selectedAccount != null)
                         Text(
                           'Balance: ${CurrencyUtils.formatCurrency(state.selectedAccount!.balance)}',
-                          style: AppStyles.caption,
+                          style: context.styles.caption,
                         ),
                     ],
                   ),
                 ),
-                Icon(Icons.keyboard_arrow_down, color: AppColors.textTertiary),
+                Icon(Icons.keyboard_arrow_down, color: context.colors.textTertiary),
               ],
             ),
           ),
@@ -328,16 +328,16 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('To Account', style: AppStyles.label),
+        Text('To Account', style: context.styles.label),
         const SizedBox(height: 12),
         GestureDetector(
           onTap: () => _showDestinationAccountPicker(state),
           child: Container(
             padding: const EdgeInsets.all(AppDimens.cardPadding),
-            decoration: AppStyles.card,
+            decoration: context.styles.card,
             child: Row(
               children: [
-                AppStyles.iconBox(icon: Icons.account_balance_wallet, size: 36),
+                context.styles.iconBox(icon: Icons.account_balance_wallet, size: 36),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -345,17 +345,17 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
                     children: [
                       Text(
                         state.selectedDestinationAccount?.name ?? 'Select Destination Account',
-                        style: state.selectedDestinationAccount != null ? AppStyles.bodyLarge : AppStyles.bodySmall,
+                        style: state.selectedDestinationAccount != null ? context.styles.bodyLarge : context.styles.bodySmall,
                       ),
                       if (state.selectedDestinationAccount != null)
                         Text(
                           'Balance: ${CurrencyUtils.formatCurrency(state.selectedDestinationAccount!.balance)}',
-                          style: AppStyles.caption,
+                          style: context.styles.caption,
                         ),
                     ],
                   ),
                 ),
-                Icon(Icons.keyboard_arrow_down, color: AppColors.textTertiary),
+                Icon(Icons.keyboard_arrow_down, color: context.colors.textTertiary),
               ],
             ),
           ),
@@ -399,8 +399,8 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Plan Item (Optional)', style: AppStyles.label),
-            Icon(Icons.info_outline, size: 16, color: AppColors.textTertiary),
+            Text('Plan Item (Optional)', style: context.styles.label),
+            Icon(Icons.info_outline, size: 16, color: context.colors.textTertiary),
           ],
         ),
         const SizedBox(height: 12),
@@ -408,7 +408,7 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
           onTap: state.planItems.isNotEmpty ? () => _showPlanItemPicker(state) : null,
           child: Container(
             padding: const EdgeInsets.all(AppDimens.cardPadding),
-            decoration: AppStyles.card,
+            decoration: context.styles.card,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -418,17 +418,17 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
                     children: [
                       Text(
                         state.selectedPlanItem?.name ?? 'Select Plan Item',
-                        style: state.selectedPlanItem != null ? AppStyles.bodyLarge : AppStyles.bodySmall,
+                        style: state.selectedPlanItem != null ? context.styles.bodyLarge : context.styles.bodySmall,
                       ),
                       if (state.selectedPlanItem != null)
                         Text(
                           'Remaining: ${CurrencyUtils.formatCurrency(state.selectedPlanItem!.remainingAmount)}',
-                          style: AppStyles.caption,
+                          style: context.styles.caption,
                         ),
                     ],
                   ),
                 ),
-                Icon(Icons.keyboard_arrow_down, color: AppColors.textTertiary),
+                Icon(Icons.keyboard_arrow_down, color: context.colors.textTertiary),
               ],
             ),
           ),
@@ -438,7 +438,7 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
           state.type == TransactionType.income
               ? 'Link income to a plan budget item.'
               : 'Plan items help you track spending against your plan.',
-          style: AppStyles.caption,
+          style: context.styles.caption,
         ),
       ],
     );
@@ -480,7 +480,7 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Date & Time', style: AppStyles.label),
+        Text('Date & Time', style: context.styles.label),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -489,7 +489,7 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
                 onTap: () => _pickDate(state),
                 child: Container(
                   padding: const EdgeInsets.all(AppDimens.cardPadding),
-                  decoration: AppStyles.card,
+                  decoration: context.styles.card,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -497,13 +497,13 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Date', style: AppStyles.caption),
+                            Text('Date', style: context.styles.caption),
                             const SizedBox(height: 4),
-                            Text(dateFormat.format(state.occurredAt), style: AppStyles.bodyMedium),
+                            Text(dateFormat.format(state.occurredAt), style: context.styles.bodyMedium),
                           ],
                         ),
                       ),
-                      Icon(Icons.calendar_today, size: 18, color: AppColors.textTertiary),
+                      Icon(Icons.calendar_today, size: 18, color: context.colors.textTertiary),
                     ],
                   ),
                 ),
@@ -515,19 +515,19 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
                 onTap: () => _pickTime(state),
                 child: Container(
                   padding: const EdgeInsets.all(AppDimens.cardPadding),
-                  decoration: AppStyles.card,
+                  decoration: context.styles.card,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Time', style: AppStyles.caption),
+                          Text('Time', style: context.styles.caption),
                           const SizedBox(height: 4),
-                          Text(timeFormat.format(state.occurredAt), style: AppStyles.bodyMedium),
+                          Text(timeFormat.format(state.occurredAt), style: context.styles.bodyMedium),
                         ],
                       ),
-                      Icon(Icons.access_time, size: 18, color: AppColors.textTertiary),
+                      Icon(Icons.access_time, size: 18, color: context.colors.textTertiary),
                     ],
                   ),
                 ),
@@ -573,12 +573,12 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Description (Optional)', style: AppStyles.label),
+        Text('Description (Optional)', style: context.styles.label),
         const SizedBox(height: 12),
         TextField(
           controller: _descriptionController,
-          style: AppStyles.bodyMedium,
-          decoration: AppStyles.input(hint: 'e.g. Coffee & Breakfast'),
+          style: context.styles.bodyMedium,
+          decoration: context.styles.input(hint: 'e.g. Coffee & Breakfast'),
           onChanged: (value) => context.read<TransactionEditorBloc>().add(TransactionDescriptionChanged(value)),
         ),
       ],
@@ -595,16 +595,16 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: AppColors.cardBg,
-          border: Border(top: BorderSide(color: AppColors.divider)),
+        decoration: BoxDecoration(
+          color: context.colors.cardBg,
+          border: Border(top: BorderSide(color: context.colors.divider)),
         ),
         child: Row(
           children: [
             Expanded(
               child: OutlinedButton(
                 onPressed: isSaving ? null : () => Navigator.pop(context),
-                style: AppStyles.secondaryButton,
+                style: context.styles.secondaryButton,
                 child: const Text('Cancel'),
               ),
             ),
@@ -614,7 +614,7 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
                 onPressed: isSaving
                     ? null
                     : () => context.read<TransactionEditorBloc>().add(const TransactionEditorSubmitted()),
-                style: AppStyles.primaryButton,
+                style: context.styles.primaryButton,
                 child: isSaving
                     ? const SizedBox(
                         width: 20, height: 20,
@@ -655,18 +655,18 @@ class _AccountPickerSheet extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text('Select Account', style: AppStyles.titleLarge),
+            child: Text('Select Account', style: context.styles.titleLarge),
           ),
           const SizedBox(height: 12),
           ...accounts.map((account) => ListTile(
-                leading: AppStyles.iconBox(icon: Icons.account_balance_wallet, size: 36),
-                title: Text(account.name, style: AppStyles.bodyLarge),
+                leading: context.styles.iconBox(icon: Icons.account_balance_wallet, size: 36),
+                title: Text(account.name, style: context.styles.bodyLarge),
                 subtitle: Text(
                   'Balance: ${CurrencyUtils.formatCurrency(account.balance)}',
-                  style: AppStyles.caption,
+                  style: context.styles.caption,
                 ),
                 trailing: account.id == selectedId
-                    ? const Icon(Icons.check_circle, color: AppColors.accent)
+                    ? Icon(Icons.check_circle, color: context.colors.accent)
                     : null,
                 onTap: () => onSelected(account.id),
               )),
@@ -700,32 +700,32 @@ class _PlanItemPickerSheet extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text('Select Plan Item', style: AppStyles.titleLarge),
+              child: Text('Select Plan Item', style: context.styles.titleLarge),
             ),
             const SizedBox(height: 12),
             ListTile(
-              leading: AppStyles.iconBox(
+              leading: context.styles.iconBox(
                 icon: Icons.clear,
                 size: 36,
-                bgColor: AppColors.surfaceLight,
-                iconColor: AppColors.textTertiary,
+                bgColor: context.colors.surfaceLight,
+                iconColor: context.colors.textTertiary,
               ),
-              title: Text('None', style: AppStyles.bodyLarge),
-              subtitle: Text('No plan item linked', style: AppStyles.caption),
+              title: Text('None', style: context.styles.bodyLarge),
+              subtitle: Text('No plan item linked', style: context.styles.caption),
               trailing: selectedId.isEmpty
-                  ? const Icon(Icons.check_circle, color: AppColors.accent)
+                  ? Icon(Icons.check_circle, color: context.colors.accent)
                   : null,
               onTap: onClear,
             ),
             ...planItems.map((item) => ListTile(
-                  leading: AppStyles.iconBox(icon: PlanItemIcon.getIcon(item.iconIndex), size: 36),
-                  title: Text(item.name, style: AppStyles.bodyLarge),
+                  leading: context.styles.iconBox(icon: PlanItemIcon.getIcon(item.iconIndex), size: 36),
+                  title: Text(item.name, style: context.styles.bodyLarge),
                   subtitle: Text(
                     'Remaining: ${CurrencyUtils.formatCurrency(item.remainingAmount)}',
-                    style: AppStyles.caption,
+                    style: context.styles.caption,
                   ),
                   trailing: item.id == selectedId
-                      ? const Icon(Icons.check_circle, color: AppColors.accent)
+                      ? Icon(Icons.check_circle, color: context.colors.accent)
                       : null,
                   onTap: () => onSelected(item.id),
                 )),

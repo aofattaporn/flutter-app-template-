@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// App Floating Action Button widget
 ///
 /// A customizable FAB that can be positioned above the bottom navigation bar
-/// Follows the app's design system with primary color (#4D648D)
+/// Follows the app's design system with accent color
 class AppFloatingActionButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final IconData icon;
@@ -11,9 +12,6 @@ class AppFloatingActionButton extends StatelessWidget {
   final Color? backgroundColor;
   final Color? foregroundColor;
   final double? elevation;
-
-  /// Primary color for FAB (matches design: #4D648D)
-  static const Color _defaultBackgroundColor = Color(0xFF4D648D);
 
   const AppFloatingActionButton({
     super.key,
@@ -31,7 +29,7 @@ class AppFloatingActionButton extends StatelessWidget {
       heroTag: 'mainAppFab',
       onPressed: onPressed,
       tooltip: tooltip,
-      backgroundColor: backgroundColor ?? _defaultBackgroundColor,
+      backgroundColor: backgroundColor ?? context.colors.accent,
       foregroundColor: foregroundColor ?? Colors.white,
       elevation: elevation ?? 6,
       shape: const CircleBorder(),

@@ -206,7 +206,7 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBg,
+      backgroundColor:  context.colors.scaffoldBg,
       body: SafeArea(
         child: BlocConsumer<ActivePlanBloc, ActivePlanState>(
           listener: _handleStateChanges,
@@ -244,8 +244,8 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Widget _buildLoadingState() {
-    return const Center(
-      child: CircularProgressIndicator(color: AppColors.primary),
+    return Center(
+      child: CircularProgressIndicator(color: context.colors.primary),
     );
   }
 
@@ -310,7 +310,7 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Budget Items', style: AppStyles.titleMedium),
+        Text('Budget Items', style: context.styles.titleMedium),
         TextButton.icon(
           onPressed: () {
             final state = context.read<ActivePlanBloc>().state;
@@ -320,7 +320,7 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
           },
           icon: const Icon(Icons.add, size: 16),
           label: const Text('Add'),
-          style: TextButton.styleFrom(foregroundColor: AppColors.accent),
+          style: TextButton.styleFrom(foregroundColor: context.colors.accent),
         ),
       ],
     );
@@ -341,16 +341,16 @@ class _ActivePlanPageState extends State<ActivePlanPage> {
   Widget _buildEmptyItemsState() {
     return Container(
       padding: const EdgeInsets.all(32),
-      decoration: AppStyles.card,
+      decoration: context.styles.card,
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.category_outlined, size: 36, color: AppColors.textTertiary),
+            Icon(Icons.category_outlined, size: 36, color: context.colors.textTertiary),
             const SizedBox(height: 16),
-            Text('No budget items yet', style: AppStyles.bodyLarge),
+            Text('No budget items yet', style: context.styles.bodyLarge),
             const SizedBox(height: 8),
-            Text('Add items to organize your budget', style: AppStyles.bodySmall),
+            Text('Add items to organize your budget', style: context.styles.bodySmall),
           ],
         ),
       ),

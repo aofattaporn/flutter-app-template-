@@ -97,18 +97,18 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.plan.name, style: AppStyles.titleLarge),
+        Text(widget.plan.name, style: context.styles.titleLarge),
         const SizedBox(height: 4),
         Row(
           children: [
-            Text(widget.plan.formattedPeriod, style: AppStyles.caption),
+            Text(widget.plan.formattedPeriod, style: context.styles.caption),
             const SizedBox(width: 8),
-            Text('·', style: AppStyles.caption),
+            Text('·', style: context.styles.caption),
             const SizedBox(width: 8),
             Text(daysLeftText, style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w500,
-              color: daysLeft <= 3 ? AppColors.expense : AppColors.accent,
+              color: daysLeft <= 3 ? context.colors.expense : context.colors.accent,
             )),
           ],
         ),
@@ -122,7 +122,7 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: isActive ? AppColors.accentLight : AppColors.surfaceLight,
+        color: isActive ? context.colors.accentLight : context.colors.surfaceLight,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -130,7 +130,7 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w500,
-          color: isActive ? AppColors.accent : AppColors.textTertiary,
+          color: isActive ? context.colors.accent : context.colors.textTertiary,
         ),
       ),
     );
@@ -145,15 +145,15 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
 
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppStyles.card,
+      decoration: context.styles.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Available to Spend', style: AppStyles.label),
+          Text('Available to Spend', style: context.styles.label),
           const SizedBox(height: 8),
           Text(
             CurrencyUtils.formatCurrency(_availableToSpend.clamp(0, double.infinity)),
-            style: AppStyles.displayLarge,
+            style: context.styles.displayLarge,
           ),
           const SizedBox(height: 16),
           ClipRRect(
@@ -161,9 +161,9 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 4,
-              backgroundColor: AppColors.surfaceLight,
+              backgroundColor: context.colors.surfaceLight,
               valueColor: AlwaysStoppedAnimation<Color>(
-                progress < 0.15 ? AppColors.expense : AppColors.accent,
+                progress < 0.15 ? context.colors.expense : context.colors.accent,
               ),
             ),
           ),
@@ -173,11 +173,11 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
             children: [
               Text(
                 '${CurrencyUtils.formatCurrency(widget.totalSpent)} spent',
-                style: AppStyles.caption,
+                style: context.styles.caption,
               ),
               Text(
                 '${_percentageLeft.toStringAsFixed(0)}% left',
-                style: AppStyles.caption,
+                style: context.styles.caption,
               ),
             ],
           ),
@@ -231,13 +231,13 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: AppStyles.bodySmall),
+        Text(label, style: context.styles.bodySmall),
         Text(
           value,
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: valueColor ?? AppColors.textPrimary,
+            color: valueColor ?? context.colors.textPrimary,
           ),
         ),
       ],
@@ -254,12 +254,12 @@ class _PlanOverviewSectionState extends State<PlanOverviewSection> {
       borderRadius: BorderRadius.circular(AppDimens.radiusMd),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: AppStyles.card,
+        decoration: context.styles.card,
         child: Column(
           children: [
-            Icon(icon, size: 20, color: AppColors.accent),
+            Icon(icon, size: 20, color: context.colors.accent),
             const SizedBox(height: 6),
-            Text(label, style: AppStyles.label),
+            Text(label, style: context.styles.label),
           ],
         ),
       ),

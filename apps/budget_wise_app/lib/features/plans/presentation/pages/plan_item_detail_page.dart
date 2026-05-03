@@ -204,13 +204,13 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: AppColors.border,
+                    color: context.colors.border,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
                 ListTile(
                   leading:
-                      const Icon(Icons.edit_outlined, color: AppColors.accent),
+                      Icon(Icons.edit_outlined, color: context.colors.accent),
                   title: const Text('Edit Transaction'),
                   onTap: () {
                     Navigator.pop(sheetContext);
@@ -218,9 +218,9 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.delete_outline, color: AppColors.expense),
+                  leading: Icon(Icons.delete_outline, color: context.colors.expense),
                   title: Text('Delete Transaction',
-                      style: TextStyle(color: AppColors.expense)),
+                      style: TextStyle(color: context.colors.expense)),
                   onTap: () {
                     Navigator.pop(sheetContext);
                     _confirmDeleteTransaction(txn);
@@ -241,8 +241,8 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBg,
-      appBar: AppStyles.appBar(
+      backgroundColor: context.colors.scaffoldBg,
+      appBar: context.styles.appBar(
         title: _item.name,
         actions: [
           IconButton(
@@ -256,7 +256,7 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
         ],
       ),
       body: RefreshIndicator(
-        color: AppColors.primary,
+        color: context.colors.primary,
         onRefresh: _loadTransactions,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -274,29 +274,29 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
 
   Widget _buildInfoCard() {
     final progressColor = _item.isOverBudget
-        ? AppColors.expense
+        ? context.colors.expense
         : _item.isNearLimit
             ? const Color(0xFFB1A296)
-            : AppColors.accent;
+            : context.colors.accent;
 
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
-      decoration: AppStyles.card,
+      decoration: context.styles.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              AppStyles.iconBox(icon: PlanItemIcon.getIcon(_item.iconIndex)),
+              context.styles.iconBox(icon: PlanItemIcon.getIcon(_item.iconIndex)),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(_item.name, style: AppStyles.titleLarge),
+                    Text(_item.name, style: context.styles.titleLarge),
                     const SizedBox(height: 2),
-                    Text('Expense Category', style: AppStyles.caption),
+                    Text('Expense Category', style: context.styles.caption),
                   ],
                 ),
               ),
@@ -311,14 +311,14 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
             _item.isOverBudget ? 'Over Budget' : 'Remaining',
             CurrencyUtils.formatCurrency(
                 _item.isOverBudget ? _item.overAmount : _item.remainingAmount),
-            valueColor: _item.isOverBudget ? AppColors.expense : AppColors.income,
+            valueColor: _item.isOverBudget ? context.colors.expense : context.colors.income,
           ),
           const SizedBox(height: 16),
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: _item.progressPercentage,
-              backgroundColor: AppColors.surfaceLight,
+              backgroundColor: context.colors.surfaceLight,
               valueColor: AlwaysStoppedAnimation<Color>(progressColor),
               minHeight: 8,
             ),
@@ -351,12 +351,12 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: AppStyles.bodySmall),
+        Text(label, style: context.styles.bodySmall),
         Text(
           value,
-          style: AppStyles.bodyMedium.copyWith(
+          style: context.styles.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
-            color: valueColor ?? AppColors.textPrimary,
+            color: valueColor ?? context.colors.textPrimary,
           ),
         ),
       ],
@@ -375,19 +375,19 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
         children: [
           Text(
             'Referenced Transactions',
-            style: AppStyles.titleMedium,
+            style: context.styles.titleMedium,
           ),
           const SizedBox(height: 4),
           Text(
             '${_transactions.length} transaction${_transactions.length == 1 ? '' : 's'}',
-            style: AppStyles.caption,
+            style: context.styles.caption,
           ),
           const SizedBox(height: 12),
           if (_isLoading)
-            const Center(
+            Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
-                child: CircularProgressIndicator(color: AppColors.primary),
+                padding: const EdgeInsets.all(24),
+                child: CircularProgressIndicator(color: context.colors.primary),
               ),
             )
           else if (_transactions.isEmpty)
@@ -403,12 +403,12 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      decoration: AppStyles.card,
+      decoration: context.styles.card,
       child: Column(
         children: [
-          Icon(Icons.receipt_long_outlined, size: 36, color: AppColors.textTertiary),
+          Icon(Icons.receipt_long_outlined, size: 36, color: context.colors.textTertiary),
           const SizedBox(height: 8),
-          Text('No transactions yet', style: AppStyles.bodySmall),
+          Text('No transactions yet', style: context.styles.bodySmall),
         ],
       ),
     );
@@ -425,26 +425,26 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
             ? Icons.arrow_upward_rounded
             : Icons.swap_horiz;
     final iconColor = isExpense
-        ? AppColors.expense
+        ? context.colors.expense
         : isIncome
-            ? AppColors.income
-            : AppColors.accent;
+            ? context.colors.income
+            : context.colors.accent;
     final amountPrefix = isExpense ? '-' : isIncome ? '+' : '';
     final amountColor = isExpense
-        ? AppColors.expense
+        ? context.colors.expense
         : isIncome
-            ? AppColors.income
-            : AppColors.textPrimary;
+            ? context.colors.income
+            : context.colors.textPrimary;
 
     return GestureDetector(
       onTap: () => _showTransactionActionSheet(txn),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(AppDimens.cardPadding),
-        decoration: AppStyles.card,
+        decoration: context.styles.card,
         child: Row(
           children: [
-            AppStyles.iconBox(
+            context.styles.iconBox(
               icon: icon,
               size: 36,
               bgColor: iconColor.withValues(alpha: 0.1),
@@ -459,19 +459,19 @@ class _PlanItemDetailPageState extends State<PlanItemDetailPage> {
                     txn.description ??
                         txn.type.name[0].toUpperCase() +
                             txn.type.name.substring(1),
-                    style: AppStyles.bodyLarge,
+                    style: context.styles.bodyLarge,
                   ),
                   const SizedBox(height: 2),
                   Text(
                     timeFormat.format(txn.occurredAt),
-                    style: AppStyles.caption,
+                    style: context.styles.caption,
                   ),
                 ],
               ),
             ),
             Text(
               '$amountPrefix${CurrencyUtils.formatCurrency(txn.amount)}',
-              style: AppStyles.bodyLarge.copyWith(color: amountColor),
+              style: context.styles.bodyLarge.copyWith(color: amountColor),
             ),
           ],
         ),

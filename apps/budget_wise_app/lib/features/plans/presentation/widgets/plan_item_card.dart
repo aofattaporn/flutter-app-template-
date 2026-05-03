@@ -18,14 +18,14 @@ class PlanItemCard extends StatelessWidget {
     this.onMenuTap,
   });
 
-  Color _getProgressColor() {
+  Color _getProgressColor(BuildContext context) {
     switch (item.status) {
       case PlanItemStatus.overBudget:
-        return AppColors.expense;
+        return context.colors.expense;
       case PlanItemStatus.nearLimit:
         return const Color(0xFFD97706); // amber
       default:
-        return AppColors.accent;
+        return context.colors.accent;
     }
   }
 
@@ -39,14 +39,14 @@ class PlanItemCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: AppStyles.card,
+        decoration: context.styles.card,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
             Row(
               children: [
-                AppStyles.iconBox(
+                context.styles.iconBox(
                   icon: PlanItemIcon.getIcon(item.iconIndex),
                   size: 36,
                   iconSize: 18,
@@ -57,8 +57,8 @@ class PlanItemCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(item.name, style: AppStyles.bodyLarge, overflow: TextOverflow.ellipsis),
-                      Text('Expense', style: AppStyles.caption),
+                      Text(item.name, style: context.styles.bodyLarge, overflow: TextOverflow.ellipsis),
+                      Text('Expense', style: context.styles.caption),
                     ],
                   ),
                 ),
@@ -66,7 +66,7 @@ class PlanItemCard extends StatelessWidget {
                   onTap: onMenuTap,
                   child: Padding(
                     padding: const EdgeInsets.all(4),
-                    child: Icon(Icons.chevron_right, size: 20, color: AppColors.textTertiary),
+                    child: Icon(Icons.chevron_right, size: 20, color: context.colors.textTertiary),
                   ),
                 ),
               ],
@@ -74,11 +74,12 @@ class PlanItemCard extends StatelessWidget {
             const SizedBox(height: 14),
 
             // Amounts
-            _buildAmountRow('Planned', item.expectedAmount),
+            _buildAmountRow(context, 'Planned', item.expectedAmount),
             const SizedBox(height: 6),
-            _buildAmountRow('Actual', item.actualAmount),
+            _buildAmountRow(context, 'Actual', item.actualAmount),
             const SizedBox(height: 6),
             _buildAmountRow(
+              context,
               item.isOverBudget ? 'Over' : 'Remaining',
               item.isOverBudget ? item.overAmount : remaining,
               isHighlight: true,
@@ -91,15 +92,15 @@ class PlanItemCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
               child: LinearProgressIndicator(
                 value: 1.0 - item.progressPercentage,
-                backgroundColor: AppColors.surfaceLight,
-                valueColor: AlwaysStoppedAnimation<Color>(_getProgressColor()),
+                backgroundColor: context.colors.surfaceLight,
+                valueColor: AlwaysStoppedAnimation<Color>(_getProgressColor(context)),
                 minHeight: 4,
               ),
             ),
 
             if (hasStatus) ...[
               const SizedBox(height: 8),
-              _buildStatusIndicator(),
+              _buildStatusIndicator(context),
             ],
           ],
         ),
@@ -107,16 +108,16 @@ class PlanItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildAmountRow(String label, double amount, {bool isHighlight = false, bool isOver = false}) {
+  Widget _buildAmountRow(BuildContext context, String label, double amount, {bool isHighlight = false, bool isOver = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: AppStyles.caption),
+        Text(label, style: context.styles.caption),
         Text(
           CurrencyUtils.formatCurrency(amount),
           style: TextStyle(
             fontSize: 12,
-            color: isOver ? AppColors.expense : AppColors.textPrimary,
+            color: isOver ? context.colors.expense : context.colors.textPrimary,
             fontWeight: isHighlight ? FontWeight.w600 : FontWeight.normal,
           ),
         ),
@@ -124,9 +125,9 @@ class PlanItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusIndicator() {
+  Widget _buildStatusIndicator(BuildContext context) {
     final isOver = item.status == PlanItemStatus.overBudget;
-    final color = isOver ? AppColors.expense : const Color(0xFFD97706);
+    final color = isOver ? context.colors.expense : const Color(0xFFD97706);
     return Row(
       children: [
         Icon(isOver ? Icons.error_outline : Icons.warning_amber_outlined, size: 13, color: color),

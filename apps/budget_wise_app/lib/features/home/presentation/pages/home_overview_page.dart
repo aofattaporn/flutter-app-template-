@@ -73,7 +73,7 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBg,
+      backgroundColor: context.colors.scaffoldBg,
       body: SafeArea(
         child: BlocConsumer<HomeBloc, HomeState>(
           listener: _handleStateChanges,
@@ -83,7 +83,7 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
       floatingActionButton: FloatingActionButton(
         heroTag: 'homeCreateTransaction',
         onPressed: _navigateToCreateTransaction,
-        backgroundColor: AppColors.primary,
+        backgroundColor: context.colors.accent,
         foregroundColor: Colors.white,
         elevation: 0,
         highlightElevation: 0,
@@ -154,17 +154,17 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                AppStyles.sheetHandle(),
+                context.styles.sheetHandle(),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
                     txn.description ?? txn.type.name[0].toUpperCase() + txn.type.name.substring(1),
-                    style: AppStyles.titleMedium,
+                    style: context.styles.titleMedium,
                   ),
                 ),
                 const SizedBox(height: 8),
                 ListTile(
-                  leading: const Icon(Icons.edit_outlined, color: AppColors.accent),
+                  leading: Icon(Icons.edit_outlined, color: context.colors.accent),
                   title: const Text('Edit Transaction'),
                   onTap: () {
                     Navigator.pop(sheetContext);
@@ -172,9 +172,9 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.delete_outline, color: AppColors.expense),
+                  leading: Icon(Icons.delete_outline, color: context.colors.expense),
                   title: Text('Delete Transaction',
-                      style: TextStyle(color: AppColors.expense)),
+                      style: TextStyle(color: context.colors.expense)),
                   onTap: () {
                     Navigator.pop(sheetContext);
                     _confirmDeleteTransaction(txn);
@@ -267,14 +267,14 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
 
   Widget _buildBody(BuildContext context, HomeState state) {
     if (state.status == HomeStatus.loading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
+      return Center(
+        child: CircularProgressIndicator(color: context.colors.primary),
       );
     }
 
     return RefreshIndicator(
       onRefresh: () async => _refreshData(),
-      color: AppColors.primary,
+      color: context.colors.primary,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: Column(
@@ -306,11 +306,11 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(_getGreeting(), style: AppStyles.displayMedium),
+          Text(_getGreeting(), style: context.styles.displayMedium),
           const SizedBox(height: 4),
           Text(
             dateFormat.format(now),
-            style: AppStyles.bodySmall,
+            style: context.styles.bodySmall,
           ),
         ],
       ),
@@ -333,24 +333,24 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
       width: double.infinity,
       margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       padding: const EdgeInsets.all(20),
-      decoration: AppStyles.card,
+      decoration: context.styles.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Total Balance', style: AppStyles.label),
+              Text('Total Balance', style: context.styles.label),
               Text(
                 '${state.accountCount} ${state.accountCount == 1 ? 'account' : 'accounts'}',
-                style: AppStyles.caption,
+                style: context.styles.caption,
               ),
             ],
           ),
           const SizedBox(height: 12),
           Text(
             CurrencyUtils.formatCurrency(state.totalBalance),
-            style: AppStyles.displayLarge,
+            style: context.styles.displayLarge,
           ),
         ],
       ),
@@ -378,27 +378,27 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
       width: double.infinity,
       margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       padding: const EdgeInsets.all(20),
-      decoration: AppStyles.card,
+      decoration: context.styles.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Active Plan', style: AppStyles.label),
+              Text('Active Plan', style: context.styles.label),
               Text(daysLeftText, style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
-                color: daysLeft <= 3 ? AppColors.expense : AppColors.accent,
+                color: daysLeft <= 3 ? context.colors.expense : context.colors.accent,
               )),
             ],
           ),
           const SizedBox(height: 4),
-          Text(plan.name, style: AppStyles.titleLarge),
+          Text(plan.name, style: context.styles.titleLarge),
           const SizedBox(height: 2),
-          Text(plan.formattedPeriod, style: AppStyles.caption),
+          Text(plan.formattedPeriod, style: context.styles.caption),
           const SizedBox(height: 16),
-          Text('Remaining Budget', style: AppStyles.caption),
+          Text('Remaining Budget', style: context.styles.caption),
           const SizedBox(height: 4),
           Text(
             CurrencyUtils.formatCurrency(remaining),
@@ -406,7 +406,7 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
               fontSize: 24,
               fontWeight: FontWeight.w700,
               letterSpacing: -0.5,
-              color: remaining >= 0 ? AppColors.textPrimary : AppColors.expense,
+              color: remaining >= 0 ? context.colors.textPrimary : context.colors.expense,
             ),
           ),
           const SizedBox(height: 16),
@@ -415,9 +415,9 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 4,
-              backgroundColor: AppColors.surfaceLight,
+              backgroundColor: context.colors.surfaceLight,
               valueColor: AlwaysStoppedAnimation<Color>(
-                progress < 0.15 ? AppColors.expense : AppColors.accent,
+                progress < 0.15 ? context.colors.expense : context.colors.accent,
               ),
             ),
           ),
@@ -427,11 +427,11 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
             children: [
               Text(
                 'Spent: ${CurrencyUtils.formatCurrency(spent)}',
-                style: AppStyles.caption,
+                style: context.styles.caption,
               ),
               Text(
                 'Budget: ${CurrencyUtils.formatCurrency(budget)}',
-                style: AppStyles.caption,
+                style: context.styles.caption,
               ),
             ],
           ),
@@ -445,16 +445,16 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
       width: double.infinity,
       margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       padding: const EdgeInsets.all(24),
-      decoration: AppStyles.card,
+      decoration: context.styles.card,
       child: Column(
         children: [
-          Icon(Icons.calendar_today_outlined, size: 32, color: AppColors.textTertiary),
+          Icon(Icons.calendar_today_outlined, size: 32, color: context.colors.textTertiary),
           const SizedBox(height: 12),
-          Text('No Active Plan', style: AppStyles.bodyLarge),
+          Text('No Active Plan', style: context.styles.bodyLarge),
           const SizedBox(height: 4),
           Text(
             'Create a plan to start tracking your budget',
-            style: AppStyles.bodySmall,
+            style: context.styles.bodySmall,
           ),
         ],
       ),
@@ -471,7 +471,7 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Accounts', style: AppStyles.titleMedium),
+          Text('Accounts', style: context.styles.titleMedium),
           const SizedBox(height: 12),
           if (state.accounts.isEmpty)
             _buildNoAccountsCard()
@@ -486,14 +486,14 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      decoration: AppStyles.card,
+      decoration: context.styles.card,
       child: Column(
         children: [
-          Icon(Icons.account_balance_wallet_outlined, size: 32, color: AppColors.textTertiary),
+          Icon(Icons.account_balance_wallet_outlined, size: 32, color: context.colors.textTertiary),
           const SizedBox(height: 12),
-          Text('No accounts yet', style: AppStyles.bodyLarge),
+          Text('No accounts yet', style: context.styles.bodyLarge),
           const SizedBox(height: 4),
-          Text('Add an account to start tracking', style: AppStyles.bodySmall),
+          Text('Add an account to start tracking', style: context.styles.bodySmall),
         ],
       ),
     );
@@ -503,24 +503,24 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(16),
-      decoration: AppStyles.card,
+      decoration: context.styles.card,
       child: Row(
         children: [
-          AppStyles.iconBox(icon: _getAccountIcon(account.type)),
+          context.styles.iconBox(icon: _getAccountIcon(account.type)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(account.name, style: AppStyles.bodyLarge),
+                Text(account.name, style: context.styles.bodyLarge),
                 const SizedBox(height: 2),
-                Text(_getAccountTypeName(account.type), style: AppStyles.caption),
+                Text(_getAccountTypeName(account.type), style: context.styles.caption),
               ],
             ),
           ),
           Text(
             CurrencyUtils.formatCurrency(account.balance),
-            style: AppStyles.bodyLarge,
+            style: context.styles.bodyLarge,
           ),
         ],
       ),
@@ -571,7 +571,7 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Recent Transactions', style: AppStyles.titleMedium),
+              Text('Recent Transactions', style: context.styles.titleMedium),
               const SizedBox(height: 12),
               if (state.recentTransactions.isEmpty)
                 _buildNoTransactionsCard()
@@ -588,14 +588,14 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      decoration: AppStyles.card,
+      decoration: context.styles.card,
       child: Column(
         children: [
-          Icon(Icons.receipt_long_outlined, size: 32, color: AppColors.textTertiary),
+          Icon(Icons.receipt_long_outlined, size: 32, color: context.colors.textTertiary),
           const SizedBox(height: 12),
-          Text('No transactions yet', style: AppStyles.bodyLarge),
+          Text('No transactions yet', style: context.styles.bodyLarge),
           const SizedBox(height: 4),
-          Text('Transactions will appear here once recorded', style: AppStyles.bodySmall),
+          Text('Transactions will appear here once recorded', style: context.styles.bodySmall),
         ],
       ),
     );
@@ -612,26 +612,26 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
             ? Icons.arrow_upward_rounded
             : Icons.swap_horiz_rounded;
     final iconColor = isExpense
-        ? AppColors.expense
+        ? context.colors.expense
         : isIncome
-            ? AppColors.income
-            : AppColors.accent;
+            ? context.colors.income
+            : context.colors.accent;
     final amountPrefix = isExpense ? '-' : isIncome ? '+' : '';
     final amountColor = isExpense
-        ? AppColors.expense
+        ? context.colors.expense
         : isIncome
-            ? AppColors.income
-            : AppColors.textPrimary;
+            ? context.colors.income
+            : context.colors.textPrimary;
 
     return GestureDetector(
       onTap: () => _showTransactionActionSheet(txn),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(16),
-        decoration: AppStyles.card,
+        decoration: context.styles.card,
         child: Row(
           children: [
-            AppStyles.iconBox(
+            context.styles.iconBox(
               icon: icon,
               bgColor: iconColor.withValues(alpha: 0.08),
               iconColor: iconColor,
@@ -645,10 +645,10 @@ class _HomeOverviewPageState extends State<HomeOverviewPage> {
                 children: [
                   Text(
                     txn.description ?? txn.type.name[0].toUpperCase() + txn.type.name.substring(1),
-                    style: AppStyles.bodyLarge,
+                    style: context.styles.bodyLarge,
                   ),
                   const SizedBox(height: 2),
-                  Text(dateFormat.format(txn.occurredAt), style: AppStyles.caption),
+                  Text(dateFormat.format(txn.occurredAt), style: context.styles.caption),
                 ],
               ),
             ),
