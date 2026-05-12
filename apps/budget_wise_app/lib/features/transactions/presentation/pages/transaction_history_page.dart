@@ -289,9 +289,26 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Widget _buildHeader(TransactionHistoryState state) {
+    final unplannedCount = state.transactions
+        .where((t) => t.type == TransactionType.expense && t.planItemId == null)
+        .length;
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-      child: Text('Transactions', style: context.styles.displayMedium),
+      padding: const EdgeInsets.fromLTRB(20, 20, 12, 0),
+      child: Row(
+        children: [
+          Expanded(child: Text('Transactions', style: context.styles.displayMedium)),
+          if (unplannedCount > 0)
+            IconButton(
+              tooltip: 'Unplanned expenses',
+              onPressed: () => _showUnplannedExpenses(state),
+              icon: Badge(
+                label: Text('$unplannedCount'),
+                child: Icon(Icons.assignment_late_outlined, color: context.colors.expense),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -643,10 +660,68 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     );
   }
 
+  void _showUnplannedExpenses(TransactionHistoryState state) {
+    final unplanned = state.transactions
+        .where((t) => t.type == TransactionType.expense && t.planItemId == null)
+        .toList()
+      ..sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (sheetContext) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.5,
+          maxChildSize: 0.85,
+          minChildSize: 0.3,
+          builder: (_, controller) {
+            return SafeArea(
+              child: Column(
+                children: [
+                  context.styles.sheetHandle(),
+                  const SizedBox(height: 4),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+                    child: Row(
+                      children: [
+                        Icon(Icons.assignment_late_outlined, size: 18, color: context.colors.expense),
+                        const SizedBox(width: 8),
+                        Text('Unplanned Expenses', style: context.styles.titleMedium),
+                        const Spacer(),
+                        Text(
+                          '${unplanned.length} item${unplanned.length == 1 ? '' : 's'}',
+                          style: context.styles.caption,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(height: 1, color: context.colors.divider),
+                  Expanded(
+                    child: ListView.builder(
+                      controller: controller,
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                      itemCount: unplanned.length,
+                      itemBuilder: (_, i) => _buildTransactionRow(unplanned[i]),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget _buildTransactionRow(Transaction txn) {
     final timeFormat = DateFormat('h:mm a');
     final isExpense = txn.type == TransactionType.expense;
     final isIncome = txn.type == TransactionType.income;
+    final isUnplanned = isExpense && txn.planItemId == null;
 
     final icon = isExpense
         ? Icons.arrow_downward_rounded
@@ -677,7 +752,30 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                     style: context.styles.bodyLarge,
                   ),
                   const SizedBox(height: 2),
-                  Text(timeFormat.format(txn.occurredAt), style: context.styles.caption),
+                  Row(
+                    children: [
+                      Text(timeFormat.format(txn.occurredAt), style: context.styles.caption),
+                      if (isUnplanned) ...
+                        [
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: context.colors.expense.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              'No plan',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                                color: context.colors.expense,
+                              ),
+                            ),
+                          ),
+                        ],
+                    ],
+                  ),
                 ],
               ),
             ),
