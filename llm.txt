@@ -1,0 +1,452 @@
+# BudgetWise — LLM Project Context
+
+> Personal budget planning & tracking app built with Flutter.
+> Currency: Thai Baht (฿). Backend: Supabase (configurable to REST).
+> Last updated: May 12, 2026
+
+---
+
+## 1. Tech Stack
+
+| Area            | Technology                                     |
+|-----------------|-------------------------------------------------|
+| Framework       | Flutter (Dart SDK ^3.5.0)                       |
+| Monorepo        | Melos ^6.1.0                                    |
+| State Mgmt      | BLoC (flutter_bloc ^8.1.6) + Riverpod (theme/router only) |
+| DI              | GetIt ^8.2.0 (manual registration in `di/injection.dart`) |
+| Routing         | GoRouter ^14.0.0 (auth-guarded, 2 top-level routes) |
+| Backend         | Supabase Flutter ^2.3.4 (primary), Dio ^5.4.0 (REST fallback) |
+| Error Handling  | dartz Either (auth layer), raw exceptions (plan/account layers) |
+| Entities        | Equatable                                       |
+| Config          | flutter_dotenv (.env file)                      |
+| Hosting         | Firebase Hosting (web build)                    |
+| Design System   | Local package `budgetwise_design_system`        |
+
+---
+
+## 2. Monorepo Structure
+
+```
+budget-wise/                          # Root (Melos workspace)
+├── melos.yaml                        # Workspace config, scripts
+├── pubspec.yaml                      # Root pubspec (melos dev dep)
+├── firebase.json                     # Firebase Hosting config
+├── docs/usecases/                    # Use case specs per feature (Markdown)
+├── propmt/                           # HTML design mockups / screen specs
+├── apps/
+│   └── budget_wise_app/              # Main Flutter application
+│       ├── pubspec.yaml
+│       ├── .env                      # Environment vars (BACKEND_TYPE, SUPABASE_URL, etc.)
+│       └── lib/
+│           ├── main.dart             # App entry point
+│           ├── config/
+│           │   └── app_config.dart   # Loads .env, configures backend type
+│           ├── di/
+│           │   └── injection.dart    # GetIt service locator setup
+│           ├── router/
+│           │   └── app_router.dart   # GoRouter with auth redirect
+│           ├── core/                 # Shared infrastructure
+│           ├── domain/               # Shared domain (plans, auth)
+│           ├── data/                 # Shared data layer (plans, auth)
+│           └── features/            # Feature modules
+└── packages/
+    └── design_system_template/       # Design system (AppTheme, shared widgets)
+        └── lib/src/theme/app_theme.dart
+```
+
+---
+
+## 3. Architecture — Clean Architecture (per feature)
+
+```
+Presentation (BLoC + Widgets)
+        │
+        ▼
+   Domain (Entities, Repository interfaces, Use Cases)
+        │
+        ▼
+   Data (Models, DataSources, Repository implementations)
+```
+
+### Important structural note
+Two patterns coexist:
+- **Plans & Auth**: domain/data live under shared `lib/domain/` and `lib/data/`
+- **Accounts & Transactions**: domain/data live inside their feature folder (`features/accounts/domain/`, `features/transactions/domain/`)
+
+---
+
+## 4. Core Layer (`lib/core/`)
+
+```
+core/
+├── base/
+│   └── use_case.dart            # Base UseCase<Type, Params> interface
+├── constants/
+│   ├── api_constants.dart
+│   └── app_constants.dart
+├── errors/
+│   ├── exceptions.dart          # ServerException, CacheException, etc.
+│   └── failures.dart            # Failure classes for dartz Either
+├── network/
+│   ├── api_client.dart          # DioApiClient wrapper
+│   ├── api_response.dart
+│   └── network_info.dart        # Connectivity check
+├── storage/
+│   └── local_storage.dart       # SharedPrefs abstraction
+├── theme/
+│   └── theme_provider.dart      # Riverpod themeModeProvider
+├── utils/
+│   ├── currency_utils.dart      # Thai Baht formatting
+│   ├── extensions.dart
+│   ├── logger.dart
+│   ├── typedefs.dart            # ResultFuture<T>, ResultVoid, JsonMap
+│   └── validators.dart
+└── widgets/
+    └── confirm_dialog.dart
+```
+
+### Key Type Aliases (`typedefs.dart`)
+```dart
+typedef ResultFuture<T> = Future<Either<Failure, T>>;
+typedef ResultVoid = ResultFuture<void>;
+typedef JsonMap = Map<String, dynamic>;
+```
+
+---
+
+## 5. Domain Entities
+
+### Plan (`lib/domain/entities/plan.dart`)
+| Field          | Type       | Notes                          |
+|----------------|------------|--------------------------------|
+| id             | String     | UUID                           |
+| name           | String     |                                |
+| startDate      | DateTime   |                                |
+| endDate        | DateTime   |                                |
+| expectedIncome | double?    |                                |
+| isActive       | bool       | Only one plan can be active    |
+| createdAt      | DateTime?  |                                |
+| updatedAt      | DateTime?  |                                |
+
+### PlanItem (`lib/domain/entities/plan_item.dart`)
+| Field          | Type       | Notes                                   |
+|----------------|------------|-----------------------------------------|
+| id             | String     | UUID                                    |
+| planId         | String     | FK → Plan                               |
+| name           | String     |                                         |
+| description    | String?    |                                         |
+| expectedAmount | double     |                                         |
+| iconIndex      | int?       | Material icon index                     |
+| actualAmount   | double     | Calculated from transactions (TODO: stub returns 0) |
+
+### Account (`features/accounts/domain/entities/account.dart`)
+| Field          | Type       | Notes                          |
+|----------------|------------|--------------------------------|
+| id             | String     | UUID                           |
+| name           | String     |                                |
+| type           | String     | e.g. "savings", "checking"     |
+| openingBalance | double     |                                |
+| balance        | double     | Current balance                |
+| currency       | String     |                                |
+| createdAt      | DateTime   |                                |
+| updatedAt      | DateTime   |                                |
+
+### Transaction (`features/transactions/domain/entities/transaction.dart`)
+| Field                | Type              | Notes                        |
+|----------------------|-------------------|------------------------------|
+| id                   | String            | UUID                         |
+| accountId            | String            | FK → Account (source)        |
+| destinationAccountId | String?           | FK → Account (for transfers) |
+| planItemId           | String?           | FK → PlanItem (optional)     |
+| type                 | TransactionType   | expense, income, transfer    |
+| amount               | double            |                              |
+| description          | String?           |                              |
+| occurredAt           | DateTime          |                              |
+| createdAt            | DateTime?         |                              |
+| updatedAt            | DateTime?         |                              |
+
+### UserEntity (`lib/domain/entities/user_entity.dart`)
+Used by auth flow. Contains id, email, name.
+
+---
+
+## 6. Repository Interfaces
+
+### AuthRepository (`lib/domain/repositories/auth_repository.dart`)
+- `login(email, password) → ResultFuture<UserEntity>`
+- `register(email, password, name?) → ResultFuture<UserEntity>`
+- `logout() → ResultVoid`
+- `getCurrentUser() → ResultFuture<UserEntity?>`
+- `isAuthenticated() → Future<bool>`
+- Uses **dartz Either** for error handling
+
+### PlanRepository (`lib/domain/repositories/plan_repository.dart`)
+- `getActivePlan() → Future<Plan?>`
+- `getAllPlans() → Future<List<Plan>>`
+- `createPlan(...)`, `updatePlan(plan)`, `deletePlan(id)`
+- `setActivePlan(id)`, `closePlan(id)`
+- `getPlanItems(planId)`, `addPlanItem(...)`, `updatePlanItem(...)`, `deletePlanItem(id)`
+- `getActualIncome(planId)` — **TODO stub, returns 0**
+- Throws raw exceptions (NOT dartz Either)
+
+### AccountRepository (`features/accounts/domain/repositories/account_repository.dart`)
+- `getAccounts() → Future<List<Account>>`
+- `createAccount(account)`, `updateAccount(account)`, `deleteAccount(id)`
+- Throws raw exceptions
+
+### TransactionRepository (`features/transactions/domain/repositories/transaction_repository.dart`)
+- `getTransactions()`, `getRecentTransactions(limit)`
+- `createTransaction(txn)`, `updateTransaction(txn)`, `deleteTransaction(id)`
+- `countByAccountId(id)`, `countByPlanItemId(id)`
+- `getTransactionsByDateRange(start, end)`
+- `getTransactionsByAccountId(id)`, `getTransactionsByPlanItemId(id)`
+- Throws raw exceptions
+
+---
+
+## 7. Data Layer
+
+### DataSources (registered in `di/injection.dart`)
+| DataSource                      | Backend    | Location                                 |
+|---------------------------------|------------|------------------------------------------|
+| AuthDataSource                  | Supabase   | `data/datasources/supabase/`             |
+| PlanDataSource                  | Supabase   | `data/datasources/supabase/`             |
+| AccountRemoteDataSource         | Supabase   | `features/accounts/data/datasources/`    |
+| TransactionRemoteDataSource     | Supabase   | `features/transactions/data/datasources/`|
+
+### Models
+| Model          | Location                                    |
+|----------------|---------------------------------------------|
+| PlanModel      | `data/models/plan_model.dart`               |
+| PlanItemModel  | `data/models/plan_item_model.dart`          |
+| UserModel      | `data/models/user_model.dart`               |
+| AccountModel   | `features/accounts/data/models/`            |
+| TransactionModel | `features/transactions/data/models/`      |
+
+### Backend Config (`data/config/backend_config.dart`)
+- `BackendType.supabase` or `BackendType.rest`
+- Set via `BACKEND_TYPE` env var in `.env`
+
+---
+
+## 8. Dependency Injection (`di/injection.dart`)
+
+Manual GetIt registration (not using injectable code generation despite having the dependency):
+
+```
+Core: LocalStorage, NetworkInfo, ApiClient
+Supabase: SupabaseClient (conditional)
+DataSources: AuthDataSource, PlanDataSource, AccountRemoteDataSource, TransactionRemoteDataSource
+Repositories: AuthRepository, PlanRepository, AccountRepository, TransactionRepository
+```
+
+Note: 9 plan use cases exist in `domain/usecases/plans/` but are NOT registered in DI. BLoCs call repositories directly.
+
+---
+
+## 9. Features
+
+### Plans Feature (~90% complete)
+```
+features/plans/
+├── plans.dart                         # Barrel file
+└── presentation/
+    ├── bloc/
+    │   ├── active_plan_bloc.dart      # Active plan state management
+    │   ├── active_plan_event.dart
+    │   ├── active_plan_state.dart
+    │   ├── plan_list_bloc.dart        # Plan list state management
+    │   ├── plan_list_event.dart
+    │   └── plan_list_state.dart
+    ├── pages/
+    │   ├── active_plan_page.dart      # Main plans tab view
+    │   ├── plan_list_page.dart        # All plans list
+    │   ├── plan_editor_page.dart      # Create/edit plan
+    │   ├── plan_detail_page.dart      # Single plan details
+    │   ├── plan_item_editor_page.dart # Create/edit plan item
+    │   └── plan_item_detail_page.dart
+    └── widgets/
+        ├── plan_overview_section.dart
+        ├── plan_item_card.dart
+        ├── plan_item_action_sheet.dart
+        ├── add_plan_item_dialog.dart
+        ├── no_plan_widget.dart
+        └── unassigned_notice.dart
+```
+- Domain & data in shared `lib/domain/` and `lib/data/`
+- Missing: actualAmount calculation from transactions
+
+### Accounts Feature (~80% complete)
+```
+features/accounts/
+├── accounts.dart                      # Barrel file
+├── domain/
+│   ├── entities/account.dart
+│   └── repositories/account_repository.dart
+├── data/
+│   ├── datasources/account_remote_datasource.dart
+│   ├── models/
+│   └── repositories/account_repository_impl.dart
+└── presentation/
+    ├── bloc/                          # Account BLoC
+    ├── pages/
+    │   └── account_screen.dart        # Account list + create/edit
+    └── widgets/
+```
+- Self-contained feature with own domain/data layers
+
+### Transactions Feature (IN PROGRESS)
+```
+features/transactions/
+├── transactions.dart                  # Barrel file
+├── domain/
+│   ├── entities/transaction.dart      # Entity defined
+│   └── repositories/transaction_repository.dart  # Interface defined
+├── data/
+│   ├── datasources/transaction_remote_datasource.dart
+│   ├── models/                        # TransactionModel
+│   └── repositories/transaction_repository_impl.dart
+└── presentation/
+    ├── bloc/
+    │   ├── transaction_editor_bloc.dart
+    │   ├── transaction_editor_event.dart
+    │   ├── transaction_editor_state.dart
+    │   ├── transaction_history_bloc.dart
+    │   ├── transaction_history_event.dart
+    │   └── transaction_history_state.dart
+    └── pages/
+        ├── transactions_placeholder_page.dart  # Current placeholder
+        ├── transaction_editor_page.dart
+        └── transaction_history_page.dart
+```
+- Entity, repository interface, datasource, model, repo impl, BLoCs, and pages exist
+- Critical missing piece that blocks plan actuals and home overview
+
+### Home Feature (~60% complete)
+```
+features/home/
+└── presentation/
+    ├── bloc/                          # HomeBloc
+    └── pages/                         # Home page (placeholder-ish)
+```
+- Shows financial summary
+- Blocked on transactions for recent txn list & quick-create
+
+### Auth Feature (backend only, no UI)
+```
+features/auth/
+└── presentation/
+    └── pages/auth_page.dart           # Login/register page
+```
+- Auth logic works via Supabase
+- GoRouter redirects unauthenticated users to login
+
+### Settings Feature (NOT STARTED)
+```
+features/settings/
+├── settings.dart
+└── presentation/                      # Placeholder only
+```
+
+### Main Shell (Navigation — COMPLETE)
+```
+features/main/
+├── main.dart                          # Barrel
+└── presentation/
+    └── main_app_shell.dart            # Bottom nav + IndexedStack
+```
+- Tabs: Home (0), Plans (1), Transactions (2), Accounts (3), Settings (4)
+- Default tab: Plans (index 1)
+- FAB visible on all tabs
+
+---
+
+## 10. Routing (`router/app_router.dart`)
+
+| Route     | Screen        | Auth Required |
+|-----------|---------------|---------------|
+| `/login`  | AuthPage      | No            |
+| `/`       | MainAppShell  | Yes           |
+
+- GoRouter with `refreshListenable` on Supabase auth state changes
+- Sub-navigation within MainAppShell is tab-based (IndexedStack), not route-based
+- Plan editor, plan item editor, etc. are pushed via `Navigator.push` (imperative)
+
+---
+
+## 11. Design System Package (`packages/design_system_template/`)
+
+- Package name: `budgetwise_design_system`
+- Contains `AppTheme` with `light()` and `dark()` theme data
+- Imported in `main.dart` for MaterialApp theming
+
+---
+
+## 12. Use Case Documents (`docs/usecases/`)
+
+| File                       | Feature            | Use Cases | Done  |
+|----------------------------|--------------------|-----------|-------|
+| 00_project_status.md       | Overview           | —         | —     |
+| 01_home_overview.md        | Home               | 3         | 1     |
+| 02_active_plan.md          | Active Plan        | 8         | 8     |
+| 03_plan_list.md            | Plan List          | varies    | most  |
+| 04_plan_editor.md          | Plan Editor        | varies    | most  |
+| 05_plan_item_editor.md     | Plan Item Editor   | varies    | most  |
+| 06_account_list.md         | Account List       | varies    | all   |
+| 07_account_create.md       | Account Create     | varies    | all   |
+| 08_transaction_editor.md   | Transaction Editor | 5         | 0     |
+| 09_transaction_history.md  | Transaction History| 6         | 0     |
+| 10_settings.md             | Settings           | 4         | 0     |
+| 11_main_navigation.md      | Navigation         | 2         | 2     |
+
+---
+
+## 13. Melos Scripts
+
+| Script          | Command                                         |
+|-----------------|--------------------------------------------------|
+| `analyze`       | `melos exec -- dart analyze .`                  |
+| `format`        | `melos exec -- dart format .`                   |
+| `format:check`  | `melos exec -- dart format --set-exit-if-changed .` |
+| `generate`      | `melos exec -- dart run build_runner build --delete-conflicting-outputs` |
+| `generate:watch`| `melos exec -- dart run build_runner watch --delete-conflicting-outputs` |
+
+---
+
+## 14. Known Issues & Technical Debt
+
+1. **Plan use cases not wired** — 9 use cases in `domain/usecases/plans/` are NOT registered in DI; BLoCs call repos directly.
+2. **`actualAmount` always 0** — `getPlanItemActuals()` is a TODO stub. Needs transactions feature.
+3. **Error handling inconsistency** — Auth uses `dartz Either`, Plan/Account/Transaction repos throw raw exceptions.
+4. **Mixed feature structure** — Accounts/Transactions are self-contained; Plans/Auth use shared `lib/domain/` and `lib/data/`.
+5. **SSL bypass in production** — `_DevHttpOverrides` in `injection.dart` always runs when Supabase is configured.
+6. **HTML prompt files** — Some in `propmt/` are duplicates of other screens.
+7. **Injectable not used** — `injectable` and `injectable_generator` are dependencies but DI is manual.
+
+---
+
+## 15. Environment Variables (`.env`)
+
+```
+BACKEND_TYPE=supabase|rest
+API_BASE_URL=...
+SUPABASE_URL=...
+SUPABASE_ANON_KEY=...
+DEBUG=true|false
+```
+
+---
+
+## 16. Overall Completion: ~60%
+
+| Feature        | Status          |
+|----------------|-----------------|
+| Plans          | ~90%            |
+| Accounts       | ~80%            |
+| Navigation     | COMPLETE        |
+| Transactions   | IN PROGRESS     |
+| Home Overview  | ~60% (blocked)  |
+| Auth UI        | Backend only    |
+| Settings       | NOT STARTED     |
+
+**Next priorities**: Complete Transactions feature → wire plan actuals → finish Home Overview → Auth UI → Settings.
