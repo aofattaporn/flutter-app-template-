@@ -14,6 +14,7 @@ class InsightChatSheet extends StatefulWidget {
 class _InsightChatSheetState extends State<InsightChatSheet> {
   final _controller = TextEditingController();
   final _scrollController = ScrollController();
+  ScrollController? _dragScrollController;
 
   @override
   void dispose() {
@@ -43,23 +44,32 @@ class _InsightChatSheetState extends State<InsightChatSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    return DraggableScrollableSheet(
+      initialChildSize: 0.5,
+      minChildSize: 0.4,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (context, scrollController) {
+        _dragScrollController = scrollController;
+        final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.65,
-      decoration: BoxDecoration(
-        color: context.colors.cardBg,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
-          _buildHandle(),
-          _buildTitle(),
-          const Divider(height: 1),
-          Expanded(child: _buildMessageList()),
-          _buildInput(bottomInset),
-        ],
-      ),
+        return Container(
+          decoration: BoxDecoration(
+            color: context.colors.cardBg,
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              _buildHandle(),
+              _buildTitle(),
+              const Divider(height: 1),
+              Expanded(child: _buildMessageList()),
+              _buildInput(bottomInset),
+            ],
+          ),
+        );
+      },
     );
   }
 
