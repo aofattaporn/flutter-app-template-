@@ -44,32 +44,36 @@ class _InsightChatSheetState extends State<InsightChatSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.5,
-      minChildSize: 0.4,
-      maxChildSize: 0.95,
-      expand: false,
-      builder: (context, scrollController) {
-        _dragScrollController = scrollController;
-        final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
-        return Container(
-          decoration: BoxDecoration(
-            color: context.colors.cardBg,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
-            children: [
-              _buildHandle(),
-              _buildTitle(),
-              const Divider(height: 1),
-              Expanded(child: _buildMessageList()),
-              _buildInput(bottomInset),
-            ],
-          ),
-        );
-      },
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: DraggableScrollableSheet(
+        initialChildSize: 0.5,
+        minChildSize: 0.4,
+        maxChildSize: 1.0,
+        expand: false,
+        builder: (context, scrollController) {
+          _dragScrollController = scrollController;
+
+          return Container(
+            decoration: BoxDecoration(
+              color: context.colors.cardBg,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              children: [
+                _buildHandle(),
+                _buildTitle(),
+                const Divider(height: 1),
+                Expanded(child: _buildMessageList()),
+                _buildInput(),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -229,13 +233,13 @@ class _InsightChatSheetState extends State<InsightChatSheet> {
     );
   }
 
-  Widget _buildInput(double bottomInset) {
+  Widget _buildInput() {
     return BlocBuilder<InsightChatCubit, InsightChatState>(
       builder: (context, state) {
         final isSending = state.status == ChatStatus.sending;
 
         return Container(
-          padding: EdgeInsets.fromLTRB(16, 8, 8, 8 + bottomInset),
+          padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
           decoration: BoxDecoration(
             color: context.colors.cardBg,
             border: Border(
