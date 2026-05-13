@@ -39,9 +39,9 @@ class AppBottomNavBar extends StatelessWidget {
       label: 'Accounts',
     ),
     BottomNavItemData(
-      icon: Icons.settings_outlined,
-      activeIcon: Icons.settings,
-      label: 'More',
+      icon: Icons.insights_outlined,
+      activeIcon: Icons.insights,
+      label: 'Insight',
     ),
   ];
 

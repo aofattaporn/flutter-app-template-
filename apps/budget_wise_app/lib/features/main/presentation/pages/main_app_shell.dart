@@ -8,6 +8,7 @@ import '../../../../domain/repositories/plan_repository.dart';
 import '../widgets/widgets.dart';
 import '../../../home/presentation/bloc/home_bloc.dart';
 import '../../../home/presentation/pages/home_overview_page.dart';
+import '../../../insight/insight.dart';
 import '../../../plans/presentation/bloc/active_plan_bloc.dart';
 import '../../../plans/presentation/pages/active_plan_page.dart';
 import '../../../transactions/transactions.dart';
@@ -37,6 +38,7 @@ class _MainAppShellState extends State<MainAppShell> {
   late final ActivePlanBloc _activePlanBloc;
   late final AccountBloc _accountBloc;
   late final TransactionHistoryBloc _transactionHistoryBloc;
+  late final InsightBloc _insightBloc;
 
   @override
   void initState() {
@@ -57,6 +59,10 @@ class _MainAppShellState extends State<MainAppShell> {
     _transactionHistoryBloc = TransactionHistoryBloc(
       repository: getIt<TransactionRepository>(),
     );
+    _insightBloc = InsightBloc(
+      transactionRepository: getIt<TransactionRepository>(),
+      planRepository: getIt<PlanRepository>(),
+    );
   }
 
   @override
@@ -65,6 +71,7 @@ class _MainAppShellState extends State<MainAppShell> {
     _activePlanBloc.close();
     _accountBloc.close();
     _transactionHistoryBloc.close();
+    _insightBloc.close();
     _processingNotifier.dispose();
     super.dispose();
   }
@@ -91,6 +98,9 @@ class _MainAppShellState extends State<MainAppShell> {
       case 3:
         _accountBloc.add(const RefreshAccountsRequested());
         break;
+      case 4:
+        _insightBloc.add(const RefreshInsightData());
+        break;
     }
   }
 
@@ -99,6 +109,7 @@ class _MainAppShellState extends State<MainAppShell> {
     _activePlanBloc.add(const RefreshActivePlan());
     _accountBloc.add(const RefreshAccountsRequested());
     _transactionHistoryBloc.add(const RefreshTransactionHistory());
+    _insightBloc.add(const RefreshInsightData());
   }
 
   @override
@@ -109,6 +120,7 @@ class _MainAppShellState extends State<MainAppShell> {
         BlocProvider.value(value: _activePlanBloc),
         BlocProvider.value(value: _accountBloc),
         BlocProvider.value(value: _transactionHistoryBloc),
+        BlocProvider.value(value: _insightBloc),
       ],
       child: ProcessingOverlay(
         notifier: _processingNotifier,
@@ -120,7 +132,7 @@ class _MainAppShellState extends State<MainAppShell> {
               const ActivePlanPage(),
               const TransactionHistoryPage(),
               const AccountScreen(),
-              const SettingsPlaceholderPage(),
+              const InsightPage(),
             ],
           ),
           bottomNavigationBar: AppBottomNavBar(
