@@ -290,7 +290,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
 
   Widget _buildHeader(TransactionHistoryState state) {
     final unplannedCount = state.transactions
-        .where((t) => t.type == TransactionType.expense && t.planItemId == null)
+        .where((t) => t.type == TransactionType.expense && t.planItemId == null && t.description?.toLowerCase().contains('rebalancing') != true)
         .length;
 
     return Padding(
@@ -733,6 +733,8 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     final amountPrefix = isExpense ? '-' : isIncome ? '+' : '';
     final amountColor = isExpense ? context.colors.expense : isIncome ? context.colors.income : context.colors.textPrimary;
 
+    final isRebalancing = txn.description?.toLowerCase().contains('rebalancing') ?? false;
+
     return GestureDetector(
       onTap: () => _showTransactionActionSheet(txn),
       child: Container(
@@ -741,7 +743,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         decoration: context.styles.card,
         child: Row(
           children: [
-            context.styles.iconBox(icon: icon, size: 36, bgColor: bgColor, iconColor: iconColor),
+            context.styles.iconBox(icon: icon, size: 36, bgColor: isRebalancing ? context.colors.accentLight : bgColor, iconColor: isRebalancing ? context.colors.accent : iconColor),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -755,12 +757,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   Row(
                     children: [
                       Text(timeFormat.format(txn.occurredAt), style: context.styles.caption),
-                      if (isUnplanned) ...
-                        [
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
+                      if (isUnplanned && !isRebalancing) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
                               color: context.colors.expense.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
@@ -776,12 +777,12 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                         ],
                     ],
                   ),
-                ],
+                ], 
               ),
             ),
             Text(
               '$amountPrefix${CurrencyUtils.formatCurrency(txn.amount)}',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: amountColor),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: isRebalancing ? context.colors.accent : amountColor),
             ),
           ],
         ),
