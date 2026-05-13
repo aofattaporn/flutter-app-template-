@@ -5,23 +5,39 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 // ─── Chat Message Model ─────────────────────────────────────────────────────
 
 class ChatMessage extends Equatable {
+  final String? id;
   final String text;
   final bool isUser;
   final DateTime timestamp;
 
   ChatMessage({
+    this.id,
     required this.text,
     required this.isUser,
     DateTime? timestamp,
   }) : timestamp = timestamp ?? DateTime.now();
 
+  factory ChatMessage.fromJson(Map<String, dynamic> json) {
+    return ChatMessage(
+      id: json['id'] as String?,
+      text: json['content'] as String,
+      isUser: json['role'] == 'user',
+      timestamp: DateTime.parse(json['created_at'] as String),
+    );
+  }
+
+  Map<String, dynamic> toInsertJson() => {
+        'role': isUser ? 'user' : 'assistant',
+        'content': text,
+      };
+
   @override
-  List<Object?> get props => [text, isUser, timestamp];
+  List<Object?> get props => [id, text, isUser, timestamp];
 }
 
 // ─── Chat State ─────────────────────────────────────────────────────────────
 
-enum ChatStatus { idle, sending, error }
+enum ChatStatus { idle, loading, sending, error }
 
 class InsightChatState extends Equatable {
   final List<ChatMessage> messages;
@@ -59,6 +75,24 @@ class InsightChatCubit extends Cubit<InsightChatState> {
       : _supabaseClient = supabaseClient,
         super(const InsightChatState());
 
+  /// Load existing chat history from the database.
+  Future<void> loadChatHistory() async {
+    emit(state.copyWith(status: ChatStatus.loading));
+    try {
+      final rows = await _supabaseClient
+          .from('chat_messages')
+          .select()
+          .order('created_at', ascending: true);
+
+      final messages =
+          (rows as List).map((r) => ChatMessage.fromJson(r)).toList();
+
+      emit(state.copyWith(messages: messages, status: ChatStatus.idle));
+    } catch (e) {
+      emit(state.copyWith(status: ChatStatus.idle));
+    }
+  }
+
   Future<void> sendMessage(String query) async {
     if (query.trim().isEmpty) return;
 
@@ -70,30 +104,81 @@ class InsightChatCubit extends Cubit<InsightChatState> {
     ));
 
     try {
+      // Save user message to DB
+      await _supabaseClient
+          .from('chat_messages')
+          .insert(userMessage.toInsertJson());
+
       final res = await _supabaseClient.functions.invoke(
         'budgetwise-gemini',
         body: {'query': query.trim()},
       );
 
       final data = res.data as Map<String, dynamic>?;
+      final statusCode = data?['statusCode'] as int?;
+
+      // Handle rate limit (HTTP 429)
+      if (statusCode == 429) {
+        emit(state.copyWith(
+          status: ChatStatus.error,
+          errorMessage:
+              'Rate limit reached. Please wait a moment before trying again.',
+        ));
+        return;
+      }
+
       final responseText =
           data?['response'] as String? ?? 'No response received.';
 
       final botMessage = ChatMessage(text: responseText, isUser: false);
+
+      // Save assistant message to DB
+      await _supabaseClient
+          .from('chat_messages')
+          .insert(botMessage.toInsertJson());
+
       emit(state.copyWith(
         messages: [...state.messages, botMessage],
         status: ChatStatus.idle,
       ));
+    } on FunctionException catch (e) {
+      final code = e.status;
+      if (code == 429) {
+        emit(state.copyWith(
+          status: ChatStatus.error,
+          errorMessage:
+              'Rate limit reached. Please wait a moment before trying again.',
+        ));
+      } else {
+        emit(state.copyWith(
+          status: ChatStatus.error,
+          errorMessage: 'Failed to get response (status $code). Please try again.',
+        ));
+      }
     } catch (e) {
-      final errorMsg = 'Failed to get response. Please try again. ${e.toString()}';
-      emit(state.copyWith(
-        status: ChatStatus.error,
-        errorMessage: errorMsg,
-      ));
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('429') || msg.contains('rate limit') || msg.contains('quota')) {
+        emit(state.copyWith(
+          status: ChatStatus.error,
+          errorMessage:
+              'Rate limit reached. Please wait a moment before trying again.',
+        ));
+      } else {
+        emit(state.copyWith(
+          status: ChatStatus.error,
+          errorMessage: 'Failed to get response. Please try again.',
+        ));
+      }
     }
   }
 
-  void clearChat() {
+  /// Delete all chat messages from DB and clear local state.
+  Future<void> clearChat() async {
+    try {
+      await _supabaseClient.from('chat_messages').delete().neq('id', '');
+    } catch (_) {
+      // Ignore DB error — still clear locally
+    }
     emit(const InsightChatState());
   }
 }

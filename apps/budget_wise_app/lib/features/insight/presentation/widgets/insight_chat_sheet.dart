@@ -16,6 +16,15 @@ class _InsightChatSheetState extends State<InsightChatSheet> {
   final _sheetController = DraggableScrollableController();
 
   @override
+  void initState() {
+    super.initState();
+    // Load chat history from DB when sheet opens
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<InsightChatCubit>().loadChatHistory();
+    });
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     _sheetController.dispose();
@@ -27,6 +36,30 @@ class _InsightChatSheetState extends State<InsightChatSheet> {
     if (text.isEmpty) return;
     context.read<InsightChatCubit>().sendMessage(text);
     _controller.clear();
+  }
+
+  Future<void> _confirmClearChat() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Clear chat?'),
+        content:
+            const Text('This will delete all chat messages. This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) {
+      context.read<InsightChatCubit>().clearChat();
+    }
   }
 
   @override
@@ -109,6 +142,12 @@ class _InsightChatSheetState extends State<InsightChatSheet> {
         });
       },
       builder: (context, state) {
+        if (state.status == ChatStatus.loading) {
+          return Center(
+            child: CircularProgressIndicator(color: context.colors.accent),
+          );
+        }
+
         if (state.messages.isEmpty) {
           // Wrap empty state in a scrollable so the DraggableScrollableSheet
           // still receives scroll gestures from this area.
@@ -191,8 +230,7 @@ class _InsightChatSheetState extends State<InsightChatSheet> {
               return IconButton(
                 icon: Icon(Icons.delete_outline,
                     size: 20, color: context.colors.textTertiary),
-                onPressed: () =>
-                    context.read<InsightChatCubit>().clearChat(),
+                onPressed: () => _confirmClearChat(),
                 tooltip: 'Clear chat',
                 splashRadius: 18,
               );
