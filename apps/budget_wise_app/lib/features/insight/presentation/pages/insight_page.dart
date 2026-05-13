@@ -2,12 +2,16 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/extensions.dart';
+import '../../../../di/injection.dart';
 import '../../../settings/settings.dart';
 import '../bloc/insight_bloc.dart';
+import '../bloc/insight_chat_cubit.dart';
+import '../widgets/insight_chat_sheet.dart';
 
 class InsightPage extends StatefulWidget {
   const InsightPage({super.key});
@@ -17,10 +21,33 @@ class InsightPage extends StatefulWidget {
 }
 
 class _InsightPageState extends State<InsightPage> {
+  late final InsightChatCubit _chatCubit;
+
   @override
   void initState() {
     super.initState();
+    _chatCubit = InsightChatCubit(
+      supabaseClient: getIt<SupabaseClient>(),
+    );
     context.read<InsightBloc>().add(const LoadInsightData());
+  }
+
+  @override
+  void dispose() {
+    _chatCubit.close();
+    super.dispose();
+  }
+
+  void _showChatSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => BlocProvider.value(
+        value: _chatCubit,
+        child: const InsightChatSheet(),
+      ),
+    );
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -53,6 +80,11 @@ class _InsightPageState extends State<InsightPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.colors.scaffoldBg,
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showChatSheet,
+        backgroundColor: context.colors.accent,
+        child: const Icon(Icons.auto_awesome, color: Colors.white),
+      ),
       body: SafeArea(
         child: BlocConsumer<InsightBloc, InsightState>(
           listener: (context, state) {
