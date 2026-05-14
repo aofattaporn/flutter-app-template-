@@ -82,7 +82,6 @@ class InsightChatCubit extends Cubit<InsightChatState> {
       final rows = await _supabaseClient
           .from('chat_messages')
           .select()
-          .limit(10)
           .order('created_at', ascending: true);
 
       final messages =
