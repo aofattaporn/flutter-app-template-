@@ -82,8 +82,8 @@ class InsightChatCubit extends Cubit<InsightChatState> {
       final rows = await _supabaseClient
           .from('chat_messages')
           .select()
-          .order('created_at', ascending: true)
-          .limit(10);
+          .limit(10)
+          .order('created_at', ascending: true);
 
       final messages =
           (rows as List).map((r) => ChatMessage.fromJson(r)).toList();
@@ -94,7 +94,8 @@ class InsightChatCubit extends Cubit<InsightChatState> {
     }
   }
 
-  Future<void> sendMessage(String query) async {
+  // TODO : add planId to chat_messages table and filter by it in loadChatHistory
+  Future<void> sendMessage(String query, String planId) async {
     if (query.trim().isEmpty) return;
 
     final userMessage = ChatMessage(text: query.trim(), isUser: true);
@@ -112,7 +113,7 @@ class InsightChatCubit extends Cubit<InsightChatState> {
 
       final res = await _supabaseClient.functions.invoke(
         'budgetwise-gemini',
-        body: {'query': query.trim()},
+        body: {'query': query.trim(), "planId": planId},
       );
 
       final data = res.data as Map<String, dynamic>?;
@@ -120,6 +121,15 @@ class InsightChatCubit extends Cubit<InsightChatState> {
 
       // Handle rate limit (HTTP 429)
       if (statusCode == 429) {
+        emit(state.copyWith(
+          status: ChatStatus.error,
+          errorMessage:
+              'Rate limit reached. Please wait a moment before trying again.',
+        ));
+        return;
+      }
+
+        if (statusCode == 503) {
         emit(state.copyWith(
           status: ChatStatus.error,
           errorMessage:

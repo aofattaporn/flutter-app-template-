@@ -5,7 +5,11 @@ import '../../../../core/theme/app_theme.dart';
 import '../bloc/insight_chat_cubit.dart';
 
 class InsightChatSheet extends StatefulWidget {
-  const InsightChatSheet({super.key});
+
+final String planId;
+
+  const InsightChatSheet({super.key, required this.planId});
+  
 
   @override
   State<InsightChatSheet> createState() => _InsightChatSheetState();
@@ -34,7 +38,7 @@ class _InsightChatSheetState extends State<InsightChatSheet> {
   void _send() {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
-    context.read<InsightChatCubit>().sendMessage(text);
+    context.read<InsightChatCubit>().sendMessage(text, widget.planId);
     _controller.clear();
   }
 

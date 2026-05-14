@@ -38,14 +38,14 @@ class _InsightPageState extends State<InsightPage> {
     super.dispose();
   }
 
-  void _showChatSheet() {
+  void _showChatSheet(InsightState state) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => BlocProvider.value(
         value: _chatCubit,
-        child: const InsightChatSheet(),
+        child: InsightChatSheet(planId: state.selectedPlan?.id ?? ''),
       ),
     );
   }
@@ -80,10 +80,13 @@ class _InsightPageState extends State<InsightPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.colors.scaffoldBg,
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showChatSheet,
-        backgroundColor: context.colors.accent,
-        child: const Icon(Icons.auto_awesome, color: Colors.white),
+      floatingActionButton: BlocConsumer<InsightBloc, InsightState>(
+        listener: (BuildContext context, InsightState state) {},
+        builder: (context, state) => FloatingActionButton(
+          onPressed: () => _showChatSheet(state),
+          backgroundColor: context.colors.accent,
+          child: const Icon(Icons.auto_awesome, color: Colors.white),
+        ),
       ),
       body: SafeArea(
         child: BlocConsumer<InsightBloc, InsightState>(
